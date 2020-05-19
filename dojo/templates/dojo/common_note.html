@@ -1,0 +1,91 @@
+{% extends "base.html" %}
+{% load navigation_tags %}
+{% block content %}
+<div class="row">
+    <div class="col-md-12">
+        <div class="panel panel-default">
+            <div class="panel-heading tight">
+                <h3 class="has-filters">
+                    Common Notes
+                    <div class="dropdown pull-right">
+                        <button class="btn btn-primary dropdown-toggle" type="button" id="dropdownMenu1"
+                                data-toggle="dropdown" aria-expanded="true">
+                            <span class="fa fa-wrench"></span>
+                            <span class="caret"></span>
+                        </button>
+                        <ul class="dropdown-menu dropdown-menu-right" role="menu"
+                            aria-labelledby="dropdownMenu1">
+                            {% if request.user.is_superuser %}
+                            <li role="presentation">
+                                <a href="{% url 'add_common_note' %}">
+                                    <i class="fa fa-plus"></i> Add Common Note
+                                </a>
+                            </li>
+                            {% endif %}
+                        </ul>
+                    </div>
+                </h3>
+            </div>
+            <div id="the-filters" class="panel-body collapse {% if request.META.QUERY_STRING %}in{% endif %}">
+                {% include "dojo/filter_snippet.html" with form=cnl.form %}
+            </div>
+        </div>
+        {% if cns %}
+        <div class="clearfix">
+            {% include "dojo/paging_snippet.html" with page=cns page_size=True %}
+        </div>
+        <div class="panel panel-default table-responsive">
+            <table id="note_types"
+                   class="tablesorter-bootstrap table table-condensed table-striped">
+                <thead>
+                <tr>
+                    <th>{% dojo_sort request 'Common Note' 'product' 'asc' %}</th>
+                    <th> Scanner</th>
+                    <th> Title</th>
+                    <th> CWE</th>
+                    <th> Product</th>
+                    <th> Note</th>
+                </tr>
+                </thead>
+                <tbody>
+                {% for cn in cns %}
+                <tr>
+                    <td><a> {{ cn.id }} </a></td>
+                    <td><a> {{ cn.scanner }} </a></td>
+                    <td><a>{{ cn.title }}</a></td>
+                    <td><a>{{ cn.cwe }}</a></td>
+                    <td><a>{{ cn.product }}</a></td>
+                    {% for note in notes %}
+                    <td><a>{{ note.id }}</a></td>
+                    {% endfor %}
+                    {% if user.is_superuser %}
+                    <td>
+                        <div class="centered">
+                            <div class="btn-group" role="group">
+                                <a class="btn btn-sm btn-warning"
+                                   href="{% url 'edit_common_note' cn.id %}">
+                                    <i class="fa fa-pencil"></i> Edit Common Note
+                                </a>
+                                <a class="btn btn-sm btn-warning"
+                                   href="{% url 'view_common_note' cn.id %}">
+                                    <i class="fa fa-pencil"></i> View Common Note
+                                </a>
+                            </div>
+                        </div>
+                    </td>
+                    {% endif %}
+
+                </tr>
+                {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        <div class="clearfix">
+            {% include "dojo/paging_snippet.html" with page=cns page_size=True %}
+        </div>
+        {% else %}
+        <p class="text-center">No Note types found.</p>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

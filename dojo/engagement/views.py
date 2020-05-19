@@ -28,7 +28,7 @@ from dojo.forms import CheckForm, \
 from dojo.models import Finding, Product, Engagement, Test, \
     Check_List, Test_Type, Notes, \
     Risk_Acceptance, Development_Environment, BurpRawRequestResponse, Endpoint, \
-    JIRA_PKey, JIRA_Issue, Cred_Mapping, Dojo_User, System_Settings
+    JIRA_PKey, JIRA_Issue, Cred_Mapping, Dojo_User, System_Settings, CommonNote
 from dojo.tools import handles_active_verified_statuses
 from dojo.tools.factory import import_parser_factory
 from dojo.utils import get_page_items, add_breadcrumb, handle_uploaded_threat, \
@@ -670,6 +670,16 @@ def import_scan_results(request, eid=None, pid=None):
                             product=t.engagement.product)
 
                         item.endpoints.add(ep)
+
+                    common_notes = CommonNote.objects.filter(title=item.title, cwe=item.cwe,
+                                                             product=item.test.engagement.product,
+                                                             scanner=item.test.test_type)
+
+                    if common_notes.exists():
+                        notes = common_notes[0].notes.all()
+                        if notes is not None:
+                            for note in notes:
+                                item.notes.add(note)
 
                     item.save(false_history=True, push_to_jira=push_to_jira)
 

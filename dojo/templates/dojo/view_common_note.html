@@ -1,0 +1,54 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="panel panel-default">
+    <div class="view-finding to_highlight">
+        <div class="panel panel-default">
+            <div class="panel-heading">
+                <h4>{{ cn.title }}<span class="pull-right"><a data-toggle="collapse" href="#vuln_desc"><i
+                        class="glyphicon glyphicon-chevron-up"></i></a></span></h4>
+            </div>
+        </div>
+    </div>
+
+    <div class="panel panel-default">
+        <table id="error_notes" class="table-striped table table-condensed table-hover centered">
+            <tr>
+                <th> Id</th>
+                <th> Scanner</th>
+                <th> Title</th>
+                <th> CWE</th>
+                <th> Product</th>
+            </tr>
+            <tr>
+                <td>
+                        <span>
+                           {{ cn.id }}
+                        </span>
+                </td>
+                <td>
+                        <span>
+                           {{ cn.scanner }}
+                        </span>
+                </td>
+                <td>
+                        <span>
+                            {{ cn.title }}
+                        </span>
+                </td>
+                <td>
+                        <span>
+                           {{ cn.cwe }}
+                        </span>
+                </td>
+                <td>
+                        <span>
+                           {{ cn.product }}
+                        </span>
+                </td>
+            </tr>
+        </table>
+    </div>
+    {% include "dojo/snippets/comments_common.html" with notes=notes object=cn destination="common_notes" %}
+</div>
+</div>
+{% endblock %}

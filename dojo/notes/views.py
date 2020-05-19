@@ -13,7 +13,7 @@ from django.utils import timezone
 
 # Local application/library imports
 from dojo.forms import DeleteNoteForm, NoteForm, FindingNoteForm
-from dojo.models import Notes, Test, Finding, NoteHistory, Note_Type
+from dojo.models import Notes, Test, Finding, NoteHistory, Note_Type, CommonNote
 
 logger = logging.getLogger(__name__)
 
@@ -31,6 +31,10 @@ def delete_issue(request, id, page, objid):
         object = get_object_or_404(Finding, id=objid)
         object_id = object.id
         reverse_url = "view_finding"
+    elif page == "common_notes":
+        object = get_object_or_404(CommonNote, id=objid)
+        object_id = object.id
+        reverse_url = "view_common_note"
     form = DeleteNoteForm(request.POST, instance=note)
 
     if page is None or str(request.user) != note.author.username and not request.user.is_staff:
@@ -71,9 +75,18 @@ def edit_issue(request, id, page, objid):
         note_type_activation = Note_Type.objects.filter(is_active=True).count()
         if note_type_activation:
             available_note_types = find_available_notetypes(object, note)
+    elif page == "common_notes":
+        object = get_object_or_404(CommonNote, id=objid)
+        object_id = object.id
+        reverse_url = "view_common_note"
+        note_type_activation = Note_Type.objects.filter(is_active=True).count()
+        if note_type_activation:
+            available_note_types = find_available_notetypes(object, note)
 
     if request.method == 'POST':
         if page == "finding" and note_type_activation:
+            form = FindingNoteForm(request.POST, available_note_types=available_note_types, instance=note)
+        elif page == "common_notes" and note_type_activation:
             form = FindingNoteForm(request.POST, available_note_types=available_note_types, instance=note)
         else:
             form = NoteForm(request.POST, instance=note)
@@ -83,6 +96,11 @@ def edit_issue(request, id, page, objid):
             note.editor = request.user
             note.edit_time = timezone.now()
             if page == "finding" and note_type_activation:
+                history = NoteHistory(note_type=note.note_type,
+                                      data=note.entry,
+                                      time=note.edit_time,
+                                      current_editor=note.editor)
+            elif page == "common_notes" and note_type_activation:
                 history = NoteHistory(note_type=note.note_type,
                                       data=note.entry,
                                       time=note.edit_time,
@@ -111,6 +129,8 @@ def edit_issue(request, id, page, objid):
     else:
         if page == "finding" and note_type_activation:
             form = FindingNoteForm(available_note_types=available_note_types, instance=note)
+        elif page == "common_notes" and note_type_activation:
+            form = FindingNoteForm(available_note_types=available_note_types, instance=note)
         else:
             form = NoteForm(instance=note)
 
@@ -137,6 +157,10 @@ def note_history(request, id, page, objid):
         object = get_object_or_404(Finding, id=objid)
         object_id = object.id
         reverse_url = "view_finding"
+    elif page == "common_notes":
+        object = get_object_or_404(CommonNote, id=objid)
+        object_id = object.id
+        reverse_url = "view_common_note"
 
     history = note.history.all()
 

@@ -2830,6 +2830,15 @@ class FieldRule(models.Model):
     text = models.CharField(max_length=200)
 
 
+class CommonNote(models.Model):
+    notes = models.ManyToManyField(Notes, blank=True,
+                                   editable=False)
+    title = models.TextField(max_length=1000)
+    scanner = models.TextField(max_length=100)
+    product = models.TextField(max_length=100)
+    cwe = models.IntegerField(default=0, null=True, blank=True)
+
+
 def enable_disable_auditlog(enable=True):
     if enable:
         # Register for automatic logging to database
@@ -2859,6 +2868,16 @@ def enable_disable_auditlog(enable=True):
 from dojo.utils import get_system_setting
 enable_disable_auditlog(enable=get_system_setting('enable_auditlog'))  # on startup choose safe to retrieve system settiung)
 
+# Register for automatic logging to database
+auditlog.register(Dojo_User)
+auditlog.register(Endpoint)
+auditlog.register(Engagement)
+auditlog.register(Finding)
+auditlog.register(Product)
+auditlog.register(Test)
+auditlog.register(Risk_Acceptance)
+auditlog.register(Finding_Template)
+auditlog.register(Cred_User)
 
 # Register tagging for models
 tag_register(Product)
@@ -2908,6 +2927,7 @@ admin.site.register(Dojo_User)
 admin.site.register(UserContactInfo)
 admin.site.register(Notes)
 admin.site.register(Note_Type)
+admin.site.register(CommonNote)
 admin.site.register(Report)
 admin.site.register(Scan)
 admin.site.register(ScanSettings)

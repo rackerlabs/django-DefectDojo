@@ -1,0 +1,89 @@
+{% load humanize %}
+<div class="panel panel-default to_highlight table-responsive">
+
+    {% if common_note_form %}
+    <div class="panel-comments">
+        <h4>Add Notes <span class="pull-right"><a data-toggle="collapse" href="#vuln_notes"><i
+                class="glyphicon glyphicon-chevron-up"></i></a></span></h4>
+    </div>
+    <div id="vuln_notes" class="panel-body">
+        <form class="form-horizontal" action="" method="post">{% csrf_token %}
+            {% include "dojo/form_fields.html" with form=common_note_form %}
+            <div class="form-group">
+                <div class="col-sm-offset-2 col-sm-10">
+                    <input class="btn btn-primary" type="submit" aria-label="Add Note"/>
+                </div>
+            </div>
+        </form>
+    </div>
+    {% endif %}
+</div>
+<div class="panel-comments">
+    <h4>Notes <span class="pull-right"><a data-toggle="collapse" href="#vuln_notes"><i
+            class="glyphicon glyphicon-chevron-up"></i></a></span></h4>
+</div>
+{% for note in notes %}
+<div>
+
+    <div class="panel panel-default">
+        <div class="panel-comments">
+            {% if user.username == note.author.username and user.is_staff or user.is_superuser %}
+            <div class="pull-right">
+                <form method="post" action="{% url 'delete_note' note.id destination object.id %}">
+                    {% csrf_token %}
+                    <input type="hidden" aria-label="id" name="id" value="{{note.id}}" id="id_id"/>
+                    <button type="submit" aria-label="Delete Note" class="btn-delete">
+                        <i class="fa fa-trash"></i>
+                    </button>
+                </form>
+            </div>
+            {% endif %}
+            {% if user.username == note.author.username or user.is_staff %}
+            <div class="pull-right">
+                <form method="get" action="{% url 'edit_note' note.id destination object.id %}">
+                    {% csrf_token %}
+                    <input type="hidden" aria-label="id" name="id" value="{{note.id}}" id="id_id"/>
+                    <button type="submit" aria-label="Edit Note" class="btn-edit">
+                        <i class="fa fa-edit"></i>
+                    </button>
+                </form>
+            </div>
+            {% endif %}
+            {% if user.is_staff %}
+            <div class="pull-right">
+                <form method="get" action="{% url 'note_history' note.id destination object.id %}">
+                    {% csrf_token %}
+                    <input type="hidden" aria-label="id" name="id" value="{{note.id}}" id="id_id"/>
+                    <button type="submit" aria-label="history" class="btn-history">
+                        <i class="fa fa-history"></i>
+                    </button>
+                </form>
+            </div>
+            {% endif %}
+
+            <div class="row-sm-2">
+                <strong>{{ note.author.username }}</strong>
+                <span class="text-muted">commented {{ note.date }}</span>
+            </div>
+            {% if note.edited %}
+            <div class="row-sm-2">
+                <strong>{{ note.editor.username }}</strong>
+                <span class="text-muted">edited {{ note.edit_time }}</span>
+            </div>
+            {% endif %}
+            {% if note.private %}
+            <div class="row-sm-2">
+                <span class="text-muted">(will not appear in report)</span>
+            </div>
+            {% endif %}
+        </div>
+        <div class="panel-body">
+            {% if note.note_type != None %}
+            <strong>Note type : {{ note.note_type }}</strong>
+            <br><br>
+            {% endif %}
+            {{ note|linebreaks }}
+        </div>
+    </div>
+</div>
+{% endfor %}

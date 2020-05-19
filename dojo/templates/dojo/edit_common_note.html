@@ -1,0 +1,14 @@
+{% extends "base.html" %}
+{% block content %}
+<h3> Edit Common Note {{ cn.name }}</h3>
+<form class="form-horizontal" action="{% url 'edit_common_note' cn.id %}" method="post">{% csrf_token %}
+    {% include "dojo/form_fields.html" with form=form %}
+    <div class="form-group">
+        <div class="col-sm-offset-2 col-sm-10">
+            <input aria-label="Edit Common Note" class="btn btn-primary" name="edit_common_note" type="submit"
+                   value="Save Changes"/>
+        </div>
+    </div>
+    {% include "dojo/snippets/comments_common.html" with notes=notes object=cn destination="common_notes" %}
+</form>
+{% endblock %}

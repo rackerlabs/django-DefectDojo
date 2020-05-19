@@ -1019,3 +1019,23 @@ class NoteTypesFilter(DojoFilter):
         model = Note_Type
         exclude = []
         include = ('name', 'is_single', 'description')
+
+
+class CommonNoteFilter(DojoFilter):
+    name = CharFilter(lookup_expr='icontains')
+
+    o = OrderingFilter(
+        # tuple-mapping retains order
+        fields=(
+            ('scanner', 'scanner'),
+            ('title', 'title'),
+            ('cwe', 'cwe'),
+            ('product', 'product'),
+            ('notes', 'notes'),
+        ),
+    )
+
+    class Meta:
+        model = Note_Type
+        exclude = []
+        include = ('name', 'is_single', 'description')

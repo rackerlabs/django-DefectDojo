@@ -20,7 +20,7 @@ from dojo.models import Finding, Product_Type, Product, Note_Type, ScanSettings,
     JIRA_Issue, JIRA_PKey, JIRA_Conf, GITHUB_Issue, GITHUB_PKey, GITHUB_Conf, UserContactInfo, Tool_Type, Tool_Configuration, Tool_Product_Settings, \
     Cred_User, Cred_Mapping, System_Settings, Notifications, Languages, Language_Type, App_Analysis, Objects, \
     Benchmark_Product, Benchmark_Requirement, Benchmark_Product_Summary, Rule, Child_Rule, Engagement_Presets, \
-    DojoMeta, Sonarqube_Product
+    DojoMeta, Sonarqube_Product, CommonNote
 from dojo.tools import requires_file, SCAN_SONARQUBE_API
 
 RE_DATE = re.compile(r'(\d{4})-(\d\d?)-(\d\d?)$')
@@ -2069,3 +2069,95 @@ class LoginBanner(forms.Form):
     def clean(self):
         cleaned_data = super().clean()
         return cleaned_data
+
+
+class CommonNoteForm(forms.ModelForm):
+    SCAN_TYPE_CHOICES = (("", "Please Select a Scanner Type"),
+                         ("Netsparker Scan", "Netsparker Scan"),
+                         ("Burp Scan", "Burp Scan"),
+                         ("Nessus Scan", "Nessus Scan"),
+                         ("Nmap Scan", "Nmap Scan"),
+                         ("Nexpose Scan", "Nexpose Scan"),
+                         ("AppSpider Scan", "AppSpider Scan"),
+                         ("Veracode Scan", "Veracode Scan"),
+                         ("Checkmarx Scan", "Checkmarx Scan"),
+                         ("Checkmarx Scan detailed", "Checkmarx Scan detailed"),
+                         ("Crashtest Security Scan", "Crashtest Security Scan"),
+                         ("ZAP Scan", "ZAP Scan"),
+                         ("Arachni Scan", "Arachni Scan"),
+                         ("VCG Scan", "VCG Scan"),
+                         ("Dependency Check Scan", "Dependency Check Scan"),
+                         ("Dependency Track Finding Packaging Format (FPF) Export",
+                          "Dependency Track Finding Packaging Format (FPF) Export"),
+                         ("Retire.js Scan", "Retire.js Scan"),
+                         ("Node Security Platform Scan", "Node Security Platform Scan"),
+                         ("NPM Audit Scan", "NPM Audit Scan"),
+                         ("Qualys Scan", "Qualys Scan"),
+                         ("Qualys Webapp Scan", "Qualys Webapp Scan"),
+                         ("OpenVAS CSV", "OpenVAS CSV"),
+                         ("Snyk Scan", "Snyk Scan"),
+                         ("Generic Findings Import", "Generic Findings Import"),
+                         ("Trustwave Scan (CSV)", "Trustwave Scan (CSV)"),
+                         ("SKF Scan", "SKF Scan"),
+                         ("Clair Klar Scan", "Clair Klar Scan"),
+                         ("Bandit Scan", "Bandit Scan"),
+                         ("SSL Labs Scan", "SSL Labs Scan"),
+                         ("Acunetix Scan", "Acunetix Scan"),
+                         ("Fortify Scan", "Fortify Scan"),
+                         ("Gosec Scanner", "Gosec Scanner"),
+                         ("SonarQube Scan", "SonarQube Scan"),
+                         ("SonarQube Scan detailed", "SonarQube Scan detailed"),
+                         (SCAN_SONARQUBE_API, SCAN_SONARQUBE_API),
+                         ("MobSF Scan", "MobSF Scan"),
+                         ("Trufflehog Scan", "Trufflehog Scan"),
+                         ("Nikto Scan", "Nikto Scan"),
+                         ("Clair Scan", "Clair Scan"),
+                         ("Brakeman Scan", "Brakeman Scan"),
+                         ("SpotBugs Scan", "SpotBugs Scan"),
+                         ("AWS Scout2 Scan", "AWS Scout2 Scan"),
+                         ("AWS Prowler Scan", "AWS Prowler Scan"),
+                         ("IBM AppScan DAST", "IBM AppScan DAST"),
+                         ("PHP Security Audit v2", "PHP Security Audit v2"),
+                         ("PHP Symfony Security Check", "PHP Symfony Security Check"),
+                         ("Safety Scan", "Safety Scan"),
+                         ("DawnScanner Scan", "DawnScanner Scan"),
+                         ("Anchore Engine Scan", "Anchore Engine Scan"),
+                         ("Bundler-Audit Scan", "Bundler-Audit Scan"),
+                         ("Twistlock Image Scan", "Twistlock Image Scan"),
+                         ("Kiuwan Scan", "Kiuwan Scan"),
+                         ("Blackduck Hub Scan", "Blackduck Hub Scan"),
+                         ("Openscap Vulnerability Scan", "Openscap Vulnerability Scan"),
+                         ("Wapiti Scan", "Wapiti Scan"),
+                         ("Immuniweb Scan", "Immuniweb Scan"),
+                         ("Sonatype Application Scan", "Sonatype Application Scan"),
+                         ("Cobalt.io Scan", "Cobalt.io Scan"),
+                         ("Mozilla Observatory Scan", "Mozilla Observatory Scan"),
+                         ("Whitesource Scan", "Whitesource Scan"),
+                         ("Contrast Scan", "Contrast Scan"),
+                         ("Microfocus Webinspect Scan", "Microfocus Webinspect Scan"),
+                         ("Wpscan", "Wpscan"),
+                         ("Sslscan", "Sslscan"),
+                         ("JFrog Xray Scan", "JFrog Xray Scan"),
+                         ("Sslyze Scan", "Sslyze Scan"),
+                         ("Testssl Scan", "Testssl Scan"),
+                         ("Hadolint Dockerfile check", "Hadolint Dockerfile check"),
+                         ("Aqua Scan", "Aqua Scan"),
+                         ("HackerOne Cases", "HackerOne Cases"),
+                         ("Xanitizer Scan", "Xanitizer Scan"),
+                         ("Trivy Scan", "Trivy Scan"))
+    SORTED_SCAN_TYPE_CHOICES = sorted(SCAN_TYPE_CHOICES, key=lambda x: x[1])
+    title = forms.CharField(max_length=1000)
+    scanner = forms.ChoiceField(required=True, choices=SORTED_SCAN_TYPE_CHOICES)
+    product = forms.CharField(max_length=100)
+    cwe = forms.IntegerField()
+    description = forms.CharField(max_length=100)
+
+    class Meta:
+        model = CommonNote
+        fields = ['title', 'scanner', 'product', 'cwe', 'description']
+
+
+class EditCommonNoteForm(CommonNoteForm):
+
+    def __init__(self, *args, **kwargs):
+        super(EditCommonNoteForm, self).__init__(*args, **kwargs)

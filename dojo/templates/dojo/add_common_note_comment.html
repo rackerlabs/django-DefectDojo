@@ -1,0 +1,14 @@
+{% extends "base.html" %}
+{% block content %}
+<h3> Add a new Note Type </h3>
+<form class="form-horizontal" action="{% url 'add_common_note_comment' cn.id %}" method="post">{% csrf_token %}
+    {% include "dojo/form_fields.html" with form=form %}
+    {% include "dojo/snippets/sonarqube_history.html" with common_note=common_note only %}
+    <div class="form-group">
+        <div class="col-sm-offset-2 col-sm-10">
+            <input class="btn btn-primary" type="submit" value="Add Note" aria-label="Add Common Note"/>
+        </div>
+    </div>
+    {% include "dojo/snippets/comments_common.html" with notes=notes object=cn destination="common_notes" %}
+</form>
+{% endblock %}
