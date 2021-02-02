@@ -14,20 +14,15 @@ from dojo.models import Endpoint, Finding
 # Since Info findings are not recroded in the Confirmed Vulnerability or
 # Potential Vulnerability categories, a severity of 1 is shown as low
 # in the portal.
-SEVERITY_MATCH = ['Low',
-                   'Low',
-                   'Medium',
-                   'High',
-                   'Critical']
+SEVERITY_MATCH = ["Low", "Low", "Medium", "High", "Critical"]
 # All QIDs in this category will be info because they only carry
 # three levels of severity (Minimal, Medium, Serious)
-INFO_CATEGORIES = ['Sensitive Content',
-                   'Information Gathered']
+INFO_CATEGORIES = ["Sensitive Content", "Information Gathered"]
 
 
 def truncate_str(value: str, maxlen: int):
     if len(value) > maxlen:
-        return value[:maxlen - 12] + " (truncated)"
+        return value[: maxlen - 12] + " (truncated)"
     return value
 
 
@@ -65,18 +60,23 @@ def attach_extras(endpoints, requests, responses, finding, date, qid):
         port = ""  # Set port to empty string by default
         # Split the returned network address into host and
         try:  # If there is port number attached to host address
-            host, port = parsedUrl.netloc.split(':')
+            host, port = parsedUrl.netloc.split(":")
         except:  # there's no port attached to address
             host = parsedUrl.netloc
 
-        finding.unsaved_endpoints.append(Endpoint(
-                    host=truncate_str(host, 500), port=port,
-                    path=truncate_str(path, 500),
-                    protocol=protocol,
-                    query=truncate_str(query, 1000), fragment=truncate_str(fragment, 500)))
+        finding.unsaved_endpoints.append(
+            Endpoint(
+                host=truncate_str(host, 500),
+                port=port,
+                path=truncate_str(path, 500),
+                protocol=protocol,
+                query=truncate_str(query, 1000),
+                fragment=truncate_str(fragment, 500),
+            )
+        )
 
     for i in range(0, len(requests)):
-        if requests[i] != '' or responses[i] != '':
+        if requests[i] != "" or responses[i] != "":
             finding.unsaved_req_resp.append({"req": requests[i], "resp": responses[i]})
 
     return finding
@@ -86,23 +86,23 @@ def attach_extras(endpoints, requests, responses, finding, date, qid):
 # found in the this section of the report
 def get_request(request):
     if request is not None:
-        header = ''
-        header += str(request.findtext('METHOD')) + ': '
-        header += str(request.findtext('URL')) + '\n'
-        headers = request.find('HEADERS')
+        header = ""
+        header += str(request.findtext("METHOD")) + ": "
+        header += str(request.findtext("URL")) + "\n"
+        headers = request.find("HEADERS")
         if headers is not None:
-            for head in headers.iter('HEADER'):
-                header += str(head.findtext('key')) + ': '
-                header += str(head.findtext('value')) + '\n'
+            for head in headers.iter("HEADER"):
+                header += str(head.findtext("key")) + ": "
+                header += str(head.findtext("value")) + "\n"
         return str(header)
-    return ''
+    return ""
 
 
 # Build a response string
 def get_response(response):
     if response is not None:
-        return decode_tag(response.find('CONTENTS'))
-    return ''
+        return decode_tag(response.find("CONTENTS"))
+    return ""
 
 
 # Decode an XML tag with base64 if the tag has base64=true set.
@@ -120,9 +120,9 @@ def decode_tag(tag):
 def get_request_response(payloads):
     requests = []
     responses = []
-    for payload in payloads.iter('PAYLOAD'):
-        requests.append(get_request(payload.find('REQUEST')))
-        responses.append(get_response(payload.find('RESPONSE')))
+    for payload in payloads.iter("PAYLOAD"):
+        requests.append(get_request(payload.find("REQUEST")))
+        responses.append(get_response(payload.find("RESPONSE")))
     return [requests, responses]
 
 
@@ -133,66 +133,72 @@ def get_vulnerabilities(vulnerabilities, is_info=False, is_app_report=False):
     # Iterate through all vulnerabilites to pull necessary info
     for vuln in vulnerabilities:
         urls = []
-        requests = response = ''
-        qid = int(vuln.findtext('QID'))
-        url = vuln.findtext('URL')
+        requests = response = ""
+        qid = int(vuln.findtext("QID"))
+        url = vuln.findtext("URL")
         if url is not None:
             urls.append(str(url))
-        access_path = vuln.find('ACCESS_PATH')
+        access_path = vuln.find("ACCESS_PATH")
         if access_path is not None:
-            urls += [url.text for url in access_path.iter('URL')]
-        payloads = vuln.find('PAYLOADS')
+            urls += [url.text for url in access_path.iter("URL")]
+        payloads = vuln.find("PAYLOADS")
         if payloads is not None:
             req_resps = get_request_response(payloads)
         else:
             req_resps = [[], []]
 
         if is_info:
-            raw_finding_date = vuln.findtext('LAST_TIME_DETECTED')
+            raw_finding_date = vuln.findtext("LAST_TIME_DETECTED")
         elif is_app_report:
-            raw_finding_date = vuln.findtext('FIRST_TIME_DETECTED')
+            raw_finding_date = vuln.findtext("FIRST_TIME_DETECTED")
         else:
-            raw_finding_date = vuln.findtext('DETECTION_DATE')
+            raw_finding_date = vuln.findtext("DETECTION_DATE")
 
         # Qualys uses a non-standard date format.
         if raw_finding_date is not None:
             if raw_finding_date.endswith("GMT"):
-                finding_date = datetime.strptime(raw_finding_date, "%d %b %Y %I:%M%p GMT")
+                finding_date = datetime.strptime(
+                    raw_finding_date, "%d %b %Y %I:%M%p GMT"
+                )
             else:
-                finding_date = datetime.strptime(raw_finding_date, "%d %b %Y %I:%M%p GMT%z")
+                finding_date = datetime.strptime(
+                    raw_finding_date, "%d %b %Y %I:%M%p GMT%z"
+                )
         else:
             finding_date = None
 
         finding = findings.get(qid, None)
-        findings[qid] = attach_extras(urls, req_resps[0], req_resps[1], finding, finding_date, qid)
+        findings[qid] = attach_extras(
+            urls, req_resps[0], req_resps[1], finding, finding_date, qid
+        )
     return findings
 
 
 # Retrieve information from a single glossary entry such as description,
 # severity, title, impact, mitigation, and CWE
 def get_glossary_item(glossary, finding):
-    title = glossary.findtext('TITLE')
+    title = glossary.findtext("TITLE")
     if title is not None:
         finding.title = str(title)
-    severity = glossary.findtext('SEVERITY')
+    severity = glossary.findtext("SEVERITY")
     if severity is not None:
-        group = glossary.findtext('GROUP')
-        category = glossary.findtext('CATEGORY')
+        group = glossary.findtext("GROUP")
+        category = glossary.findtext("CATEGORY")
         if category in INFO_CATEGORIES or group == "DIAG":
             # Scan Diagnostics are always Info.
             finding.severity = "Info"
         else:
             finding.severity = SEVERITY_MATCH[int(severity) - 1]
-    description = glossary.findtext('DESCRIPTION')
+    description = glossary.findtext("DESCRIPTION")
     if description is not None:
         finding.description = str(description)
-    impact = glossary.findtext('IMPACT')
+    impact = glossary.findtext("IMPACT")
     if impact is not None:
         finding.impact = str(impact)
-    solution = glossary.findtext('SOLUTION')
+    solution = glossary.findtext("SOLUTION")
     if solution is not None:
         finding.mitigation = str(solution)
-    cwe = glossary.findtext('CWE')
+    cwe = glossary.findtext("CWE")
     if cwe is not None:
         finding.cwe = int(get_cwe(str(cwe)))
     return finding
@@ -200,21 +206,23 @@ def get_glossary_item(glossary, finding):
 
 # Retrieve information from a single information gathered entry
 def get_info_item(info_gathered, finding):
-    data = info_gathered.find('DATA')
+    data = info_gathered.find("DATA")
     if data is not None:
-        finding.description += '\n\n' + decode_tag(data)
+        finding.description += "\n\n" + decode_tag(data)
     return finding
 
 
 # Create finding items for all vulnerabilities in the report
 def get_items(vulnerabilities, info_gathered, glossary, is_app_report):
-    ig_qid_list = [int(ig.findtext('QID')) for ig in info_gathered]
-    g_qid_list = [int(g.findtext('QID')) for g in glossary]
+    ig_qid_list = [int(ig.findtext("QID")) for ig in info_gathered]
+    g_qid_list = [int(g.findtext("QID")) for g in glossary]
 
     # This dict has findings mapped by QID to remove any duplicates
     findings = {}
 
-    for qid, finding in get_vulnerabilities(vulnerabilities, False, is_app_report).items():
+    for qid, finding in get_vulnerabilities(
+        vulnerabilities, False, is_app_report
+    ).items():
         if qid in g_qid_list:
             index = g_qid_list.index(qid)
             findings[qid] = get_glossary_item(glossary[index], finding)
@@ -235,17 +243,25 @@ def qualys_webapp_parser(qualys_xml_file, test):
 
     # supposed to be safe against XEE: https://docs.python.org/3/library/xml.html#xml-vulnerabilities
     tree = xml.etree.ElementTree.parse(qualys_xml_file)
-    is_app_report = tree.getroot().tag == 'WAS_WEBAPP_REPORT'
+    is_app_report = tree.getroot().tag == "WAS_WEBAPP_REPORT"
 
     if is_app_report:
-        vulnerabilities = tree.findall('./RESULTS/WEB_APPLICATION/VULNERABILITY_LIST/VULNERABILITY')
-        info_gathered = tree.findall('./RESULTS/WEB_APPLICATION/INFORMATION_GATHERED_LIST/INFORMATION_GATHERED')
+        vulnerabilities = tree.findall(
+            "./RESULTS/WEB_APPLICATION/VULNERABILITY_LIST/VULNERABILITY"
+        )
+        info_gathered = tree.findall(
+            "./RESULTS/WEB_APPLICATION/INFORMATION_GATHERED_LIST/INFORMATION_GATHERED"
+        )
     else:
-        vulnerabilities = tree.findall('./RESULTS/VULNERABILITY_LIST/VULNERABILITY')
-        info_gathered = tree.findall('./RESULTS/INFORMATION_GATHERED_LIST/INFORMATION_GATHERED')
-    glossary = tree.findall('./GLOSSARY/QID_LIST/QID')
+        vulnerabilities = tree.findall("./RESULTS/VULNERABILITY_LIST/VULNERABILITY")
+        info_gathered = tree.findall(
+            "./RESULTS/INFORMATION_GATHERED_LIST/INFORMATION_GATHERED"
+        )
+    glossary = tree.findall("./GLOSSARY/QID_LIST/QID")
 
-    items = list(get_items(vulnerabilities, info_gathered, glossary, is_app_report).values())
+    items = list(
+        get_items(vulnerabilities, info_gathered, glossary, is_app_report).values()
+    )
 
     return items
 

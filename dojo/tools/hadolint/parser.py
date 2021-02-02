@@ -17,7 +17,7 @@ class HadolintParser(object):
         json_output = json_output.read().strip()
         try:
             try:
-                tree = json.loads(str(json_output, 'utf-8'))
+                tree = json.loads(str(json_output, "utf-8"))
             except:
                 tree = json.loads(json_output)
         except ValueError:
@@ -29,18 +29,24 @@ class HadolintParser(object):
         items = {}
         for node in tree:
             item = get_item(node, test)
-            unique_key = str(node['line']) + "-" + str(node['column']) + node['code'] + node['file']
+            unique_key = (
+                str(node["line"])
+                + "-"
+                + str(node["column"])
+                + node["code"]
+                + node["file"]
+            )
             items[unique_key] = item
 
         return items.values()
 
 
 def get_item(vulnerability, test):
-    if 'level' in vulnerability:
+    if "level" in vulnerability:
         # If we're dealing with a license finding, there will be no cvssScore
-        if vulnerability['level'] == "error":
+        if vulnerability["level"] == "error":
             severity = "Critical"
-        elif vulnerability['level'] == "warning":
+        elif vulnerability["level"] == "warning":
             severity = "High"
         else:
             severity = "Info"
@@ -50,10 +56,15 @@ def get_item(vulnerability, test):
 
     # create the finding object
     finding = Finding(
-        title=vulnerability['code'] + ": " + vulnerability['file'],
+        title=vulnerability["code"] + ": " + vulnerability["file"],
         test=test,
         severity=severity,
-        description="File: {}:{}\nVulnerability ID: {}\nDetails: {}\n".format(vulnerability['file'], vulnerability['line'], vulnerability['code'], vulnerability['message']),
+        description="File: {}:{}\nVulnerability ID: {}\nDetails: {}\n".format(
+            vulnerability["file"],
+            vulnerability["line"],
+            vulnerability["code"],
+            vulnerability["message"],
+        ),
         mitigation="No mitigation provided",
         active=False,
         verified=False,
@@ -61,7 +72,8 @@ def get_item(vulnerability, test):
         duplicate=False,
         out_of_scope=False,
         mitigated=None,
-        impact="No impact provided")
+        impact="No impact provided",
+    )
 
     finding.description = finding.description.strip()
 

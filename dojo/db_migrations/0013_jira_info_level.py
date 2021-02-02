@@ -6,18 +6,33 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('dojo', '0012_jira_finding_age'),
+        ("dojo", "0012_jira_finding_age"),
     ]
 
     operations = [
         migrations.AddField(
-            model_name='jira_conf',
-            name='info_mapping_severity',
-            field=models.CharField(help_text="Maps to the 'Priority' field in Jira. For example: Info", max_length=200),
+            model_name="jira_conf",
+            name="info_mapping_severity",
+            field=models.CharField(
+                help_text="Maps to the 'Priority' field in Jira. For example: Info",
+                max_length=200,
+            ),
         ),
         migrations.AlterField(
-            model_name='system_settings',
-            name='jira_minimum_severity',
-            field=models.CharField(blank=True, choices=[('Critical', 'Critical'), ('High', 'High'), ('Medium', 'Medium'), ('Low', 'Low'), ('Info', 'Info')], default='None', max_length=20, null=True),
+            model_name="system_settings",
+            name="jira_minimum_severity",
+            field=models.CharField(
+                blank=True,
+                choices=[
+                    ("Critical", "Critical"),
+                    ("High", "High"),
+                    ("Medium", "Medium"),
+                    ("Low", "Low"),
+                    ("Info", "Info"),
+                ],
+                default="None",
+                max_length=20,
+                null=True,
+            ),
         ),
     ]

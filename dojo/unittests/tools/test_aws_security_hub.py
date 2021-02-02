@@ -10,7 +10,6 @@ def sample_path(file_name):
 
 
 class TestAwsSecurityFindingFormatParser(TestCase):
-
     def test_one_finding(self):
         with open(sample_path("one_finding.json")) as test_file:
             parser = AwsSecurityFindingFormatParser()

@@ -10,6 +10,7 @@ class ComposableSchema:
     yielding a new composable schema whose transformation is defined as the function composition
     of the transformation of the two source schema.
     """
+
     def transform_operation(self, operation, resolver):
         """Defines an operation transformation
 
@@ -66,8 +67,8 @@ class IdentitySchema(ComposableSchema):
 
 
 class ExtraParameters(ComposableSchema):
-    """Define a schema that can add parameters to the operation
-    """
+    """Define a schema that can add parameters to the operation"""
+
     def __init__(self, operation_name, extra_parameters, *args, **kwargs):
         """Initialize the schema
 
@@ -90,8 +91,8 @@ class ExtraParameters(ComposableSchema):
 
 
 class ExtraResponseField(ComposableSchema):
-    """Define a schema that can add fields to the responses of the operation
-    """
+    """Define a schema that can add fields to the responses of the operation"""
+
     def __init__(self, operation_name, extra_fields, *args, **kwargs):
         """Initialize the schema
 
@@ -123,7 +124,11 @@ class ExtraResponseField(ComposableSchema):
         for code, params in self._extra_fields.items():
             if code in responses:
                 original_schema = responses[code]["schema"]
-                schema = original_schema if type(original_schema) is Schema else resolve_ref(original_schema, resolver)
+                schema = (
+                    original_schema
+                    if type(original_schema) is Schema
+                    else resolve_ref(original_schema, resolver)
+                )
                 schema = copy.deepcopy(schema)
 
                 for name, param in params.items():

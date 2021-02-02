@@ -5,9 +5,9 @@ from dojo.models import Dojo_User
 
 
 class Command(BaseCommand):
-    help = 'Handle any risk acceptances that are expired (and not handled yet). Also posts expiration heads alerts / jira comments if configured'
+    help = "Handle any risk acceptances that are expired (and not handled yet). Also posts expiration heads alerts / jira comments if configured"
 
     def handle(self, *args, **options):
         # use admin user to make sure we have access to its properties i.e. to determine wants_async
-        with impersonate(Dojo_User.objects.get(username='admin')):
+        with impersonate(Dojo_User.objects.get(username="admin")):
             ra_helper.expiration_handler()

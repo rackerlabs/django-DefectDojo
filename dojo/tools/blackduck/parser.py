@@ -10,6 +10,7 @@ class BlackduckHubCSVParser(object):
     - from a zip file containing a security.csv and files.csv
     - a single security.csv file
     """
+
     def get_findings(self, filename, test):
         normalized_findings = self.normalize_findings(filename)
         return self.ingest_findings(normalized_findings, test)
@@ -32,45 +33,46 @@ class BlackduckHubCSVParser(object):
             impact = i.impact
             references = self.format_reference(i)
 
-            dupe_key = hashlib.md5("{} | {}".format(title, i.vuln_source)
-                .encode("utf-8")) \
-                .hexdigest()
+            dupe_key = hashlib.md5(
+                "{} | {}".format(title, i.vuln_source).encode("utf-8")
+            ).hexdigest()
 
             if dupe_key in dupes:
                 finding = dupes[dupe_key]
                 if finding.description:
                     finding.description += "Vulnerability ID: {}\n {}\n".format(
-                        cve, i.vuln_source)
+                        cve, i.vuln_source
+                    )
                 dupes[dupe_key] = finding
             else:
                 dupes[dupe_key] = True
 
-                finding = Finding(title=title,
-                                  cwe=int(cwe),
-                                  cve=cve,
-                                  test=test,
-                                  active=False,
-                                  verified=False,
-                                  description=description,
-                                  severity=severity,
-                                  numerical_severity=Finding.get_numerical_severity(
-                                      severity),
-                                  mitigation=mitigation,
-                                  impact=impact,
-                                  references=references,
-                                  url=i.url,
-                                  file_path=i.locations,
-                                  component_name=i.component_name,
-                                  component_version=i.component_version,
-                                  static_finding=True
-                                  )
+                finding = Finding(
+                    title=title,
+                    cwe=int(cwe),
+                    cve=cve,
+                    test=test,
+                    active=False,
+                    verified=False,
+                    description=description,
+                    severity=severity,
+                    numerical_severity=Finding.get_numerical_severity(severity),
+                    mitigation=mitigation,
+                    impact=impact,
+                    references=references,
+                    url=i.url,
+                    file_path=i.locations,
+                    component_name=i.component_name,
+                    component_version=i.component_version,
+                    static_finding=True,
+                )
 
                 dupes[dupe_key] = finding
 
         return dupes.values()
 
     def format_title(self, i):
-        if (i.channel_version_origin_id is not None):
+        if i.channel_version_origin_id is not None:
             component_title = i.channel_version_origin_id
         else:
             component_title = i.component_origin_id

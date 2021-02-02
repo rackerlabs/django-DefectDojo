@@ -60,219 +60,316 @@ class UniqueUploadNameProvider:
 
 
 class Regulation(models.Model):
-    PRIVACY_CATEGORY = 'privacy'
-    FINANCE_CATEGORY = 'finance'
-    EDUCATION_CATEGORY = 'education'
-    MEDICAL_CATEGORY = 'medical'
-    CORPORATE_CATEGORY = 'corporate'
-    OTHER_CATEGORY = 'other'
+    PRIVACY_CATEGORY = "privacy"
+    FINANCE_CATEGORY = "finance"
+    EDUCATION_CATEGORY = "education"
+    MEDICAL_CATEGORY = "medical"
+    CORPORATE_CATEGORY = "corporate"
+    OTHER_CATEGORY = "other"
     CATEGORY_CHOICES = (
-        (PRIVACY_CATEGORY, _('Privacy')),
-        (FINANCE_CATEGORY, _('Finance')),
-        (EDUCATION_CATEGORY, _('Education')),
-        (MEDICAL_CATEGORY, _('Medical')),
-        (CORPORATE_CATEGORY, _('Corporate')),
-        (OTHER_CATEGORY, _('Other')),
+        (PRIVACY_CATEGORY, _("Privacy")),
+        (FINANCE_CATEGORY, _("Finance")),
+        (EDUCATION_CATEGORY, _("Education")),
+        (MEDICAL_CATEGORY, _("Medical")),
+        (CORPORATE_CATEGORY, _("Corporate")),
+        (OTHER_CATEGORY, _("Other")),
     )
 
-    name = models.CharField(max_length=128, unique=True, help_text=_('The name of the regulation.'))
-    acronym = models.CharField(max_length=20, unique=True, help_text=_('A shortened representation of the name.'))
-    category = models.CharField(max_length=9, choices=CATEGORY_CHOICES, help_text=_('The subject of the regulation.'))
-    jurisdiction = models.CharField(max_length=64, help_text=_('The territory over which the regulation applies.'))
-    description = models.TextField(blank=True, help_text=_('Information about the regulation\'s purpose.'))
-    reference = models.URLField(blank=True, help_text=_('An external URL for more information.'))
+    name = models.CharField(
+        max_length=128, unique=True, help_text=_("The name of the regulation.")
+    )
+    acronym = models.CharField(
+        max_length=20,
+        unique=True,
+        help_text=_("A shortened representation of the name."),
+    )
+    category = models.CharField(
+        max_length=9,
+        choices=CATEGORY_CHOICES,
+        help_text=_("The subject of the regulation."),
+    )
+    jurisdiction = models.CharField(
+        max_length=64, help_text=_("The territory over which the regulation applies.")
+    )
+    description = models.TextField(
+        blank=True, help_text=_("Information about the regulation's purpose.")
+    )
+    reference = models.URLField(
+        blank=True, help_text=_("An external URL for more information.")
+    )
 
     class Meta:
-        ordering = ['name']
+        ordering = ["name"]
 
     def __str__(self):
-        return self.acronym + ' (' + self.jurisdiction + ')'
+        return self.acronym + " (" + self.jurisdiction + ")"
 
 
 class System_Settings(models.Model):
     enable_auditlog = models.BooleanField(
         default=True,
         blank=False,
-        verbose_name='Enable audit logging',
+        verbose_name="Enable audit logging",
         help_text="With this setting turned on, Dojo maintains an audit log "
-                  "of changes made to entities (Findings, Tests, Engagements, Procuts, ...)"
-                  "If you run big import you may want to disable this "
-                  "because the way django-auditlog currently works, there's a "
-                  "big performance hit. Especially during (re-)imports.")
+        "of changes made to entities (Findings, Tests, Engagements, Procuts, ...)"
+        "If you run big import you may want to disable this "
+        "because the way django-auditlog currently works, there's a "
+        "big performance hit. Especially during (re-)imports.",
+    )
     enable_deduplication = models.BooleanField(
         default=False,
         blank=False,
-        verbose_name='Deduplicate findings',
+        verbose_name="Deduplicate findings",
         help_text="With this setting turned on, Dojo deduplicates findings by "
-                  "comparing endpoints, cwe fields, and titles. "
-                  "If two findings share a URL and have the same CWE or "
-                  "title, Dojo marks the less recent finding as a duplicate. "
-                  "When deduplication is enabled, a list of "
-                  "deduplicated findings is added to the engagement view.")
-    delete_dupulicates = models.BooleanField(default=False, blank=False, help_text="Requires next setting: maximum number of duplicates to retain.")
-    max_dupes = models.IntegerField(blank=True, null=True, default=10,
-                                    verbose_name='Max Duplicates',
-                                    help_text="When enabled, if a single "
-                                              "issue reaches the maximum "
-                                              "number of duplicates, the "
-                                              "oldest will be deleted. Duplicate will not be deleted when left empty. A value of 0 will remove all duplicates.")
+        "comparing endpoints, cwe fields, and titles. "
+        "If two findings share a URL and have the same CWE or "
+        "title, Dojo marks the less recent finding as a duplicate. "
+        "When deduplication is enabled, a list of "
+        "deduplicated findings is added to the engagement view.",
+    )
+    delete_dupulicates = models.BooleanField(
+        default=False,
+        blank=False,
+        help_text="Requires next setting: maximum number of duplicates to retain.",
+    )
+    max_dupes = models.IntegerField(
+        blank=True,
+        null=True,
+        default=10,
+        verbose_name="Max Duplicates",
+        help_text="When enabled, if a single "
+        "issue reaches the maximum "
+        "number of duplicates, the "
+        "oldest will be deleted. Duplicate will not be deleted when left empty. A value of 0 will remove all duplicates.",
+    )
 
-    enable_jira = models.BooleanField(default=False,
-                                      verbose_name='Enable JIRA integration',
-                                      blank=False)
+    enable_jira = models.BooleanField(
+        default=False, verbose_name="Enable JIRA integration", blank=False
+    )
 
-    enable_jira_web_hook = models.BooleanField(default=False,
-                                      verbose_name='Enable JIRA web hook',
-                                      help_text='Please note: It is strongly recommended to use a secret below and / or IP whitelist the JIRA server using a proxy such as Nginx.',
-                                      blank=False)
+    enable_jira_web_hook = models.BooleanField(
+        default=False,
+        verbose_name="Enable JIRA web hook",
+        help_text="Please note: It is strongly recommended to use a secret below and / or IP whitelist the JIRA server using a proxy such as Nginx.",
+        blank=False,
+    )
 
-    disable_jira_webhook_secret = models.BooleanField(default=False,
-                                      verbose_name='Disable web hook secret',
-                                      help_text='Allows incoming requests without a secret (discouraged legacy behaviour)',
-                                      blank=False)
+    disable_jira_webhook_secret = models.BooleanField(
+        default=False,
+        verbose_name="Disable web hook secret",
+        help_text="Allows incoming requests without a secret (discouraged legacy behaviour)",
+        blank=False,
+    )
 
     # will be set to random / uuid by initializer so null needs to be True
-    jira_webhook_secret = models.CharField(max_length=64, blank=False, null=True, verbose_name='JIRA Webhook URL',
-                                           help_text='Secret needed in URL for incoming JIRA Webhook')
+    jira_webhook_secret = models.CharField(
+        max_length=64,
+        blank=False,
+        null=True,
+        verbose_name="JIRA Webhook URL",
+        help_text="Secret needed in URL for incoming JIRA Webhook",
+    )
 
-    jira_choices = (('Critical', 'Critical'),
-                    ('High', 'High'),
-                    ('Medium', 'Medium'),
-                    ('Low', 'Low'),
-                    ('Info', 'Info'))
-    jira_minimum_severity = models.CharField(max_length=20, blank=True,
-                                             null=True, choices=jira_choices,
-                                             default='Low')
-    jira_labels = models.CharField(max_length=200, blank=True, null=True,
-                                   help_text='JIRA issue labels space seperated')
+    jira_choices = (
+        ("Critical", "Critical"),
+        ("High", "High"),
+        ("Medium", "Medium"),
+        ("Low", "Low"),
+        ("Info", "Info"),
+    )
+    jira_minimum_severity = models.CharField(
+        max_length=20, blank=True, null=True, choices=jira_choices, default="Low"
+    )
+    jira_labels = models.CharField(
+        max_length=200,
+        blank=True,
+        null=True,
+        help_text="JIRA issue labels space seperated",
+    )
 
-    enable_github = models.BooleanField(default=False,
-                                      verbose_name='Enable GITHUB integration',
-                                      blank=False)
+    enable_github = models.BooleanField(
+        default=False, verbose_name="Enable GITHUB integration", blank=False
+    )
 
-    enable_slack_notifications = \
-        models.BooleanField(default=False,
-                            verbose_name='Enable Slack notifications',
-                            blank=False)
-    slack_channel = models.CharField(max_length=100, default='', blank=True,
-                    help_text='Optional. Needed if you want to send global notifications.')
-    slack_token = models.CharField(max_length=100, default='', blank=True,
-                                   help_text='Token required for interacting '
-                                             'with Slack. Get one at '
-                                             'https://api.slack.com/tokens')
-    slack_username = models.CharField(max_length=100, default='', blank=True,
-                     help_text='Optional. Will take your bot name otherwise.')
-    enable_msteams_notifications = \
-        models.BooleanField(default=False,
-                            verbose_name='Enable Microsoft Teams notifications',
-                            blank=False)
-    msteams_url = models.CharField(max_length=400, default='', blank=True,
-                                    help_text='The full URL of the '
-                                              'incoming webhook')
+    enable_slack_notifications = models.BooleanField(
+        default=False, verbose_name="Enable Slack notifications", blank=False
+    )
+    slack_channel = models.CharField(
+        max_length=100,
+        default="",
+        blank=True,
+        help_text="Optional. Needed if you want to send global notifications.",
+    )
+    slack_token = models.CharField(
+        max_length=100,
+        default="",
+        blank=True,
+        help_text="Token required for interacting "
+        "with Slack. Get one at "
+        "https://api.slack.com/tokens",
+    )
+    slack_username = models.CharField(
+        max_length=100,
+        default="",
+        blank=True,
+        help_text="Optional. Will take your bot name otherwise.",
+    )
+    enable_msteams_notifications = models.BooleanField(
+        default=False, verbose_name="Enable Microsoft Teams notifications", blank=False
+    )
+    msteams_url = models.CharField(
+        max_length=400,
+        default="",
+        blank=True,
+        help_text="The full URL of the " "incoming webhook",
+    )
     enable_mail_notifications = models.BooleanField(default=False, blank=False)
-    mail_notifications_from = models.CharField(max_length=200,
-                                               default='from@example.com',
-                                               blank=True)
-    mail_notifications_to = models.CharField(max_length=200, default='',
-                                             blank=True)
-    s_finding_severity_naming = \
-        models.BooleanField(default=False, blank=False,
-                            help_text='With this setting turned on, Dojo '
-                                      'will display S0, S1, S2, etc in most '
-                                      'places, whereas if turned off '
-                                      'Critical, High, Medium, etc will '
-                                      'be displayed.')
-    false_positive_history = models.BooleanField(default=False, help_text="DefectDojo will automatically mark the finding as a false positive if the finding has been previously marked as a false positive. Not needed when using deduplication, advised to not combine these two.")
+    mail_notifications_from = models.CharField(
+        max_length=200, default="from@example.com", blank=True
+    )
+    mail_notifications_to = models.CharField(max_length=200, default="", blank=True)
+    s_finding_severity_naming = models.BooleanField(
+        default=False,
+        blank=False,
+        help_text="With this setting turned on, Dojo "
+        "will display S0, S1, S2, etc in most "
+        "places, whereas if turned off "
+        "Critical, High, Medium, etc will "
+        "be displayed.",
+    )
+    false_positive_history = models.BooleanField(
+        default=False,
+        help_text="DefectDojo will automatically mark the finding as a false positive if the finding has been previously marked as a false positive. Not needed when using deduplication, advised to not combine these two.",
+    )
 
-    url_prefix = models.CharField(max_length=300, default='', blank=True, help_text="URL prefix if DefectDojo is installed in it's own virtual subdirectory.")
-    team_name = models.CharField(max_length=100, default='', blank=True)
-    time_zone = models.CharField(max_length=50,
-                                 choices=[(tz, tz) for tz in all_timezones],
-                                 default='UTC', blank=False)
-    display_endpoint_uri = models.BooleanField(default=False, verbose_name="Display Endpoint Full URI", help_text="Displays the full endpoint URI in the endpoint view.")
-    enable_product_grade = models.BooleanField(default=False, verbose_name="Enable Product Grading", help_text="Displays a grade letter next to a product to show the overall health.")
+    url_prefix = models.CharField(
+        max_length=300,
+        default="",
+        blank=True,
+        help_text="URL prefix if DefectDojo is installed in it's own virtual subdirectory.",
+    )
+    team_name = models.CharField(max_length=100, default="", blank=True)
+    time_zone = models.CharField(
+        max_length=50,
+        choices=[(tz, tz) for tz in all_timezones],
+        default="UTC",
+        blank=False,
+    )
+    display_endpoint_uri = models.BooleanField(
+        default=False,
+        verbose_name="Display Endpoint Full URI",
+        help_text="Displays the full endpoint URI in the endpoint view.",
+    )
+    enable_product_grade = models.BooleanField(
+        default=False,
+        verbose_name="Enable Product Grading",
+        help_text="Displays a grade letter next to a product to show the overall health.",
+    )
     product_grade = models.CharField(max_length=800, blank=True)
-    product_grade_a = models.IntegerField(default=90,
-                                          verbose_name="Grade A",
-                                          help_text="Percentage score for an "
-                                                    "'A' >=")
-    product_grade_b = models.IntegerField(default=80,
-                                          verbose_name="Grade B",
-                                          help_text="Percentage score for a "
-                                                    "'B' >=")
-    product_grade_c = models.IntegerField(default=70,
-                                          verbose_name="Grade C",
-                                          help_text="Percentage score for a "
-                                                    "'C' >=")
-    product_grade_d = models.IntegerField(default=60,
-                                          verbose_name="Grade D",
-                                          help_text="Percentage score for a "
-                                                    "'D' >=")
-    product_grade_f = models.IntegerField(default=59,
-                                          verbose_name="Grade F",
-                                          help_text="Percentage score for an "
-                                                    "'F' <=")
+    product_grade_a = models.IntegerField(
+        default=90,
+        verbose_name="Grade A",
+        help_text="Percentage score for an " "'A' >=",
+    )
+    product_grade_b = models.IntegerField(
+        default=80, verbose_name="Grade B", help_text="Percentage score for a " "'B' >="
+    )
+    product_grade_c = models.IntegerField(
+        default=70, verbose_name="Grade C", help_text="Percentage score for a " "'C' >="
+    )
+    product_grade_d = models.IntegerField(
+        default=60, verbose_name="Grade D", help_text="Percentage score for a " "'D' >="
+    )
+    product_grade_f = models.IntegerField(
+        default=59,
+        verbose_name="Grade F",
+        help_text="Percentage score for an " "'F' <=",
+    )
     enable_benchmark = models.BooleanField(
         default=True,
         blank=False,
         verbose_name="Enable Benchmarks",
         help_text="Enables Benchmarks such as the OWASP ASVS "
-                  "(Application Security Verification Standard)")
+        "(Application Security Verification Standard)",
+    )
 
     enable_template_match = models.BooleanField(
         default=False,
         blank=False,
         verbose_name="Enable Remediation Advice",
-        help_text="Enables global remediation advice and matching on CWE and Title. The text will be replaced for mitigation, impact and references on a finding. Useful for providing consistent impact and remediation advice regardless of the scanner.")
+        help_text="Enables global remediation advice and matching on CWE and Title. The text will be replaced for mitigation, impact and references on a finding. Useful for providing consistent impact and remediation advice regardless of the scanner.",
+    )
 
     engagement_auto_close = models.BooleanField(
         default=False,
         blank=False,
         verbose_name="Enable Engagement Auto-Close",
-        help_text="Closes an engagement after 3 days (default) past due date including last update.")
+        help_text="Closes an engagement after 3 days (default) past due date including last update.",
+    )
 
     engagement_auto_close_days = models.IntegerField(
         default=3,
         blank=False,
         verbose_name="Engagement Auto-Close Days",
-        help_text="Closes an engagement after the specified number of days past due date including last update.")
+        help_text="Closes an engagement after the specified number of days past due date including last update.",
+    )
 
     enable_finding_sla = models.BooleanField(
         default=True,
         blank=False,
         verbose_name="Enable Finding SLA's",
-        help_text="Enables Finding SLA's for time to remediate.")
+        help_text="Enables Finding SLA's for time to remediate.",
+    )
 
-    sla_critical = models.IntegerField(default=7,
-                                          verbose_name="Crital Finding SLA Days",
-                                          help_text="# of days to remediate a critical finding.")
+    sla_critical = models.IntegerField(
+        default=7,
+        verbose_name="Crital Finding SLA Days",
+        help_text="# of days to remediate a critical finding.",
+    )
 
-    sla_high = models.IntegerField(default=30,
-                                          verbose_name="High Finding SLA Days",
-                                          help_text="# of days to remediate a high finding.")
-    sla_medium = models.IntegerField(default=90,
-                                          verbose_name="Medium Finding SLA Days",
-                                          help_text="# of days to remediate a medium finding.")
+    sla_high = models.IntegerField(
+        default=30,
+        verbose_name="High Finding SLA Days",
+        help_text="# of days to remediate a high finding.",
+    )
+    sla_medium = models.IntegerField(
+        default=90,
+        verbose_name="Medium Finding SLA Days",
+        help_text="# of days to remediate a medium finding.",
+    )
 
-    sla_low = models.IntegerField(default=120,
-                                          verbose_name="Low Finding SLA Days",
-                                          help_text="# of days to remediate a low finding.")
+    sla_low = models.IntegerField(
+        default=120,
+        verbose_name="Low Finding SLA Days",
+        help_text="# of days to remediate a low finding.",
+    )
     allow_anonymous_survey_repsonse = models.BooleanField(
         default=False,
         blank=False,
         verbose_name="Allow Anonymous Survey Responses",
-        help_text="Enable anyone with a link to the survey to answer a survey"
+        help_text="Enable anyone with a link to the survey to answer a survey",
     )
     credentials = models.CharField(max_length=3000, blank=True)
     column_widths = models.CharField(max_length=1500, blank=True)
     drive_folder_ID = models.CharField(max_length=100, blank=True)
     enable_google_sheets = models.BooleanField(default=False, null=True, blank=True)
     email_address = models.EmailField(max_length=100, blank=True)
-    risk_acceptance_form_default_days = models.IntegerField(null=True, blank=True, default=180, help_text="Default expiry period for risk acceptance form.")
-    risk_acceptance_notify_before_expiration = models.IntegerField(null=True, blank=True, default=10,
-                    verbose_name="Risk acceptance expiration heads up days", help_text="Notify X days before risk acceptance expires. Leave empty to disable.")
+    risk_acceptance_form_default_days = models.IntegerField(
+        null=True,
+        blank=True,
+        default=180,
+        help_text="Default expiry period for risk acceptance form.",
+    )
+    risk_acceptance_notify_before_expiration = models.IntegerField(
+        null=True,
+        blank=True,
+        default=10,
+        verbose_name="Risk acceptance expiration heads up days",
+        help_text="Notify X days before risk acceptance expires. Leave empty to disable.",
+    )
 
     from dojo.middleware import System_Settings_Manager
+
     objects = System_Settings_Manager()
 
 
@@ -281,12 +378,12 @@ class SystemSettingsFormAdmin(forms.ModelForm):
 
     class Meta:
         model = System_Settings
-        fields = ['product_grade']
+        fields = ["product_grade"]
 
 
 class System_SettingsAdmin(admin.ModelAdmin):
     form = SystemSettingsFormAdmin
-    fields = ('product_grade',)
+    fields = ("product_grade",)
 
 
 def get_current_date():
@@ -317,38 +414,53 @@ class Dojo_User(User):
     @staticmethod
     def wants_block_execution(user):
         # this return False if there is no user, i.e. in celery processes, unittests, etc.
-        return hasattr(user, 'usercontactinfo') and user.usercontactinfo.block_execution
+        return hasattr(user, "usercontactinfo") and user.usercontactinfo.block_execution
 
     @staticmethod
     def generate_full_name(user):
         """
         Returns the first_name plus the last_name, with a space in between.
         """
-        full_name = '%s %s (%s)' % (user.first_name,
-                                    user.last_name,
-                                    user.username)
+        full_name = "%s %s (%s)" % (user.first_name, user.last_name, user.username)
         return full_name.strip()
 
 
 class UserContactInfo(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE)
     title = models.CharField(blank=True, null=True, max_length=150)
-    phone_regex = RegexValidator(regex=r'^\+?1?\d{9,15}$',
-                                 message="Phone number must be entered in the format: '+999999999'. "
-                                         "Up to 15 digits allowed.")
-    phone_number = models.CharField(validators=[phone_regex], blank=True,
-                                    max_length=15,
-                                    help_text="Phone number must be entered in the format: '+999999999'. "
-                                              "Up to 15 digits allowed.")
-    cell_number = models.CharField(validators=[phone_regex], blank=True,
-                                   max_length=15,
-                                   help_text="Phone number must be entered in the format: '+999999999'. "
-                                             "Up to 15 digits allowed.")
+    phone_regex = RegexValidator(
+        regex=r"^\+?1?\d{9,15}$",
+        message="Phone number must be entered in the format: '+999999999'. "
+        "Up to 15 digits allowed.",
+    )
+    phone_number = models.CharField(
+        validators=[phone_regex],
+        blank=True,
+        max_length=15,
+        help_text="Phone number must be entered in the format: '+999999999'. "
+        "Up to 15 digits allowed.",
+    )
+    cell_number = models.CharField(
+        validators=[phone_regex],
+        blank=True,
+        max_length=15,
+        help_text="Phone number must be entered in the format: '+999999999'. "
+        "Up to 15 digits allowed.",
+    )
     twitter_username = models.CharField(blank=True, null=True, max_length=150)
     github_username = models.CharField(blank=True, null=True, max_length=150)
-    slack_username = models.CharField(blank=True, null=True, max_length=150, help_text="Email address associated with your slack account", verbose_name="Slack Email Address")
+    slack_username = models.CharField(
+        blank=True,
+        null=True,
+        max_length=150,
+        help_text="Email address associated with your slack account",
+        verbose_name="Slack Email Address",
+    )
     slack_user_id = models.CharField(blank=True, null=True, max_length=25)
-    block_execution = models.BooleanField(default=False, help_text="Instead of async deduping a finding the findings will be deduped synchronously and will 'block' the user until completion.")
+    block_execution = models.BooleanField(
+        default=False,
+        help_text="Instead of async deduping a finding the findings will be deduped synchronously and will 'block' the user until completion.",
+    )
 
 
 class Contact(models.Model):
@@ -375,29 +487,47 @@ class Note_Type(models.Model):
 
 
 class NoteHistory(models.Model):
-    note_type = models.ForeignKey(Note_Type, null=True, blank=True, on_delete=models.CASCADE)
+    note_type = models.ForeignKey(
+        Note_Type, null=True, blank=True, on_delete=models.CASCADE
+    )
     data = models.TextField()
-    time = models.DateTimeField(null=True, editable=False,
-                                default=get_current_datetime)
-    current_editor = models.ForeignKey(User, editable=False, null=True, on_delete=models.CASCADE)
+    time = models.DateTimeField(null=True, editable=False, default=get_current_datetime)
+    current_editor = models.ForeignKey(
+        User, editable=False, null=True, on_delete=models.CASCADE
+    )
 
 
 class Notes(models.Model):
-    note_type = models.ForeignKey(Note_Type, related_name='note_type', null=True, blank=True, on_delete=models.CASCADE)
+    note_type = models.ForeignKey(
+        Note_Type,
+        related_name="note_type",
+        null=True,
+        blank=True,
+        on_delete=models.CASCADE,
+    )
     entry = models.TextField()
-    date = models.DateTimeField(null=False, editable=False,
-                                default=get_current_datetime)
-    author = models.ForeignKey(User, related_name='editor_notes_set', editable=False, on_delete=models.CASCADE)
+    date = models.DateTimeField(
+        null=False, editable=False, default=get_current_datetime
+    )
+    author = models.ForeignKey(
+        User, related_name="editor_notes_set", editable=False, on_delete=models.CASCADE
+    )
     private = models.BooleanField(default=False)
     edited = models.BooleanField(default=False)
-    editor = models.ForeignKey(User, related_name='author_notes_set', editable=False, null=True, on_delete=models.CASCADE)
-    edit_time = models.DateTimeField(null=True, editable=False,
-                                default=get_current_datetime)
-    history = models.ManyToManyField(NoteHistory, blank=True,
-                                   editable=False)
+    editor = models.ForeignKey(
+        User,
+        related_name="author_notes_set",
+        editable=False,
+        null=True,
+        on_delete=models.CASCADE,
+    )
+    edit_time = models.DateTimeField(
+        null=True, editable=False, default=get_current_datetime
+    )
+    history = models.ManyToManyField(NoteHistory, blank=True, editable=False)
 
     class Meta:
-        ordering = ['-date']
+        ordering = ["-date"]
 
     def __unicode__(self):
         return self.entry
@@ -408,18 +538,19 @@ class Notes(models.Model):
 
 class FileUpload(models.Model):
     title = models.CharField(max_length=100, unique=True)
-    file = models.FileField(upload_to=UniqueUploadNameProvider('uploaded_files'))
+    file = models.FileField(upload_to=UniqueUploadNameProvider("uploaded_files"))
 
 
 class Product_Type(models.Model):
     """Product types represent the top level model, these can be business unit divisions, different offices or locations, development teams, or any other logical way of distinguishing “types” of products.
 
-       Examples:
-         * IAM Team
-         * Internal / 3rd Party
-         * Main company / Acquisition
-         * San Francisco / New York offices
+    Examples:
+      * IAM Team
+      * Internal / 3rd Party
+      * Main company / Acquisition
+      * San Francisco / New York offices
     """
+
     name = models.CharField(max_length=255, unique=True)
     description = models.CharField(max_length=4000, null=True)
     critical_product = models.BooleanField(default=False)
@@ -431,23 +562,27 @@ class Product_Type(models.Model):
     @cached_property
     def critical_present(self):
         c_findings = Finding.objects.filter(
-            test__engagement__product__prod_type=self, severity='Critical')
+            test__engagement__product__prod_type=self, severity="Critical"
+        )
         if c_findings.count() > 0:
             return True
 
     @cached_property
     def high_present(self):
         c_findings = Finding.objects.filter(
-            test__engagement__product__prod_type=self, severity='High')
+            test__engagement__product__prod_type=self, severity="High"
+        )
         if c_findings.count() > 0:
             return True
 
     @cached_property
     def calc_health(self):
         h_findings = Finding.objects.filter(
-            test__engagement__product__prod_type=self, severity='High')
+            test__engagement__product__prod_type=self, severity="High"
+        )
         c_findings = Finding.objects.filter(
-            test__engagement__product__prod_type=self, severity='Critical')
+            test__engagement__product__prod_type=self, severity="Critical"
+        )
         health = 100
         if c_findings.count() > 0:
             health = 40
@@ -464,10 +599,16 @@ class Product_Type(models.Model):
     # only used by bulk risk acceptance api
     @property
     def unaccepted_open_findings(self):
-        return Finding.objects.filter(risk_accepted=False, active=True, verified=True, duplicate=False, test__engagement__product__prod_type=self)
+        return Finding.objects.filter(
+            risk_accepted=False,
+            active=True,
+            verified=True,
+            duplicate=False,
+            test__engagement__product__prod_type=self,
+        )
 
     class Meta:
-        ordering = ('name',)
+        ordering = ("name",)
 
     def __unicode__(self):
         return self.name
@@ -476,13 +617,18 @@ class Product_Type(models.Model):
         return self.name
 
     def get_breadcrumbs(self):
-        bc = [{'title': self.__unicode__(),
-               'url': reverse('edit_product_type', args=(self.id,))}]
+        bc = [
+            {
+                "title": self.__unicode__(),
+                "url": reverse("edit_product_type", args=(self.id,)),
+            }
+        ]
         return bc
 
     def get_absolute_url(self):
         from django.urls import reverse
-        return reverse('product_type', args=[str(self.id)])
+
+        return reverse("product_type", args=[str(self.id)])
 
 
 class Product_Line(models.Model):
@@ -512,41 +658,45 @@ class Test_Type(models.Model):
         return self.name
 
     class Meta:
-        ordering = ('name',)
+        ordering = ("name",)
 
     def get_breadcrumbs(self):
-        bc = [{'title': self.__unicode__(),
-               'url': None}]
+        bc = [{"title": self.__unicode__(), "url": None}]
         return bc
 
 
 class DojoMeta(models.Model):
     name = models.CharField(max_length=120)
     value = models.CharField(max_length=300)
-    product = models.ForeignKey('Product',
-                                on_delete=models.CASCADE,
-                                null=True,
-                                editable=False,
-                                related_name='product_meta')
-    endpoint = models.ForeignKey('Endpoint',
-                                 on_delete=models.CASCADE,
-                                 null=True,
-                                 editable=False,
-                                 related_name='endpoint_meta')
-    finding = models.ForeignKey('Finding',
-                                 on_delete=models.CASCADE,
-                                 null=True,
-                                 editable=False,
-                                 related_name='finding_meta')
+    product = models.ForeignKey(
+        "Product",
+        on_delete=models.CASCADE,
+        null=True,
+        editable=False,
+        related_name="product_meta",
+    )
+    endpoint = models.ForeignKey(
+        "Endpoint",
+        on_delete=models.CASCADE,
+        null=True,
+        editable=False,
+        related_name="endpoint_meta",
+    )
+    finding = models.ForeignKey(
+        "Finding",
+        on_delete=models.CASCADE,
+        null=True,
+        editable=False,
+        related_name="finding_meta",
+    )
 
     """
     Verify that this metadata entry belongs only to one object.
     """
+
     def clean(self):
 
-        ids = [self.product_id,
-               self.endpoint_id,
-               self.finding_id]
+        ids = [self.product_id, self.endpoint_id, self.finding_id]
         ids_count = 0
 
         for id in ids:
@@ -554,9 +704,13 @@ class DojoMeta(models.Model):
                 ids_count += 1
 
         if ids_count == 0:
-            raise ValidationError('Metadata entries need either a product, an endpoint or a finding')
+            raise ValidationError(
+                "Metadata entries need either a product, an endpoint or a finding"
+            )
         if ids_count > 1:
-            raise ValidationError('Metadata entries may not have more than one relation, either a product, an endpoint either or a finding')
+            raise ValidationError(
+                "Metadata entries may not have more than one relation, either a product, an endpoint either or a finding"
+            )
 
     def __unicode__(self):
         return "%s: %s" % (self.name, self.value)
@@ -565,68 +719,70 @@ class DojoMeta(models.Model):
         return "%s: %s" % (self.name, self.value)
 
     class Meta:
-        unique_together = (('product', 'name'),
-                           ('endpoint', 'name'),
-                           ('finding', 'name'))
+        unique_together = (
+            ("product", "name"),
+            ("endpoint", "name"),
+            ("finding", "name"),
+        )
 
 
 class Product(models.Model):
-    WEB_PLATFORM = 'web'
-    IOT = 'iot'
-    DESKTOP_PLATFORM = 'desktop'
-    MOBILE_PLATFORM = 'mobile'
-    WEB_SERVICE_PLATFORM = 'web service'
+    WEB_PLATFORM = "web"
+    IOT = "iot"
+    DESKTOP_PLATFORM = "desktop"
+    MOBILE_PLATFORM = "mobile"
+    WEB_SERVICE_PLATFORM = "web service"
     PLATFORM_CHOICES = (
-        (WEB_SERVICE_PLATFORM, _('API')),
-        (DESKTOP_PLATFORM, _('Desktop')),
-        (IOT, _('Internet of Things')),
-        (MOBILE_PLATFORM, _('Mobile')),
-        (WEB_PLATFORM, _('Web')),
+        (WEB_SERVICE_PLATFORM, _("API")),
+        (DESKTOP_PLATFORM, _("Desktop")),
+        (IOT, _("Internet of Things")),
+        (MOBILE_PLATFORM, _("Mobile")),
+        (WEB_PLATFORM, _("Web")),
     )
 
-    CONSTRUCTION = 'construction'
-    PRODUCTION = 'production'
-    RETIREMENT = 'retirement'
+    CONSTRUCTION = "construction"
+    PRODUCTION = "production"
+    RETIREMENT = "retirement"
     LIFECYCLE_CHOICES = (
-        (CONSTRUCTION, _('Construction')),
-        (PRODUCTION, _('Production')),
-        (RETIREMENT, _('Retirement')),
+        (CONSTRUCTION, _("Construction")),
+        (PRODUCTION, _("Production")),
+        (RETIREMENT, _("Retirement")),
     )
 
-    THIRD_PARTY_LIBRARY_ORIGIN = 'third party library'
-    PURCHASED_ORIGIN = 'purchased'
-    CONTRACTOR_ORIGIN = 'contractor'
-    INTERNALLY_DEVELOPED_ORIGIN = 'internal'
-    OPEN_SOURCE_ORIGIN = 'open source'
-    OUTSOURCED_ORIGIN = 'outsourced'
+    THIRD_PARTY_LIBRARY_ORIGIN = "third party library"
+    PURCHASED_ORIGIN = "purchased"
+    CONTRACTOR_ORIGIN = "contractor"
+    INTERNALLY_DEVELOPED_ORIGIN = "internal"
+    OPEN_SOURCE_ORIGIN = "open source"
+    OUTSOURCED_ORIGIN = "outsourced"
     ORIGIN_CHOICES = (
-        (THIRD_PARTY_LIBRARY_ORIGIN, _('Third Party Library')),
-        (PURCHASED_ORIGIN, _('Purchased')),
-        (CONTRACTOR_ORIGIN, _('Contractor Developed')),
-        (INTERNALLY_DEVELOPED_ORIGIN, _('Internally Developed')),
-        (OPEN_SOURCE_ORIGIN, _('Open Source')),
-        (OUTSOURCED_ORIGIN, _('Outsourced')),
+        (THIRD_PARTY_LIBRARY_ORIGIN, _("Third Party Library")),
+        (PURCHASED_ORIGIN, _("Purchased")),
+        (CONTRACTOR_ORIGIN, _("Contractor Developed")),
+        (INTERNALLY_DEVELOPED_ORIGIN, _("Internally Developed")),
+        (OPEN_SOURCE_ORIGIN, _("Open Source")),
+        (OUTSOURCED_ORIGIN, _("Outsourced")),
     )
 
-    VERY_HIGH_CRITICALITY = 'very high'
-    HIGH_CRITICALITY = 'high'
-    MEDIUM_CRITICALITY = 'medium'
-    LOW_CRITICALITY = 'low'
-    VERY_LOW_CRITICALITY = 'very low'
-    NONE_CRITICALITY = 'none'
+    VERY_HIGH_CRITICALITY = "very high"
+    HIGH_CRITICALITY = "high"
+    MEDIUM_CRITICALITY = "medium"
+    LOW_CRITICALITY = "low"
+    VERY_LOW_CRITICALITY = "very low"
+    NONE_CRITICALITY = "none"
     BUSINESS_CRITICALITY_CHOICES = (
-        (VERY_HIGH_CRITICALITY, _('Very High')),
-        (HIGH_CRITICALITY, _('High')),
-        (MEDIUM_CRITICALITY, _('Medium')),
-        (LOW_CRITICALITY, _('Low')),
-        (VERY_LOW_CRITICALITY, _('Very Low')),
-        (NONE_CRITICALITY, _('None')),
+        (VERY_HIGH_CRITICALITY, _("Very High")),
+        (HIGH_CRITICALITY, _("High")),
+        (MEDIUM_CRITICALITY, _("Medium")),
+        (LOW_CRITICALITY, _("Low")),
+        (VERY_LOW_CRITICALITY, _("Very Low")),
+        (NONE_CRITICALITY, _("None")),
     )
 
     name = models.CharField(max_length=255, unique=True)
     description = models.CharField(max_length=4000)
 
-    '''
+    """
     The following three fields are deprecated and no longer in use.
     They remain in model for backwards compatibility and will be removed
     in a future release.  prod_manager, tech_contact, manager
@@ -634,43 +790,115 @@ class Product(models.Model):
     The admin script migrate_product_contacts should be used to migrate data
     from these fields to their replacements.
     ./manage.py migrate_product_contacts
-    '''
-    prod_manager = models.CharField(default=0, max_length=200, null=True, blank=True)  # unused
-    tech_contact = models.CharField(default=0, max_length=200, null=True, blank=True)  # unused
-    manager = models.CharField(default=0, max_length=200, null=True, blank=True)  # unused
+    """
+    prod_manager = models.CharField(
+        default=0, max_length=200, null=True, blank=True
+    )  # unused
+    tech_contact = models.CharField(
+        default=0, max_length=200, null=True, blank=True
+    )  # unused
+    manager = models.CharField(
+        default=0, max_length=200, null=True, blank=True
+    )  # unused
 
-    product_manager = models.ForeignKey(Dojo_User, null=True, blank=True,
-                                        related_name='product_manager', on_delete=models.CASCADE)
-    technical_contact = models.ForeignKey(Dojo_User, null=True, blank=True,
-                                          related_name='technical_contact', on_delete=models.CASCADE)
-    team_manager = models.ForeignKey(Dojo_User, null=True, blank=True,
-                                     related_name='team_manager', on_delete=models.CASCADE)
+    product_manager = models.ForeignKey(
+        Dojo_User,
+        null=True,
+        blank=True,
+        related_name="product_manager",
+        on_delete=models.CASCADE,
+    )
+    technical_contact = models.ForeignKey(
+        Dojo_User,
+        null=True,
+        blank=True,
+        related_name="technical_contact",
+        on_delete=models.CASCADE,
+    )
+    team_manager = models.ForeignKey(
+        Dojo_User,
+        null=True,
+        blank=True,
+        related_name="team_manager",
+        on_delete=models.CASCADE,
+    )
 
     created = models.DateTimeField(editable=False, null=True, blank=True)
-    prod_type = models.ForeignKey(Product_Type, related_name='prod_type',
-                                  null=False, blank=False, on_delete=models.CASCADE)
+    prod_type = models.ForeignKey(
+        Product_Type,
+        related_name="prod_type",
+        null=False,
+        blank=False,
+        on_delete=models.CASCADE,
+    )
     updated = models.DateTimeField(editable=False, null=True, blank=True)
     tid = models.IntegerField(default=0, editable=False)
     authorized_users = models.ManyToManyField(User, blank=True)
     prod_numeric_grade = models.IntegerField(null=True, blank=True)
 
     # Metadata
-    business_criticality = models.CharField(max_length=9, choices=BUSINESS_CRITICALITY_CHOICES, blank=True, null=True)
-    platform = models.CharField(max_length=11, choices=PLATFORM_CHOICES, blank=True, null=True)
-    lifecycle = models.CharField(max_length=12, choices=LIFECYCLE_CHOICES, blank=True, null=True)
-    origin = models.CharField(max_length=19, choices=ORIGIN_CHOICES, blank=True, null=True)
-    user_records = models.PositiveIntegerField(blank=True, null=True, help_text=_('Estimate the number of user records within the application.'))
-    revenue = models.DecimalField(max_digits=15, decimal_places=2, blank=True, null=True, help_text=_('Estimate the application\'s revenue.'))
-    external_audience = models.BooleanField(default=False, help_text=_('Specify if the application is used by people outside the organization.'))
-    internet_accessible = models.BooleanField(default=False, help_text=_('Specify if the application is accessible from the public internet.'))
+    business_criticality = models.CharField(
+        max_length=9, choices=BUSINESS_CRITICALITY_CHOICES, blank=True, null=True
+    )
+    platform = models.CharField(
+        max_length=11, choices=PLATFORM_CHOICES, blank=True, null=True
+    )
+    lifecycle = models.CharField(
+        max_length=12, choices=LIFECYCLE_CHOICES, blank=True, null=True
+    )
+    origin = models.CharField(
+        max_length=19, choices=ORIGIN_CHOICES, blank=True, null=True
+    )
+    user_records = models.PositiveIntegerField(
+        blank=True,
+        null=True,
+        help_text=_("Estimate the number of user records within the application."),
+    )
+    revenue = models.DecimalField(
+        max_digits=15,
+        decimal_places=2,
+        blank=True,
+        null=True,
+        help_text=_("Estimate the application's revenue."),
+    )
+    external_audience = models.BooleanField(
+        default=False,
+        help_text=_(
+            "Specify if the application is used by people outside the organization."
+        ),
+    )
+    internet_accessible = models.BooleanField(
+        default=False,
+        help_text=_(
+            "Specify if the application is accessible from the public internet."
+        ),
+    )
     regulations = models.ManyToManyField(Regulation, blank=True)
 
-    tags_from_django_tagging = models.TextField(editable=False, blank=True, help_text=_('Temporary archive with tags from the previous tagging library we used'))
+    tags_from_django_tagging = models.TextField(
+        editable=False,
+        blank=True,
+        help_text=_(
+            "Temporary archive with tags from the previous tagging library we used"
+        ),
+    )
     # tags = TagField(blank=True, force_lowercase=True, help_text="Add tags that help describe this product. Choose from the list or add new tags. Press Enter key to add.")
-    tags = TagField(blank=True, force_lowercase=True, help_text="Add tags that help describe this product. Choose from the list or add new tags. Press Enter key to add.")
+    tags = TagField(
+        blank=True,
+        force_lowercase=True,
+        help_text="Add tags that help describe this product. Choose from the list or add new tags. Press Enter key to add.",
+    )
 
-    enable_simple_risk_acceptance = models.BooleanField(default=False, help_text=_('Allows simple risk acceptance by checking/unchecking a checkbox.'))
-    enable_full_risk_acceptance = models.BooleanField(default=True, help_text=_('Allows full risk acceptanc using a risk acceptance form, expiration date, uploaded proof, etc.'))
+    enable_simple_risk_acceptance = models.BooleanField(
+        default=False,
+        help_text=_("Allows simple risk acceptance by checking/unchecking a checkbox."),
+    )
+    enable_full_risk_acceptance = models.BooleanField(
+        default=True,
+        help_text=_(
+            "Allows full risk acceptanc using a risk acceptance form, expiration date, uploaded proof, etc."
+        ),
+    )
 
     def __unicode__(self):
         return self.name
@@ -679,7 +907,7 @@ class Product(models.Model):
         return self.name
 
     class Meta:
-        ordering = ('name',)
+        ordering = ("name",)
 
     @cached_property
     def findings_count(self):
@@ -688,8 +916,9 @@ class Product(models.Model):
             return self.active_finding_count
         except AttributeError:
             # ideally it's always prefetched and we can remove this code in the future
-            self.active_finding_count = Finding.objects.filter(active=True,
-                                            test__engagement__product=self).count()
+            self.active_finding_count = Finding.objects.filter(
+                active=True, test__engagement__product=self
+            ).count()
             return self.active_finding_count
 
     @cached_property
@@ -699,9 +928,9 @@ class Product(models.Model):
             return self.active_verified_finding_count
         except AttributeError:
             # ideally it's always prefetched and we can remove this code in the future
-            self.active_verified_finding_count = Finding.objects.filter(active=True,
-                                            verified=True,
-                                            test__engagement__product=self).count()
+            self.active_verified_finding_count = Finding.objects.filter(
+                active=True, verified=True, test__engagement__product=self
+            ).count()
             return self.active_verified_finding_count
 
     @cached_property
@@ -713,7 +942,7 @@ class Product(models.Model):
         ids = []
         for e in endpoints:
             if ":" in e.host:
-                host_no_port = e.host[:e.host.index(':')]
+                host_no_port = e.host[: e.host.index(":")]
             else:
                 host_no_port = e.host
 
@@ -729,65 +958,76 @@ class Product(models.Model):
         if start_date is None or end_date is None:
             return {}
         else:
-            critical = Finding.objects.filter(test__engagement__product=self,
-                                              mitigated__isnull=True,
-                                              verified=True,
-                                              false_p=False,
-                                              duplicate=False,
-                                              out_of_scope=False,
-                                              severity="Critical",
-                                              date__range=[start_date,
-                                                           end_date]).count()
-            high = Finding.objects.filter(test__engagement__product=self,
-                                          mitigated__isnull=True,
-                                          verified=True,
-                                          false_p=False,
-                                          duplicate=False,
-                                          out_of_scope=False,
-                                          severity="High",
-                                          date__range=[start_date,
-                                                       end_date]).count()
-            medium = Finding.objects.filter(test__engagement__product=self,
-                                            mitigated__isnull=True,
-                                            verified=True,
-                                            false_p=False,
-                                            duplicate=False,
-                                            out_of_scope=False,
-                                            severity="Medium",
-                                            date__range=[start_date,
-                                                         end_date]).count()
-            low = Finding.objects.filter(test__engagement__product=self,
-                                         mitigated__isnull=True,
-                                         verified=True,
-                                         false_p=False,
-                                         duplicate=False,
-                                         out_of_scope=False,
-                                         severity="Low",
-                                         date__range=[start_date,
-                                                      end_date]).count()
-            return {'Critical': critical,
-                    'High': high,
-                    'Medium': medium,
-                    'Low': low,
-                    'Total': (critical + high + medium + low)}
+            critical = Finding.objects.filter(
+                test__engagement__product=self,
+                mitigated__isnull=True,
+                verified=True,
+                false_p=False,
+                duplicate=False,
+                out_of_scope=False,
+                severity="Critical",
+                date__range=[start_date, end_date],
+            ).count()
+            high = Finding.objects.filter(
+                test__engagement__product=self,
+                mitigated__isnull=True,
+                verified=True,
+                false_p=False,
+                duplicate=False,
+                out_of_scope=False,
+                severity="High",
+                date__range=[start_date, end_date],
+            ).count()
+            medium = Finding.objects.filter(
+                test__engagement__product=self,
+                mitigated__isnull=True,
+                verified=True,
+                false_p=False,
+                duplicate=False,
+                out_of_scope=False,
+                severity="Medium",
+                date__range=[start_date, end_date],
+            ).count()
+            low = Finding.objects.filter(
+                test__engagement__product=self,
+                mitigated__isnull=True,
+                verified=True,
+                false_p=False,
+                duplicate=False,
+                out_of_scope=False,
+                severity="Low",
+                date__range=[start_date, end_date],
+            ).count()
+            return {
+                "Critical": critical,
+                "High": high,
+                "Medium": medium,
+                "Low": low,
+                "Total": (critical + high + medium + low),
+            }
 
     def get_breadcrumbs(self):
-        bc = [{'title': self.__unicode__(),
-               'url': reverse('view_product', args=(self.id,))}]
+        bc = [
+            {
+                "title": self.__unicode__(),
+                "url": reverse("view_product", args=(self.id,)),
+            }
+        ]
         return bc
 
     @property
     def get_product_type(self):
-        return self.prod_type if self.prod_type is not None else 'unknown'
+        return self.prod_type if self.prod_type is not None else "unknown"
 
     def open_findings_list(self):
-        findings = Finding.objects.filter(test__engagement__product=self,
-                                          mitigated__isnull=True,
-                                          verified=True,
-                                          false_p=False,
-                                          duplicate=False,
-                                          out_of_scope=False
-                                          )
+        findings = Finding.objects.filter(
+            test__engagement__product=self,
+            mitigated__isnull=True,
+            verified=True,
+            false_p=False,
+            duplicate=False,
+            out_of_scope=False,
+        )
         findings_list = []
         for i in findings:
             findings_list.append(i.id)
@@ -796,43 +1036,59 @@ class Product(models.Model):
     @property
     def has_jira_configured(self):
         import dojo.jira_link.helper as jira_helper
+
         return jira_helper.has_jira_configured(self)
 
     def get_absolute_url(self):
         from django.urls import reverse
-        return reverse('view_product', args=[str(self.id)])
+
+        return reverse("view_product", args=[str(self.id)])
 
 
 class ScanSettings(models.Model):
-    product = models.ForeignKey(Product, default=1, editable=False, on_delete=models.CASCADE)
+    product = models.ForeignKey(
+        Product, default=1, editable=False, on_delete=models.CASCADE
+    )
     addresses = models.TextField(default="none")
     user = models.ForeignKey(User, editable=False, on_delete=models.CASCADE)
-    date = models.DateTimeField(editable=False, blank=True,
-                                default=get_current_datetime)
-    frequency = models.CharField(max_length=10000, null=True,
-                                 blank=True)
+    date = models.DateTimeField(
+        editable=False, blank=True, default=get_current_datetime
+    )
+    frequency = models.CharField(max_length=10000, null=True, blank=True)
     email = models.CharField(max_length=512)
-    protocol = models.CharField(max_length=10, default='TCP')
+    protocol = models.CharField(max_length=10, default="TCP")
 
     def addresses_as_list(self):
         if self.addresses:
-            return [a.strip() for a in self.addresses.split(',')]
+            return [a.strip() for a in self.addresses.split(",")]
         return []
 
     def get_breadcrumbs(self):
         bc = self.product.get_breadcrumbs()
-        bc += [{'title': "Scan Settings",
-                'url': reverse('view_scan_settings',
-                               args=(self.product.id, self.id,))}]
+        bc += [
+            {
+                "title": "Scan Settings",
+                "url": reverse(
+                    "view_scan_settings",
+                    args=(
+                        self.product.id,
+                        self.id,
+                    ),
+                ),
+            }
+        ]
         return bc
 
 
 class Scan(models.Model):
-    scan_settings = models.ForeignKey(ScanSettings, default=1, editable=False, on_delete=models.CASCADE)
-    date = models.DateTimeField(editable=False, blank=True,
-                                default=get_current_datetime)
-    protocol = models.CharField(max_length=10, default='TCP')
-    status = models.CharField(max_length=10, default='Pending', editable=False)
+    scan_settings = models.ForeignKey(
+        ScanSettings, default=1, editable=False, on_delete=models.CASCADE
+    )
+    date = models.DateTimeField(
+        editable=False, blank=True, default=get_current_datetime
+    )
+    protocol = models.CharField(max_length=10, default="TCP")
+    status = models.CharField(max_length=10, default="Pending", editable=False)
     baseline = models.BooleanField(default=False, verbose_name="Current Baseline")
 
     def __unicode__(self):
@@ -843,8 +1099,9 @@ class Scan(models.Model):
 
     def get_breadcrumbs(self):
         bc = self.scan_settings.get_breadcrumbs()
-        bc += [{'title': self.__unicode__(),
-                'url': reverse('view_scan', args=(self.id,))}]
+        bc += [
+            {"title": self.__unicode__(), "url": reverse("view_scan", args=(self.id,))}
+        ]
         return bc
 
 
@@ -859,7 +1116,7 @@ class Tool_Type(models.Model):
     description = models.CharField(max_length=2000, null=True)
 
     class Meta:
-        ordering = ['name']
+        ordering = ["name"]
 
     def __unicode__(self):
         return self.name
@@ -872,24 +1129,27 @@ class Tool_Configuration(models.Model):
     name = models.CharField(max_length=200, null=False)
     description = models.CharField(max_length=2000, null=True, blank=True)
     url = models.CharField(max_length=2000, null=True)
-    tool_type = models.ForeignKey(Tool_Type, related_name='tool_type', on_delete=models.CASCADE)
-    authentication_type = models.CharField(max_length=15,
-                                           choices=(
-                                               ('API', 'API Key'),
-                                               ('Password',
-                                                'Username/Password'),
-                                               ('SSH', 'SSH')),
-                                           null=True, blank=True)
+    tool_type = models.ForeignKey(
+        Tool_Type, related_name="tool_type", on_delete=models.CASCADE
+    )
+    authentication_type = models.CharField(
+        max_length=15,
+        choices=(("API", "API Key"), ("Password", "Username/Password"), ("SSH", "SSH")),
+        null=True,
+        blank=True,
+    )
     username = models.CharField(max_length=200, null=True, blank=True)
     password = models.CharField(max_length=600, null=True, blank=True)
-    auth_title = models.CharField(max_length=200, null=True, blank=True,
-                                  verbose_name="Title for SSH/API Key")
+    auth_title = models.CharField(
+        max_length=200, null=True, blank=True, verbose_name="Title for SSH/API Key"
+    )
     ssh = models.CharField(max_length=6000, null=True, blank=True)
-    api_key = models.CharField(max_length=600, null=True, blank=True,
-                               verbose_name="API Key")
+    api_key = models.CharField(
+        max_length=600, null=True, blank=True, verbose_name="API Key"
+    )
 
     class Meta:
-        ordering = ['name']
+        ordering = ["name"]
 
     def __unicode__(self):
         return self.name
@@ -920,10 +1180,14 @@ class ToolConfigForm_Admin(forms.ModelForm):
     def clean(self):
         # self.fields['endpoints'].queryset = Endpoint.objects.all()
         cleaned_data = super().clean()
-        if not cleaned_data['password'] and not cleaned_data['ssh'] and not cleaned_data['api_key']:
-            cleaned_data['password'] = self.password_from_db
-            cleaned_data['ssh'] = self.ssh_from_db
-            cleaned_data['api_key'] = self.api_key_from_db
+        if (
+            not cleaned_data["password"]
+            and not cleaned_data["ssh"]
+            and not cleaned_data["api_key"]
+        ):
+            cleaned_data["password"] = self.password_from_db
+            cleaned_data["ssh"] = self.ssh_from_db
+            cleaned_data["api_key"] = self.api_key_from_db
 
         return cleaned_data
 
@@ -933,7 +1197,10 @@ class Tool_Configuration_Admin(admin.ModelAdmin):
 
 
 class Network_Locations(models.Model):
-    location = models.CharField(max_length=500, help_text="Location of network testing: Examples: VPN, Internet or Internal.")
+    location = models.CharField(
+        max_length=500,
+        help_text="Location of network testing: Examples: VPN, Internet or Internal.",
+    )
 
     def __unicode__(self):
         return self.location
@@ -943,11 +1210,25 @@ class Network_Locations(models.Model):
 
 
 class Engagement_Presets(models.Model):
-    title = models.CharField(max_length=500, default=None, help_text="Brief description of preset.")
+    title = models.CharField(
+        max_length=500, default=None, help_text="Brief description of preset."
+    )
     test_type = models.ManyToManyField(Test_Type, default=None, blank=True)
-    network_locations = models.ManyToManyField(Network_Locations, default=None, blank=True)
-    notes = models.CharField(max_length=2000, help_text="Description of what needs to be tested or setting up environment for testing", null=True, blank=True)
-    scope = models.CharField(max_length=800, help_text="Scope of Engagement testing, IP's/Resources/URL's)", default=None, blank=True)
+    network_locations = models.ManyToManyField(
+        Network_Locations, default=None, blank=True
+    )
+    notes = models.CharField(
+        max_length=2000,
+        help_text="Description of what needs to be tested or setting up environment for testing",
+        null=True,
+        blank=True,
+    )
+    scope = models.CharField(
+        max_length=800,
+        help_text="Scope of Engagement testing, IP's/Resources/URL's)",
+        default=None,
+        blank=True,
+    )
     product = models.ForeignKey(Product, on_delete=models.CASCADE)
     created = models.DateTimeField(auto_now_add=True, null=False)
 
@@ -958,7 +1239,7 @@ class Engagement_Presets(models.Model):
         return self.title
 
     class Meta:
-        ordering = ['title']
+        ordering = ["title"]
 
 
 class Engagement_Type(models.Model):
@@ -971,33 +1252,58 @@ class Engagement_Type(models.Model):
         return self.name
 
 
-ENGAGEMENT_STATUS_CHOICES = (('Not Started', 'Not Started'),
-                             ('Blocked', 'Blocked'),
-                             ('Cancelled', 'Cancelled'),
-                             ('Completed', 'Completed'),
-                             ('In Progress', 'In Progress'),
-                             ('On Hold', 'On Hold'),
-                             ('Waiting for Resource', 'Waiting for Resource'))
+ENGAGEMENT_STATUS_CHOICES = (
+    ("Not Started", "Not Started"),
+    ("Blocked", "Blocked"),
+    ("Cancelled", "Cancelled"),
+    ("Completed", "Completed"),
+    ("In Progress", "In Progress"),
+    ("On Hold", "On Hold"),
+    ("Waiting for Resource", "Waiting for Resource"),
+)
 
 
 class Engagement(models.Model):
     name = models.CharField(max_length=300, null=True, blank=True)
     description = models.CharField(max_length=2000, null=True, blank=True)
-    version = models.CharField(max_length=100, null=True, blank=True, help_text="Version of the product the engagement tested.")
-    eng_type = models.ForeignKey(Engagement_Type, null=True, blank=True, on_delete=models.CASCADE)
+    version = models.CharField(
+        max_length=100,
+        null=True,
+        blank=True,
+        help_text="Version of the product the engagement tested.",
+    )
+    eng_type = models.ForeignKey(
+        Engagement_Type, null=True, blank=True, on_delete=models.CASCADE
+    )
     first_contacted = models.DateField(null=True, blank=True)
     target_start = models.DateField(null=False, blank=False)
     target_end = models.DateField(null=False, blank=False)
     lead = models.ForeignKey(User, editable=True, null=True, on_delete=models.CASCADE)
-    requester = models.ForeignKey(Contact, null=True, blank=True, on_delete=models.CASCADE)
-    preset = models.ForeignKey(Engagement_Presets, null=True, blank=True, help_text="Settings and notes for performing this engagement.", on_delete=models.CASCADE)
+    requester = models.ForeignKey(
+        Contact, null=True, blank=True, on_delete=models.CASCADE
+    )
+    preset = models.ForeignKey(
+        Engagement_Presets,
+        null=True,
+        blank=True,
+        help_text="Settings and notes for performing this engagement.",
+        on_delete=models.CASCADE,
+    )
     reason = models.CharField(max_length=2000, null=True, blank=True)
-    report_type = models.ForeignKey(Report_Type, null=True, blank=True, on_delete=models.CASCADE)
+    report_type = models.ForeignKey(
+        Report_Type, null=True, blank=True, on_delete=models.CASCADE
+    )
     product = models.ForeignKey(Product, on_delete=models.CASCADE)
     updated = models.DateTimeField(auto_now=True, null=True)
     created = models.DateTimeField(auto_now_add=True, null=True)
     active = models.BooleanField(default=True, editable=False)
-    tracker = models.URLField(max_length=200, help_text="Link to epic or ticket system with changes to version.", editable=True, blank=True, null=True)
+    tracker = models.URLField(
+        max_length=200,
+        help_text="Link to epic or ticket system with changes to version.",
+        editable=True,
+        blank=True,
+        null=True,
+    )
     test_strategy = models.URLField(editable=True, blank=True, null=True)
     threat_model = models.BooleanField(default=True)
     api_test = models.BooleanField(default=True)
@@ -1005,42 +1311,111 @@ class Engagement(models.Model):
     check_list = models.BooleanField(default=True)
     notes = models.ManyToManyField(Notes, blank=True, editable=False)
     files = models.ManyToManyField(FileUpload, blank=True, editable=False)
-    status = models.CharField(editable=True, max_length=2000, default='',
-                              null=True,
-                              choices=ENGAGEMENT_STATUS_CHOICES)
-    progress = models.CharField(max_length=100,
-                                default='threat_model', editable=False)
-    tmodel_path = models.CharField(max_length=1000, default='none',
-                                   editable=False, blank=True, null=True)
-    risk_acceptance = models.ManyToManyField("Risk_Acceptance",
-                                             default=None,
-                                             editable=False,
-                                             blank=True)
+    status = models.CharField(
+        editable=True,
+        max_length=2000,
+        default="",
+        null=True,
+        choices=ENGAGEMENT_STATUS_CHOICES,
+    )
+    progress = models.CharField(max_length=100, default="threat_model", editable=False)
+    tmodel_path = models.CharField(
+        max_length=1000, default="none", editable=False, blank=True, null=True
+    )
+    risk_acceptance = models.ManyToManyField(
+        "Risk_Acceptance", default=None, editable=False, blank=True
+    )
     done_testing = models.BooleanField(default=False, editable=False)
-    engagement_type = models.CharField(editable=True, max_length=30, default='Interactive',
-                                       null=True,
-                                       choices=(('Interactive', 'Interactive'),
-                                                ('CI/CD', 'CI/CD')))
-    build_id = models.CharField(editable=True, max_length=150,
-                                   null=True, blank=True, help_text="Build ID of the product the engagement tested.", verbose_name="Build ID")
-    commit_hash = models.CharField(editable=True, max_length=150,
-                                   null=True, blank=True, help_text="Commit hash from repo", verbose_name="Commit Hash")
-    branch_tag = models.CharField(editable=True, max_length=150,
-                                   null=True, blank=True, help_text="Tag or branch of the product the engagement tested.", verbose_name="Branch/Tag")
-    build_server = models.ForeignKey(Tool_Configuration, verbose_name="Build Server", help_text="Build server responsible for CI/CD test", null=True, blank=True, related_name='build_server', on_delete=models.CASCADE)
-    source_code_management_server = models.ForeignKey(Tool_Configuration, null=True, blank=True, verbose_name="SCM Server", help_text="Source code server for CI/CD test", related_name='source_code_management_server', on_delete=models.CASCADE)
-    source_code_management_uri = models.URLField(max_length=600, null=True, blank=True, editable=True, verbose_name="Repo", help_text="Resource link to source code")
-    orchestration_engine = models.ForeignKey(Tool_Configuration, verbose_name="Orchestration Engine", help_text="Orchestration service responsible for CI/CD test", null=True, blank=True, related_name='orchestration', on_delete=models.CASCADE)
-    deduplication_on_engagement = models.BooleanField(default=False, verbose_name="Deduplication within this engagement only", help_text="If enabled deduplication will only mark a finding in this engagement as duplicate of another finding if both findings are in this engagement. If disabled, deduplication is on the product level.")
+    engagement_type = models.CharField(
+        editable=True,
+        max_length=30,
+        default="Interactive",
+        null=True,
+        choices=(("Interactive", "Interactive"), ("CI/CD", "CI/CD")),
+    )
+    build_id = models.CharField(
+        editable=True,
+        max_length=150,
+        null=True,
+        blank=True,
+        help_text="Build ID of the product the engagement tested.",
+        verbose_name="Build ID",
+    )
+    commit_hash = models.CharField(
+        editable=True,
+        max_length=150,
+        null=True,
+        blank=True,
+        help_text="Commit hash from repo",
+        verbose_name="Commit Hash",
+    )
+    branch_tag = models.CharField(
+        editable=True,
+        max_length=150,
+        null=True,
+        blank=True,
+        help_text="Tag or branch of the product the engagement tested.",
+        verbose_name="Branch/Tag",
+    )
+    build_server = models.ForeignKey(
+        Tool_Configuration,
+        verbose_name="Build Server",
+        help_text="Build server responsible for CI/CD test",
+        null=True,
+        blank=True,
+        related_name="build_server",
+        on_delete=models.CASCADE,
+    )
+    source_code_management_server = models.ForeignKey(
+        Tool_Configuration,
+        null=True,
+        blank=True,
+        verbose_name="SCM Server",
+        help_text="Source code server for CI/CD test",
+        related_name="source_code_management_server",
+        on_delete=models.CASCADE,
+    )
+    source_code_management_uri = models.URLField(
+        max_length=600,
+        null=True,
+        blank=True,
+        editable=True,
+        verbose_name="Repo",
+        help_text="Resource link to source code",
+    )
+    orchestration_engine = models.ForeignKey(
+        Tool_Configuration,
+        verbose_name="Orchestration Engine",
+        help_text="Orchestration service responsible for CI/CD test",
+        null=True,
+        blank=True,
+        related_name="orchestration",
+        on_delete=models.CASCADE,
+    )
+    deduplication_on_engagement = models.BooleanField(
+        default=False,
+        verbose_name="Deduplication within this engagement only",
+        help_text="If enabled deduplication will only mark a finding in this engagement as duplicate of another finding if both findings are in this engagement. If disabled, deduplication is on the product level.",
+    )
 
-    tags_from_django_tagging = models.TextField(editable=False, blank=True, help_text=_('Temporary archive with tags from the previous tagging library we used'))
-    tags = TagField(blank=True, force_lowercase=True, help_text="Add tags that help describe this engagement. Choose from the list or add new tags. Press Enter key to add.")
+    tags_from_django_tagging = models.TextField(
+        editable=False,
+        blank=True,
+        help_text=_(
+            "Temporary archive with tags from the previous tagging library we used"
+        ),
+    )
+    tags = TagField(
+        blank=True,
+        force_lowercase=True,
+        help_text="Add tags that help describe this engagement. Choose from the list or add new tags. Press Enter key to add.",
+    )
 
     class Meta:
-        ordering = ['-target_start']
+        ordering = ["-target_start"]
 
     def is_overdue(self):
-        if self.engagement_type == 'CI/CD':
+        if self.engagement_type == "CI/CD":
             overdue_grace_days = 10
         else:
             overdue_grace_days = 0
@@ -1053,25 +1428,37 @@ class Engagement(models.Model):
         return False
 
     def __unicode__(self):
-        return "Engagement: %s (%s)" % (self.name if self.name else '',
-                                        self.target_start.strftime(
-                                            "%b %d, %Y"))
+        return "Engagement: %s (%s)" % (
+            self.name if self.name else "",
+            self.target_start.strftime("%b %d, %Y"),
+        )
 
     def __str__(self):
-        return "Engagement: %s (%s)" % (self.name if self.name else '',
-                                        self.target_start.strftime(
-                                            "%b %d, %Y"))
+        return "Engagement: %s (%s)" % (
+            self.name if self.name else "",
+            self.target_start.strftime("%b %d, %Y"),
+        )
 
     def get_breadcrumbs(self):
         bc = self.product.get_breadcrumbs()
-        bc += [{'title': self.__unicode__(),
-                'url': reverse('view_engagement', args=(self.id,))}]
+        bc += [
+            {
+                "title": self.__unicode__(),
+                "url": reverse("view_engagement", args=(self.id,)),
+            }
+        ]
         return bc
 
     # only used by bulk risk acceptance api
     @property
     def unaccepted_open_findings(self):
-        return Finding.objects.filter(risk_accepted=False, active=True, verified=True, duplicate=False, test__engagement=self)
+        return Finding.objects.filter(
+            risk_accepted=False,
+            active=True,
+            verified=True,
+            duplicate=False,
+            test__engagement=self,
+        )
 
     def accept_risks(self, accepted_risks):
         self.risk_acceptance.add(*accepted_risks)
@@ -1079,11 +1466,13 @@ class Engagement(models.Model):
     @property
     def has_jira_issue(self):
         import dojo.jira_link.helper as jira_helper
+
         return jira_helper.has_jira_issue(self)
 
     def get_absolute_url(self):
         from django.urls import reverse
-        return reverse('view_engagement', args=[str(self.id)])
+
+        return reverse("view_engagement", args=[str(self.id)])
 
 
 class CWE(models.Model):
@@ -1095,22 +1484,39 @@ class CWE(models.Model):
 class Endpoint_Params(models.Model):
     param = models.CharField(max_length=150)
     value = models.CharField(max_length=150)
-    method_type = (('GET', 'GET'),
-                   ('POST', 'POST'))
-    method = models.CharField(max_length=20, blank=False, null=True, choices=method_type)
+    method_type = (("GET", "GET"), ("POST", "POST"))
+    method = models.CharField(
+        max_length=20, blank=False, null=True, choices=method_type
+    )
 
 
 class Endpoint_Status(models.Model):
     date = models.DateTimeField(default=get_current_date)
-    last_modified = models.DateTimeField(null=True, editable=False, default=get_current_datetime)
+    last_modified = models.DateTimeField(
+        null=True, editable=False, default=get_current_datetime
+    )
     mitigated = models.BooleanField(default=False, blank=True)
     mitigated_time = models.DateTimeField(editable=False, null=True, blank=True)
-    mitigated_by = models.ForeignKey(User, editable=True, null=True, on_delete=models.CASCADE)
+    mitigated_by = models.ForeignKey(
+        User, editable=True, null=True, on_delete=models.CASCADE
+    )
     false_positive = models.BooleanField(default=False, blank=True)
     out_of_scope = models.BooleanField(default=False, blank=True)
     risk_accepted = models.BooleanField(default=False, blank=True)
-    endpoint = models.ForeignKey('Endpoint', null=True, blank=True, on_delete=models.CASCADE, related_name='status_endpoint')
-    finding = models.ForeignKey('Finding', null=True, blank=True, on_delete=models.CASCADE, related_name='status_finding')
+    endpoint = models.ForeignKey(
+        "Endpoint",
+        null=True,
+        blank=True,
+        on_delete=models.CASCADE,
+        related_name="status_endpoint",
+    )
+    finding = models.ForeignKey(
+        "Finding",
+        null=True,
+        blank=True,
+        on_delete=models.CASCADE,
+        related_name="status_finding",
+    )
 
     @property
     def age(self):
@@ -1124,38 +1530,77 @@ class Endpoint_Status(models.Model):
     def __str__(self):
         field_values = []
         for field in self._meta.get_fields():
-            field_values.append(str(getattr(self, field.name, '')))
-        return ' '.join(field_values)
+            field_values.append(str(getattr(self, field.name, "")))
+        return " ".join(field_values)
 
 
 class Endpoint(models.Model):
-    protocol = models.CharField(null=True, blank=True, max_length=10,
-                                help_text="The communication protocol such as 'http', 'ftp', etc.")
-    host = models.CharField(null=True, blank=True, max_length=500,
-                            help_text="The host name or IP address, you can also include the port number. For example"
-                                      "'127.0.0.1', '127.0.0.1:8080', 'localhost', 'yourdomain.com'.")
+    protocol = models.CharField(
+        null=True,
+        blank=True,
+        max_length=10,
+        help_text="The communication protocol such as 'http', 'ftp', etc.",
+    )
+    host = models.CharField(
+        null=True,
+        blank=True,
+        max_length=500,
+        help_text="The host name or IP address, you can also include the port number. For example"
+        "'127.0.0.1', '127.0.0.1:8080', 'localhost', 'yourdomain.com'.",
+    )
     fqdn = models.CharField(null=True, blank=True, max_length=500)
-    port = models.IntegerField(null=True, blank=True,
-                               help_text="The network port associated with the endpoint.")
-    path = models.CharField(null=True, blank=True, max_length=500,
-                            help_text="The location of the resource, it should start with a '/'. For example"
-                                      "/endpoint/420/edit")
-    query = models.CharField(null=True, blank=True, max_length=1000,
-                             help_text="The query string, the question mark should be omitted."
-                                       "For example 'group=4&team=8'")
-    fragment = models.CharField(null=True, blank=True, max_length=500,
-                                help_text="The fragment identifier which follows the hash mark. The hash mark should "
-                                          "be omitted. For example 'section-13', 'paragraph-2'.")
-    product = models.ForeignKey(Product, null=True, blank=True, on_delete=models.CASCADE)
-    endpoint_params = models.ManyToManyField(Endpoint_Params, blank=True, editable=False)
+    port = models.IntegerField(
+        null=True,
+        blank=True,
+        help_text="The network port associated with the endpoint.",
+    )
+    path = models.CharField(
+        null=True,
+        blank=True,
+        max_length=500,
+        help_text="The location of the resource, it should start with a '/'. For example"
+        "/endpoint/420/edit",
+    )
+    query = models.CharField(
+        null=True,
+        blank=True,
+        max_length=1000,
+        help_text="The query string, the question mark should be omitted."
+        "For example 'group=4&team=8'",
+    )
+    fragment = models.CharField(
+        null=True,
+        blank=True,
+        max_length=500,
+        help_text="The fragment identifier which follows the hash mark. The hash mark should "
+        "be omitted. For example 'section-13', 'paragraph-2'.",
+    )
+    product = models.ForeignKey(
+        Product, null=True, blank=True, on_delete=models.CASCADE
+    )
+    endpoint_params = models.ManyToManyField(
+        Endpoint_Params, blank=True, editable=False
+    )
     mitigated = models.BooleanField(default=False, blank=True)
-    endpoint_status = models.ManyToManyField(Endpoint_Status, blank=True, related_name='endpoint_endpoint_status')
+    endpoint_status = models.ManyToManyField(
+        Endpoint_Status, blank=True, related_name="endpoint_endpoint_status"
+    )
 
-    tags_from_django_tagging = models.TextField(editable=False, blank=True, help_text=_('Temporary archive with tags from the previous tagging library we used'))
-    tags = TagField(blank=True, force_lowercase=True, help_text="Add tags that help describe this endpoint. Choose from the list or add new tags. Press Enter key to add.")
+    tags_from_django_tagging = models.TextField(
+        editable=False,
+        blank=True,
+        help_text=_(
+            "Temporary archive with tags from the previous tagging library we used"
+        ),
+    )
+    tags = TagField(
+        blank=True,
+        force_lowercase=True,
+        help_text="Add tags that help describe this endpoint. Choose from the list or add new tags. Press Enter key to add.",
+    )
 
     class Meta:
-        ordering = ['product', 'protocol', 'host', 'path', 'query', 'fragment']
+        ordering = ["product", "protocol", "host", "path", "query", "fragment"]
 
     def __unicode__(self):
         from urllib.parse import uses_netloc
@@ -1163,28 +1608,28 @@ class Endpoint(models.Model):
         netloc = self.host
         port = self.port
         scheme = self.protocol
-        url = self.path if self.path else ''
+        url = self.path if self.path else ""
         query = self.query
         fragment = self.fragment
 
         if port:
             # If http or https on standard ports then don't tack on the port number
             if (port != 443 and scheme == "https") or (port != 80 and scheme == "http"):
-                netloc += ':%s' % port
+                netloc += ":%s" % port
 
-        if netloc or (scheme and scheme in uses_netloc and url[:2] != '//'):
-            if url and url[:1] != '/':
-                url = '/' + url
-            if scheme and scheme in uses_netloc and url[:2] != '//':
-                url = '//' + (netloc or '') + url
+        if netloc or (scheme and scheme in uses_netloc and url[:2] != "//"):
+            if url and url[:1] != "/":
+                url = "/" + url
+            if scheme and scheme in uses_netloc and url[:2] != "//":
+                url = "//" + (netloc or "") + url
             else:
-                url = (netloc or '') + url
+                url = (netloc or "") + url
         if scheme:
-            url = scheme + ':' + url
+            url = scheme + ":" + url
         if query:
-            url = url + '?' + query
+            url = url + "?" + query
         if fragment:
-            url = url + '#' + fragment
+            url = url + "#" + fragment
         return url
 
     def __str__(self):
@@ -1193,28 +1638,28 @@ class Endpoint(models.Model):
         netloc = self.host
         port = self.port
         scheme = self.protocol
-        url = self.path if self.path else ''
+        url = self.path if self.path else ""
         query = self.query
         fragment = self.fragment
 
         if port:
             # If http or https on standard ports then don't tack on the port number
             if (port != 443 and scheme == "https") or (port != 80 and scheme == "http"):
-                netloc += ':%s' % port
+                netloc += ":%s" % port
 
-        if netloc or (scheme and scheme in uses_netloc and url[:2] != '//'):
-            if url and url[:1] != '/':
-                url = '/' + url
-            if scheme and scheme in uses_netloc and url[:2] != '//':
-                url = '//' + (netloc or '') + url
+        if netloc or (scheme and scheme in uses_netloc and url[:2] != "//"):
+            if url and url[:1] != "/":
+                url = "/" + url
+            if scheme and scheme in uses_netloc and url[:2] != "//":
+                url = "//" + (netloc or "") + url
             else:
-                url = (netloc or '') + url
+                url = (netloc or "") + url
         if scheme:
-            url = scheme + ':' + url
+            url = scheme + ":" + url
         if query:
-            url = url + '?' + query
+            url = url + "?" + query
         if fragment:
-            url = url + '#' + fragment
+            url = url + "#" + fragment
         return url
 
     def __hash__(self):
@@ -1230,43 +1675,55 @@ class Endpoint(models.Model):
     def finding_count(self):
         host = self.host_no_port
 
-        endpoints = Endpoint.objects.filter(host__regex="^" + host + ":?",
-                                            product=self.product).distinct()
+        endpoints = Endpoint.objects.filter(
+            host__regex="^" + host + ":?", product=self.product
+        ).distinct()
 
-        findings = Finding.objects.filter(endpoints__in=endpoints,
-                                          active=True,
-                                          verified=True,
-                                          out_of_scope=False).distinct()
+        findings = Finding.objects.filter(
+            endpoints__in=endpoints, active=True, verified=True, out_of_scope=False
+        ).distinct()
 
         return findings.count()
 
     def active_findings(self):
         host = self.host_no_port
 
-        endpoints = Endpoint.objects.filter(host__regex="^" + host + ":?",
-                                            product=self.product).distinct()
-        return Finding.objects.filter(endpoints__in=endpoints,
-                                      active=True,
-                                      verified=True,
-                                      mitigated__isnull=True,
-                                      false_p=False,
-                                      duplicate=False).distinct().order_by(
-            'numerical_severity')
+        endpoints = Endpoint.objects.filter(
+            host__regex="^" + host + ":?", product=self.product
+        ).distinct()
+        return (
+            Finding.objects.filter(
+                endpoints__in=endpoints,
+                active=True,
+                verified=True,
+                mitigated__isnull=True,
+                false_p=False,
+                duplicate=False,
+            )
+            .distinct()
+            .order_by("numerical_severity")
+        )
 
     @cached_property
     def finding_count_endpoint(self):
-        findings = Finding.objects.filter(endpoints=self,
-                                          active=True,
-                                          verified=True,
-                                          duplicate=False,
-                                          out_of_scope=False).distinct()
+        findings = Finding.objects.filter(
+            endpoints=self,
+            active=True,
+            verified=True,
+            duplicate=False,
+            out_of_scope=False,
+        ).distinct()
 
         return findings.count()
 
     def get_breadcrumbs(self):
         bc = self.product.get_breadcrumbs()
-        bc += [{'title': self.host_no_port,
-                'url': reverse('view_endpoint', args=(self.id,))}]
+        bc += [
+            {
+                "title": self.host_no_port,
+                "url": reverse("view_endpoint", args=(self.id,)),
+            }
+        ]
         return bc
 
     @staticmethod
@@ -1276,7 +1733,7 @@ class Endpoint(models.Model):
     @property
     def host_no_port(self):
         if ":" in self.host:
-            return self.host[:self.host.index(":")]
+            return self.host[: self.host.index(":")]
         else:
             return self.host
 
@@ -1288,15 +1745,16 @@ class Endpoint(models.Model):
         if ":" in host:
             return host
         elif (port is None) and (scheme == "https"):
-            return host + ':443'
+            return host + ":443"
         elif (port is None) and (scheme == "http"):
-            return host + ':80'
+            return host + ":80"
         else:
             return str(self)
 
     def get_absolute_url(self):
         from django.urls import reverse
-        return reverse('view_endpoint', args=[str(self.id)])
+
+        return reverse("view_endpoint", args=[str(self.id)])
 
 
 class Development_Environment(models.Model):
@@ -1309,8 +1767,12 @@ class Development_Environment(models.Model):
         return self.name
 
     def get_breadcrumbs(self):
-        return [{"title": self.__unicode__(),
-                 "url": reverse("edit_dev_env", args=(self.id,))}]
+        return [
+            {
+                "title": self.__unicode__(),
+                "url": reverse("edit_dev_env", args=(self.id,)),
+            }
+        ]
 
 
 class Test(models.Model):
@@ -1322,20 +1784,33 @@ class Test(models.Model):
     target_start = models.DateTimeField()
     target_end = models.DateTimeField()
     estimated_time = models.TimeField(null=True, blank=True, editable=False)
-    actual_time = models.TimeField(null=True, blank=True, editable=False, )
-    percent_complete = models.IntegerField(null=True, blank=True,
-                                           editable=True)
-    notes = models.ManyToManyField(Notes, blank=True,
-                                   editable=False)
+    actual_time = models.TimeField(
+        null=True,
+        blank=True,
+        editable=False,
+    )
+    percent_complete = models.IntegerField(null=True, blank=True, editable=True)
+    notes = models.ManyToManyField(Notes, blank=True, editable=False)
     files = models.ManyToManyField(FileUpload, blank=True, editable=False)
-    environment = models.ForeignKey(Development_Environment, null=True,
-                                    blank=False, on_delete=models.CASCADE)
+    environment = models.ForeignKey(
+        Development_Environment, null=True, blank=False, on_delete=models.CASCADE
+    )
 
     updated = models.DateTimeField(auto_now=True, null=True)
     created = models.DateTimeField(auto_now_add=True, null=True)
 
-    tags_from_django_tagging = models.TextField(editable=False, blank=True, help_text=_('Temporary archive with tags from the previous tagging library we used'))
-    tags = TagField(blank=True, force_lowercase=True, help_text="Add tags that help describe this test. Choose from the list or add new tags. Press Enter key to add.")
+    tags_from_django_tagging = models.TextField(
+        editable=False,
+        blank=True,
+        help_text=_(
+            "Temporary archive with tags from the previous tagging library we used"
+        ),
+    )
+    tags = TagField(
+        blank=True,
+        force_lowercase=True,
+        help_text="Add tags that help describe this test. Choose from the list or add new tags. Press Enter key to add.",
+    )
 
     version = models.CharField(max_length=100, null=True, blank=True)
 
@@ -1354,14 +1829,17 @@ class Test(models.Model):
 
     def get_breadcrumbs(self):
         bc = self.engagement.get_breadcrumbs()
-        bc += [{'title': self.__unicode__(),
-                'url': reverse('view_test', args=(self.id,))}]
+        bc += [
+            {"title": self.__unicode__(), "url": reverse("view_test", args=(self.id,))}
+        ]
         return bc
 
     # only used by bulk risk acceptance api
     @property
     def unaccepted_open_findings(self):
-        return Finding.objects.filter(risk_accepted=False, active=True, verified=True, duplicate=False, test=self)
+        return Finding.objects.filter(
+            risk_accepted=False, active=True, verified=True, duplicate=False, test=self
+        )
 
     def accept_risks(self, accepted_risks):
         self.engagement.risk_acceptance.add(*accepted_risks)
@@ -1369,24 +1847,29 @@ class Test(models.Model):
     @property
     def dedupe_algo(self):
         deduplicationAlgorithm = settings.DEDUPE_ALGO_LEGACY
-        if hasattr(settings, 'DEDUPLICATION_ALGORITHM_PER_PARSER'):
+        if hasattr(settings, "DEDUPLICATION_ALGORITHM_PER_PARSER"):
             scan_type = self.test_type.name
 
             # Check for an override for this scan_type in the deduplication configuration
-            if (scan_type in settings.DEDUPLICATION_ALGORITHM_PER_PARSER):
-                deduplicationAlgorithm = settings.DEDUPLICATION_ALGORITHM_PER_PARSER[scan_type]
+            if scan_type in settings.DEDUPLICATION_ALGORITHM_PER_PARSER:
+                deduplicationAlgorithm = settings.DEDUPLICATION_ALGORITHM_PER_PARSER[
+                    scan_type
+                ]
 
         return deduplicationAlgorithm
 
     def get_absolute_url(self):
         from django.urls import reverse
-        return reverse('view_test', args=[str(self.id)])
+
+        return reverse("view_test", args=[str(self.id)])
 
 
 class VA(models.Model):
     address = models.TextField(editable=False, default="none")
     user = models.ForeignKey(User, editable=False, on_delete=models.CASCADE)
-    result = models.ForeignKey(Test, editable=False, null=True, blank=True, on_delete=models.CASCADE)
+    result = models.ForeignKey(
+        Test, editable=False, null=True, blank=True, on_delete=models.CASCADE
+    )
     status = models.BooleanField(default=False, editable=False)
     start = models.CharField(max_length=100)
 
@@ -1401,14 +1884,16 @@ class Sonarqube_Issue(models.Model):
 
 
 class Sonarqube_Issue_Transition(models.Model):
-    sonarqube_issue = models.ForeignKey(Sonarqube_Issue, on_delete=models.CASCADE, db_index=True)
+    sonarqube_issue = models.ForeignKey(
+        Sonarqube_Issue, on_delete=models.CASCADE, db_index=True
+    )
     created = models.DateTimeField(null=False, editable=False, default=now)
     finding_status = models.CharField(max_length=100)
     sonarqube_status = models.CharField(max_length=50)
     transitions = models.CharField(max_length=100)
 
     class Meta:
-        ordering = ('-created', )
+        ordering = ("-created",)
 
 
 class Sonarqube_Product(models.Model):
@@ -1417,349 +1902,494 @@ class Sonarqube_Product(models.Model):
         max_length=200, null=True, blank=True, verbose_name="SonarQube Project Key"
     )
     sonarqube_tool_config = models.ForeignKey(
-        Tool_Configuration, verbose_name="SonarQube Configuration",
-        null=True, blank=True, on_delete=models.CASCADE
+        Tool_Configuration,
+        verbose_name="SonarQube Configuration",
+        null=True,
+        blank=True,
+        on_delete=models.CASCADE,
     )
 
     def __unicode__(self):
-        return '{} | {}'.format(self.product.name, self.sonarqube_project_key)
+        return "{} | {}".format(self.product.name, self.sonarqube_project_key)
 
     def __str__(self):
-        return '{} | {}'.format(self.product.name, self.sonarqube_project_key)
+        return "{} | {}".format(self.product.name, self.sonarqube_project_key)
 
 
 class Finding(models.Model):
 
-    title = models.CharField(max_length=511,
-                             verbose_name="Title",
-                             help_text="A short description of the flaw.")
-    date = models.DateField(default=get_current_date,
-                            verbose_name="Date",
-                            help_text="The date the flaw was discovered.")
+    title = models.CharField(
+        max_length=511,
+        verbose_name="Title",
+        help_text="A short description of the flaw.",
+    )
+    date = models.DateField(
+        default=get_current_date,
+        verbose_name="Date",
+        help_text="The date the flaw was discovered.",
+    )
 
     sla_start_date = models.DateField(
-                            blank=True,
-                            null=True,
-                            verbose_name="SLA Start Date",
-                            help_text="(readonly)The date used as start date for SLA calculation. Set by expiring risk acceptances. Empty by default, causing a fallback to 'date'.")
+        blank=True,
+        null=True,
+        verbose_name="SLA Start Date",
+        help_text="(readonly)The date used as start date for SLA calculation. Set by expiring risk acceptances. Empty by default, causing a fallback to 'date'.",
+    )
 
-    cwe = models.IntegerField(default=0, null=True, blank=True,
-                              verbose_name="CWE",
-                              help_text="The CWE number associated with this flaw.")
-    cve_regex = RegexValidator(regex=r'^[A-Z]{1,10}(-\d+)+$',
-                               message="Vulnerability ID must be entered in the format: 'ABC-9999-9999'.")
-    cve = models.CharField(validators=[cve_regex],
-                           max_length=28,
-                           null=True,
-                           blank=False,
-                           verbose_name="CVE",
-                           help_text="The Common Vulnerabilities and Exposures (CVE) associated with this flaw.")
-    cvssv3_regex = RegexValidator(regex=r'^AV:[NALP]|AC:[LH]|PR:[UNLH]|UI:[NR]|S:[UC]|[CIA]:[NLH]', message="CVSS must be entered in format: 'AV:N/AC:L/PR:N/UI:N/S:C/C:H/I:H/A:H'")
-    cvssv3 = models.TextField(validators=[cvssv3_regex],
-                              max_length=117,
-                              null=True,
-                              verbose_name="CVSSv3",
-                              help_text="Common Vulnerability Scoring System version 3 (CVSSv3) score associated with this flaw.")
-    url = models.TextField(null=True,
-                           blank=True,
-                           editable=False,
-                           verbose_name="URL",
-                           help_text="External reference that provides more information about this flaw.")
-    severity = models.CharField(max_length=200,
-                                verbose_name="Severity",
-                                help_text="The severity level of this flaw (Critical, High, Medium, Low, Informational).")
-    description = models.TextField(verbose_name="Description",
-                                   help_text="Longer more descriptive information about the flaw.")
-    mitigation = models.TextField(verbose_name="Mitigation",
-                                  help_text="Text describing how to best fix the flaw.")
-    impact = models.TextField(verbose_name="Impact",
-                              help_text="Text describing the impact this flaw has on systems, products, enterprise, etc.")
-    steps_to_reproduce = models.TextField(null=True,
-                                          blank=True,
-                                          verbose_name="Steps to Reproduce",
-                                          help_text="Text describing the steps that must be followed in order to reproduce the flaw / bug.")
-    severity_justification = models.TextField(null=True,
-                                              blank=True,
-                                              verbose_name="Severity Justification",
-                                              help_text="Text describing why a certain severity was associated with this flaw.")
-    endpoints = models.ManyToManyField(Endpoint,
-                                       blank=True,
-                                       verbose_name="Endpoints",
-                                       help_text="The hosts within the product that are susceptible to this flaw.")
-    endpoint_status = models.ManyToManyField(Endpoint_Status,
-                                             blank=True,
-                                             related_name="finding_endpoint_status",
-                                             verbose_name="Endpoint Status",
-                                             help_text="The status of the endpoint associated with this flaw (Vulnerable, Mitigated, ...).")
+    cwe = models.IntegerField(
+        default=0,
+        null=True,
+        blank=True,
+        verbose_name="CWE",
+        help_text="The CWE number associated with this flaw.",
+    )
+    cve_regex = RegexValidator(
+        regex=r"^[A-Z]{1,10}(-\d+)+$",
+        message="Vulnerability ID must be entered in the format: 'ABC-9999-9999'.",
+    )
+    cve = models.CharField(
+        validators=[cve_regex],
+        max_length=28,
+        null=True,
+        blank=False,
+        verbose_name="CVE",
+        help_text="The Common Vulnerabilities and Exposures (CVE) associated with this flaw.",
+    )
+    cvssv3_regex = RegexValidator(
+        regex=r"^AV:[NALP]|AC:[LH]|PR:[UNLH]|UI:[NR]|S:[UC]|[CIA]:[NLH]",
+        message="CVSS must be entered in format: 'AV:N/AC:L/PR:N/UI:N/S:C/C:H/I:H/A:H'",
+    )
+    cvssv3 = models.TextField(
+        validators=[cvssv3_regex],
+        max_length=117,
+        null=True,
+        verbose_name="CVSSv3",
+        help_text="Common Vulnerability Scoring System version 3 (CVSSv3) score associated with this flaw.",
+    )
+    url = models.TextField(
+        null=True,
+        blank=True,
+        editable=False,
+        verbose_name="URL",
+        help_text="External reference that provides more information about this flaw.",
+    )
+    severity = models.CharField(
+        max_length=200,
+        verbose_name="Severity",
+        help_text="The severity level of this flaw (Critical, High, Medium, Low, Informational).",
+    )
+    description = models.TextField(
+        verbose_name="Description",
+        help_text="Longer more descriptive information about the flaw.",
+    )
+    mitigation = models.TextField(
+        verbose_name="Mitigation", help_text="Text describing how to best fix the flaw."
+    )
+    impact = models.TextField(
+        verbose_name="Impact",
+        help_text="Text describing the impact this flaw has on systems, products, enterprise, etc.",
+    )
+    steps_to_reproduce = models.TextField(
+        null=True,
+        blank=True,
+        verbose_name="Steps to Reproduce",
+        help_text="Text describing the steps that must be followed in order to reproduce the flaw / bug.",
+    )
+    severity_justification = models.TextField(
+        null=True,
+        blank=True,
+        verbose_name="Severity Justification",
+        help_text="Text describing why a certain severity was associated with this flaw.",
+    )
+    endpoints = models.ManyToManyField(
+        Endpoint,
+        blank=True,
+        verbose_name="Endpoints",
+        help_text="The hosts within the product that are susceptible to this flaw.",
+    )
+    endpoint_status = models.ManyToManyField(
+        Endpoint_Status,
+        blank=True,
+        related_name="finding_endpoint_status",
+        verbose_name="Endpoint Status",
+        help_text="The status of the endpoint associated with this flaw (Vulnerable, Mitigated, ...).",
+    )
     unsaved_endpoints = []
     unsaved_request = None
     unsaved_response = None
     unsaved_tags = None
-    references = models.TextField(null=True,
-                                  blank=True,
-                                  db_column="refs",
-                                  verbose_name="References",
-                                  help_text="The external documentation available for this flaw.")
-    test = models.ForeignKey(Test,
-                             editable=False,
-                             on_delete=models.CASCADE,
-                             verbose_name="Test",
-                             help_text="The test that is associated with this flaw.")
+    references = models.TextField(
+        null=True,
+        blank=True,
+        db_column="refs",
+        verbose_name="References",
+        help_text="The external documentation available for this flaw.",
+    )
+    test = models.ForeignKey(
+        Test,
+        editable=False,
+        on_delete=models.CASCADE,
+        verbose_name="Test",
+        help_text="The test that is associated with this flaw.",
+    )
     # TODO: Will be deprecated soon
-    is_template = models.BooleanField(default=False,
-                                      verbose_name="Is Template",
-                                      help_text="Denotes if this finding is a template and can be reused.")
-    active = models.BooleanField(default=True,
-                                 verbose_name="Active",
-                                 help_text="Denotes if this flaw is active or not.")
-    verified = models.BooleanField(default=True,
-                                   verbose_name="Verified",
-                                   help_text="Denotes if this flaw has been manually verified by the tester.")
-    false_p = models.BooleanField(default=False,
-                                  verbose_name="False Positive",
-                                  help_text="Denotes if this flaw has been deemed a false positive by the tester.")
-    duplicate = models.BooleanField(default=False,
-                                    verbose_name="Duplicate",
-                                    help_text="Denotes if this flaw is a duplicate of other flaws reported.")
-    duplicate_finding = models.ForeignKey('self',
-                                          editable=False,
-                                          null=True,
-                                          related_name='original_finding',
-                                          blank=True, on_delete=models.CASCADE,
-                                          verbose_name="Duplicate Finding",
-                                          help_text="Link to the original finding if this finding is a duplicate.")
-    out_of_scope = models.BooleanField(default=False,
-                                       verbose_name="Out Of Scope",
-                                       help_text="Denotes if this flaw falls outside the scope of the test and/or engagement.")
-    risk_accepted = models.BooleanField(default=False,
-                                       verbose_name="Risk Accepted",
-                                       help_text="Denotes if this finding has been marked as an accepted risk.")
-    under_review = models.BooleanField(default=False,
-                                       verbose_name="Under Review",
-                                       help_text="Denotes is this flaw is currently being reviewed.")
-    review_requested_by = models.ForeignKey(Dojo_User,
-                                            null=True,
-                                            blank=True,
-                                            related_name='review_requested_by',
-                                            on_delete=models.CASCADE,
-                                            verbose_name="Review Requested By",
-                                            help_text="Documents who requested a review for this finding.")
-    reviewers = models.ManyToManyField(User,
-                                       blank=True,
-                                       verbose_name="Reviewers",
-                                       help_text="Documents who reviewed the flaw.")
+    is_template = models.BooleanField(
+        default=False,
+        verbose_name="Is Template",
+        help_text="Denotes if this finding is a template and can be reused.",
+    )
+    active = models.BooleanField(
+        default=True,
+        verbose_name="Active",
+        help_text="Denotes if this flaw is active or not.",
+    )
+    verified = models.BooleanField(
+        default=True,
+        verbose_name="Verified",
+        help_text="Denotes if this flaw has been manually verified by the tester.",
+    )
+    false_p = models.BooleanField(
+        default=False,
+        verbose_name="False Positive",
+        help_text="Denotes if this flaw has been deemed a false positive by the tester.",
+    )
+    duplicate = models.BooleanField(
+        default=False,
+        verbose_name="Duplicate",
+        help_text="Denotes if this flaw is a duplicate of other flaws reported.",
+    )
+    duplicate_finding = models.ForeignKey(
+        "self",
+        editable=False,
+        null=True,
+        related_name="original_finding",
+        blank=True,
+        on_delete=models.CASCADE,
+        verbose_name="Duplicate Finding",
+        help_text="Link to the original finding if this finding is a duplicate.",
+    )
+    out_of_scope = models.BooleanField(
+        default=False,
+        verbose_name="Out Of Scope",
+        help_text="Denotes if this flaw falls outside the scope of the test and/or engagement.",
+    )
+    risk_accepted = models.BooleanField(
+        default=False,
+        verbose_name="Risk Accepted",
+        help_text="Denotes if this finding has been marked as an accepted risk.",
+    )
+    under_review = models.BooleanField(
+        default=False,
+        verbose_name="Under Review",
+        help_text="Denotes is this flaw is currently being reviewed.",
+    )
+    review_requested_by = models.ForeignKey(
+        Dojo_User,
+        null=True,
+        blank=True,
+        related_name="review_requested_by",
+        on_delete=models.CASCADE,
+        verbose_name="Review Requested By",
+        help_text="Documents who requested a review for this finding.",
+    )
+    reviewers = models.ManyToManyField(
+        User,
+        blank=True,
+        verbose_name="Reviewers",
+        help_text="Documents who reviewed the flaw.",
+    )
 
     # Defect Tracking Review
-    under_defect_review = models.BooleanField(default=False,
-                                              verbose_name="Under Defect Review",
-                                              help_text="Denotes if this finding is under defect review.")
-    defect_review_requested_by = models.ForeignKey(Dojo_User,
-                                                   null=True,
-                                                   blank=True,
-                                                   related_name='defect_review_requested_by',
-                                                   on_delete=models.CASCADE,
-                                                   verbose_name="Defect Review Requested By",
-                                                   help_text="Documents who requested a defect review for this flaw.")
-    is_Mitigated = models.BooleanField(default=False,
-                                       verbose_name="Is Mitigated",
-                                       help_text="Denotes if this flaw has been fixed.")
-    thread_id = models.IntegerField(default=0,
-                                    editable=False,
-                                    verbose_name="Thread ID")
-    mitigated = models.DateTimeField(editable=False,
-                                     null=True,
-                                     blank=True,
-                                     verbose_name="Mitigated",
-                                     help_text="Denotes if this flaw has been fixed by storing the date it was fixed.")
-    mitigated_by = models.ForeignKey(User,
-                                     null=True,
-                                     editable=False,
-                                     related_name="mitigated_by",
-                                     on_delete=models.CASCADE,
-                                     verbose_name="Mitigated By",
-                                     help_text="Documents who has marked this flaw as fixed.")
-    reporter = models.ForeignKey(User,
-                                 editable=False,
-                                 default=1,
-                                 related_name='reporter',
-                                 on_delete=models.CASCADE,
-                                 verbose_name="Reporter",
-                                 help_text="Documents who reported the flaw.")
-    notes = models.ManyToManyField(Notes,
-                                   blank=True,
-                                   editable=False,
-                                   verbose_name="Notes",
-                                   help_text="Stores information pertinent to the flaw or the mitigation.")
-    numerical_severity = models.CharField(max_length=4,
-                                          verbose_name="Numerical Severity",
-                                          help_text="The numerical representation of the severity (S0, S1, S2, S3, S4).")
-    last_reviewed = models.DateTimeField(null=True,
-                                         editable=False,
-                                         verbose_name="Last Reviewed",
-                                         help_text="Provides the date the flaw was last 'touched' by a tester.")
-    last_reviewed_by = models.ForeignKey(User,
-                                         null=True,
-                                         editable=False,
-                                         related_name='last_reviewed_by',
-                                         on_delete=models.CASCADE,
-                                         verbose_name="Last Reviewed By",
-                                         help_text="Provides the person who last reviewed the flaw.")
-    images = models.ManyToManyField('FindingImage',
-                                    blank=True,
-                                    verbose_name="Images",
-                                    help_text="Image(s) / Screenshot(s) related to the flaw.")
-    files = models.ManyToManyField(FileUpload,
-                                   blank=True,
-                                   editable=False,
-                                   verbose_name="Files",
-                                   help_text="Files(s) related to the flaw.")
-    line_number = models.CharField(null=True,
-                                   blank=True,
-                                   max_length=200,
-                                   verbose_name="Line Number",
-                                   help_text="Deprecated will be removed, use line",
-                                   editable=False)  # Deprecated will be removed, use line
-    sourcefilepath = models.TextField(null=True,
-                                      blank=True,
-                                      editable=False,
-                                      verbose_name="Source File Path",
-                                      help_text="Filepath of the source code file in which the flaw is located.")  # Not used? to remove
-    sourcefile = models.TextField(null=True,
-                                  blank=True,
-                                  editable=False,
-                                  verbose_name="Source File",
-                                  help_text="Name of the source code file in which the flaw is located.")
-    param = models.TextField(null=True,
-                             blank=True,
-                             editable=False,
-                             verbose_name="Parameter",
-                             help_text="Parameter used to trigger the issue (DAST).")
-    payload = models.TextField(null=True,
-                               blank=True,
-                               editable=False,
-                               verbose_name="Payload",
-                               help_text="Payload used to attack the service / application and trigger the bug / problem.")
-    hash_code = models.CharField(null=True,
-                                 blank=True,
-                                 editable=False,
-                                 max_length=64,
-                                 verbose_name="Hash Code",
-                                 help_text="A hash over a configurable set of fields that is used for findings deduplication.")
-    line = models.IntegerField(null=True,
-                               blank=True,
-                               verbose_name="Line number",
-                               help_text="Source line number of the attack vector.")
-    file_path = models.CharField(null=True,
-                                 blank=True,
-                                 max_length=4000,
-                                 verbose_name="File path",
-                                 help_text="Identified file(s) containing the flaw.")
-    component_name = models.CharField(null=True,
-                                      blank=True,
-                                      max_length=200,
-                                      verbose_name="Component name",
-                                      help_text="Name of the affected component (library name, part of a system, ...).")
-    component_version = models.CharField(null=True,
-                                         blank=True,
-                                         max_length=100,
-                                         verbose_name="Component version",
-                                         help_text="Version of the affected component.")
-    found_by = models.ManyToManyField(Test_Type,
-                                      editable=False,
-                                      verbose_name="Found by",
-                                      help_text="The name of the scanner that identified the flaw.")
-    static_finding = models.BooleanField(default=False,
-                                         verbose_name="Static finding (SAST)",
-                                         help_text="Flaw has been detected from a Static Application Security Testing tool (SAST).")
-    dynamic_finding = models.BooleanField(default=True,
-                                          verbose_name="Dynamic finding (DAST)",
-                                          help_text="Flaw has been detected from a Dynamic Application Security Testing tool (DAST).")
-    created = models.DateTimeField(auto_now_add=True,
-                                   null=True,
-                                   verbose_name="Created",
-                                   help_text="The date the finding was created inside DefectDojo.")
-    scanner_confidence = models.IntegerField(null=True,
-                                             blank=True,
-                                             default=None,
-                                             editable=False,
-                                             verbose_name="Scanner confidence",
-                                             help_text="Confidence level of vulnerability which is supplied by the scanner.")
-    sonarqube_issue = models.ForeignKey(Sonarqube_Issue,
-                                        null=True,
-                                        blank=True,
-                                        help_text="The SonarQube issue associated with this finding.",
-                                        verbose_name="SonarQube issue",
-                                        on_delete=models.CASCADE)
-    unique_id_from_tool = models.CharField(null=True,
-                                           blank=True,
-                                           max_length=500,
-                                           verbose_name="Unique ID from tool",
-                                           help_text="Vulnerability technical id from the source tool. Allows to track unique vulnerabilities.")
-    vuln_id_from_tool = models.CharField(null=True,
-                                         blank=True,
-                                         max_length=500,
-                                         verbose_name="Vulnerability ID from tool",
-                                         help_text="Non-unique technical id from the source tool associated with the vulnerability type.")
-    sast_source_object = models.CharField(null=True,
-                                          blank=True,
-                                          max_length=500,
-                                          verbose_name="SAST Source Object",
-                                          help_text="Source object (variable, function...) of the attack vector.")
-    sast_sink_object = models.CharField(null=True,
-                                        blank=True,
-                                        max_length=500,
-                                        verbose_name="SAST Sink Object",
-                                        help_text="Sink object (variable, function...) of the attack vector.")
-    sast_source_line = models.IntegerField(null=True,
-                                           blank=True,
-                                           verbose_name="SAST Source Line number",
-                                           help_text="Source line number of the attack vector.")
-    sast_source_file_path = models.CharField(null=True,
-                                             blank=True,
-                                             max_length=4000,
-                                             verbose_name="SAST Source File Path",
-                                             help_text="Source file path of the attack vector.")
-    nb_occurences = models.IntegerField(null=True,
-                                        blank=True,
-                                        verbose_name="Number of occurences",
-                                        help_text="Number of occurences in the source tool when several vulnerabilites were found and aggregated by the scanner.")
+    under_defect_review = models.BooleanField(
+        default=False,
+        verbose_name="Under Defect Review",
+        help_text="Denotes if this finding is under defect review.",
+    )
+    defect_review_requested_by = models.ForeignKey(
+        Dojo_User,
+        null=True,
+        blank=True,
+        related_name="defect_review_requested_by",
+        on_delete=models.CASCADE,
+        verbose_name="Defect Review Requested By",
+        help_text="Documents who requested a defect review for this flaw.",
+    )
+    is_Mitigated = models.BooleanField(
+        default=False,
+        verbose_name="Is Mitigated",
+        help_text="Denotes if this flaw has been fixed.",
+    )
+    thread_id = models.IntegerField(default=0, editable=False, verbose_name="Thread ID")
+    mitigated = models.DateTimeField(
+        editable=False,
+        null=True,
+        blank=True,
+        verbose_name="Mitigated",
+        help_text="Denotes if this flaw has been fixed by storing the date it was fixed.",
+    )
+    mitigated_by = models.ForeignKey(
+        User,
+        null=True,
+        editable=False,
+        related_name="mitigated_by",
+        on_delete=models.CASCADE,
+        verbose_name="Mitigated By",
+        help_text="Documents who has marked this flaw as fixed.",
+    )
+    reporter = models.ForeignKey(
+        User,
+        editable=False,
+        default=1,
+        related_name="reporter",
+        on_delete=models.CASCADE,
+        verbose_name="Reporter",
+        help_text="Documents who reported the flaw.",
+    )
+    notes = models.ManyToManyField(
+        Notes,
+        blank=True,
+        editable=False,
+        verbose_name="Notes",
+        help_text="Stores information pertinent to the flaw or the mitigation.",
+    )
+    numerical_severity = models.CharField(
+        max_length=4,
+        verbose_name="Numerical Severity",
+        help_text="The numerical representation of the severity (S0, S1, S2, S3, S4).",
+    )
+    last_reviewed = models.DateTimeField(
+        null=True,
+        editable=False,
+        verbose_name="Last Reviewed",
+        help_text="Provides the date the flaw was last 'touched' by a tester.",
+    )
+    last_reviewed_by = models.ForeignKey(
+        User,
+        null=True,
+        editable=False,
+        related_name="last_reviewed_by",
+        on_delete=models.CASCADE,
+        verbose_name="Last Reviewed By",
+        help_text="Provides the person who last reviewed the flaw.",
+    )
+    images = models.ManyToManyField(
+        "FindingImage",
+        blank=True,
+        verbose_name="Images",
+        help_text="Image(s) / Screenshot(s) related to the flaw.",
+    )
+    files = models.ManyToManyField(
+        FileUpload,
+        blank=True,
+        editable=False,
+        verbose_name="Files",
+        help_text="Files(s) related to the flaw.",
+    )
+    line_number = models.CharField(
+        null=True,
+        blank=True,
+        max_length=200,
+        verbose_name="Line Number",
+        help_text="Deprecated will be removed, use line",
+        editable=False,
+    )  # Deprecated will be removed, use line
+    sourcefilepath = models.TextField(
+        null=True,
+        blank=True,
+        editable=False,
+        verbose_name="Source File Path",
+        help_text="Filepath of the source code file in which the flaw is located.",
+    )  # Not used? to remove
+    sourcefile = models.TextField(
+        null=True,
+        blank=True,
+        editable=False,
+        verbose_name="Source File",
+        help_text="Name of the source code file in which the flaw is located.",
+    )
+    param = models.TextField(
+        null=True,
+        blank=True,
+        editable=False,
+        verbose_name="Parameter",
+        help_text="Parameter used to trigger the issue (DAST).",
+    )
+    payload = models.TextField(
+        null=True,
+        blank=True,
+        editable=False,
+        verbose_name="Payload",
+        help_text="Payload used to attack the service / application and trigger the bug / problem.",
+    )
+    hash_code = models.CharField(
+        null=True,
+        blank=True,
+        editable=False,
+        max_length=64,
+        verbose_name="Hash Code",
+        help_text="A hash over a configurable set of fields that is used for findings deduplication.",
+    )
+    line = models.IntegerField(
+        null=True,
+        blank=True,
+        verbose_name="Line number",
+        help_text="Source line number of the attack vector.",
+    )
+    file_path = models.CharField(
+        null=True,
+        blank=True,
+        max_length=4000,
+        verbose_name="File path",
+        help_text="Identified file(s) containing the flaw.",
+    )
+    component_name = models.CharField(
+        null=True,
+        blank=True,
+        max_length=200,
+        verbose_name="Component name",
+        help_text="Name of the affected component (library name, part of a system, ...).",
+    )
+    component_version = models.CharField(
+        null=True,
+        blank=True,
+        max_length=100,
+        verbose_name="Component version",
+        help_text="Version of the affected component.",
+    )
+    found_by = models.ManyToManyField(
+        Test_Type,
+        editable=False,
+        verbose_name="Found by",
+        help_text="The name of the scanner that identified the flaw.",
+    )
+    static_finding = models.BooleanField(
+        default=False,
+        verbose_name="Static finding (SAST)",
+        help_text="Flaw has been detected from a Static Application Security Testing tool (SAST).",
+    )
+    dynamic_finding = models.BooleanField(
+        default=True,
+        verbose_name="Dynamic finding (DAST)",
+        help_text="Flaw has been detected from a Dynamic Application Security Testing tool (DAST).",
+    )
+    created = models.DateTimeField(
+        auto_now_add=True,
+        null=True,
+        verbose_name="Created",
+        help_text="The date the finding was created inside DefectDojo.",
+    )
+    scanner_confidence = models.IntegerField(
+        null=True,
+        blank=True,
+        default=None,
+        editable=False,
+        verbose_name="Scanner confidence",
+        help_text="Confidence level of vulnerability which is supplied by the scanner.",
+    )
+    sonarqube_issue = models.ForeignKey(
+        Sonarqube_Issue,
+        null=True,
+        blank=True,
+        help_text="The SonarQube issue associated with this finding.",
+        verbose_name="SonarQube issue",
+        on_delete=models.CASCADE,
+    )
+    unique_id_from_tool = models.CharField(
+        null=True,
+        blank=True,
+        max_length=500,
+        verbose_name="Unique ID from tool",
+        help_text="Vulnerability technical id from the source tool. Allows to track unique vulnerabilities.",
+    )
+    vuln_id_from_tool = models.CharField(
+        null=True,
+        blank=True,
+        max_length=500,
+        verbose_name="Vulnerability ID from tool",
+        help_text="Non-unique technical id from the source tool associated with the vulnerability type.",
+    )
+    sast_source_object = models.CharField(
+        null=True,
+        blank=True,
+        max_length=500,
+        verbose_name="SAST Source Object",
+        help_text="Source object (variable, function...) of the attack vector.",
+    )
+    sast_sink_object = models.CharField(
+        null=True,
+        blank=True,
+        max_length=500,
+        verbose_name="SAST Sink Object",
+        help_text="Sink object (variable, function...) of the attack vector.",
+    )
+    sast_source_line = models.IntegerField(
+        null=True,
+        blank=True,
+        verbose_name="SAST Source Line number",
+        help_text="Source line number of the attack vector.",
+    )
+    sast_source_file_path = models.CharField(
+        null=True,
+        blank=True,
+        max_length=4000,
+        verbose_name="SAST Source File Path",
+        help_text="Source file path of the attack vector.",
+    )
+    nb_occurences = models.IntegerField(
+        null=True,
+        blank=True,
+        verbose_name="Number of occurences",
+        help_text="Number of occurences in the source tool when several vulnerabilites were found and aggregated by the scanner.",
+    )
 
-    tags_from_django_tagging = models.TextField(editable=False, blank=True, help_text=_('Temporary archive with tags from the previous tagging library we used'))
-    tags = TagField(blank=True, force_lowercase=True, help_text="Add tags that help describe this finding. Choose from the list or add new tags. Press Enter key to add.")
+    tags_from_django_tagging = models.TextField(
+        editable=False,
+        blank=True,
+        help_text=_(
+            "Temporary archive with tags from the previous tagging library we used"
+        ),
+    )
+    tags = TagField(
+        blank=True,
+        force_lowercase=True,
+        help_text="Add tags that help describe this finding. Choose from the list or add new tags. Press Enter key to add.",
+    )
 
-    SEVERITIES = {'Info': 4, 'Low': 3, 'Medium': 2,
-                  'High': 1, 'Critical': 0}
+    SEVERITIES = {"Info": 4, "Low": 3, "Medium": 2, "High": 1, "Critical": 0}
 
     class Meta:
-        ordering = ('numerical_severity', '-date', 'title')
+        ordering = ("numerical_severity", "-date", "title")
         indexes = [
-            models.Index(fields=['cve']),
-            models.Index(fields=['cwe']),
-            models.Index(fields=['out_of_scope']),
-            models.Index(fields=['false_p']),
-            models.Index(fields=['verified']),
-            models.Index(fields=['mitigated']),
-            models.Index(fields=['active']),
-            models.Index(fields=['numerical_severity']),
-            models.Index(fields=['date']),
-            models.Index(fields=['title']),
-            models.Index(fields=['hash_code']),
-            models.Index(fields=['unique_id_from_tool']),
+            models.Index(fields=["cve"]),
+            models.Index(fields=["cwe"]),
+            models.Index(fields=["out_of_scope"]),
+            models.Index(fields=["false_p"]),
+            models.Index(fields=["verified"]),
+            models.Index(fields=["mitigated"]),
+            models.Index(fields=["active"]),
+            models.Index(fields=["numerical_severity"]),
+            models.Index(fields=["date"]),
+            models.Index(fields=["title"]),
+            models.Index(fields=["hash_code"]),
+            models.Index(fields=["unique_id_from_tool"]),
             # models.Index(fields=['file_path']), # can't add index because the field has max length 4000.
-            models.Index(fields=['line']),
-            models.Index(fields=['component_name']),
-            models.Index(fields=['duplicate']),
-            models.Index(fields=['is_Mitigated']),
+            models.Index(fields=["line"]),
+            models.Index(fields=["component_name"]),
+            models.Index(fields=["duplicate"]),
+            models.Index(fields=["is_Mitigated"]),
         ]
 
     def get_absolute_url(self):
         from django.urls import reverse
-        return reverse('view_finding', args=[str(self.id)])
+
+        return reverse("view_finding", args=[str(self.id)])
 
     # only used by bulk risk acceptance api
     @classmethod
     def unaccepted_open_findings(cls):
-        return cls.objects.filter(active=True, verified=True, duplicate=False, risk_accepted=False)
+        return cls.objects.filter(
+            active=True, verified=True, duplicate=False, risk_accepted=False
+        )
 
     @property
     def risk_acceptance(self):
@@ -1770,78 +2400,141 @@ class Finding(models.Model):
         return None
 
     def compute_hash_code(self):
-        if hasattr(settings, 'HASHCODE_FIELDS_PER_SCANNER') and hasattr(settings, 'HASHCODE_ALLOWS_NULL_CWE') and hasattr(settings, 'HASHCODE_ALLOWED_FIELDS'):
+        if (
+            hasattr(settings, "HASHCODE_FIELDS_PER_SCANNER")
+            and hasattr(settings, "HASHCODE_ALLOWS_NULL_CWE")
+            and hasattr(settings, "HASHCODE_ALLOWED_FIELDS")
+        ):
             # Default fields
             if self.dynamic_finding:
-                deduplicationLogger.debug('dynamic finding, so including endpoints in hash_code computation as default')
-                hashcodeFields = ['title', 'cwe', 'line', 'file_path', 'description', 'endpoints']
+                deduplicationLogger.debug(
+                    "dynamic finding, so including endpoints in hash_code computation as default"
+                )
+                hashcodeFields = [
+                    "title",
+                    "cwe",
+                    "line",
+                    "file_path",
+                    "description",
+                    "endpoints",
+                ]
             else:
-                hashcodeFields = ['title', 'cwe', 'line', 'file_path', 'description']
+                hashcodeFields = ["title", "cwe", "line", "file_path", "description"]
 
             # Check for an override for this scan_type in the deduplication configuration
             scan_type = self.test.test_type.name
-            if (scan_type in settings.HASHCODE_FIELDS_PER_SCANNER):
-                hashcodeFieldsCandidate = settings.HASHCODE_FIELDS_PER_SCANNER[scan_type]
+            if scan_type in settings.HASHCODE_FIELDS_PER_SCANNER:
+                hashcodeFieldsCandidate = settings.HASHCODE_FIELDS_PER_SCANNER[
+                    scan_type
+                ]
                 # check that the configuration is valid: all elements of HASHCODE_FIELDS_PER_SCANNER should be in HASHCODE_ALLOWED_FIELDS
-                if (all(elem in settings.HASHCODE_ALLOWED_FIELDS for elem in hashcodeFieldsCandidate)):
+                if all(
+                    elem in settings.HASHCODE_ALLOWED_FIELDS
+                    for elem in hashcodeFieldsCandidate
+                ):
                     # Makes sure that we have a cwe if we need one
-                    if (scan_type in settings.HASHCODE_ALLOWS_NULL_CWE):
-                        if (settings.HASHCODE_ALLOWS_NULL_CWE[scan_type] or self.cwe != 0):
+                    if scan_type in settings.HASHCODE_ALLOWS_NULL_CWE:
+                        if (
+                            settings.HASHCODE_ALLOWS_NULL_CWE[scan_type]
+                            or self.cwe != 0
+                        ):
                             hashcodeFields = hashcodeFieldsCandidate
                         else:
                             deduplicationLogger.warn(
-                                "Cannot compute hash_code based on configured fields because cwe is 0 for finding of title '" + self.title + "' found in file '" + str(self.file_path) +
-                                "'. Fallback to legacy mode for this finding.")
+                                "Cannot compute hash_code based on configured fields because cwe is 0 for finding of title '"
+                                + self.title
+                                + "' found in file '"
+                                + str(self.file_path)
+                                + "'. Fallback to legacy mode for this finding."
+                            )
                     else:
                         # no configuration found for this scanner: defaulting to accepting null cwe when we find one
                         hashcodeFields = hashcodeFieldsCandidate
-                        if(self.cwe == 0):
+                        if self.cwe == 0:
                             deduplicationLogger.debug(
-                                "Accepting null cwe by default for finding of title '" + self.title + "' found in file '" + str(self.file_path) +
-                                "'. This is because no configuration was found for scanner " + scan_type + " in HASHCODE_ALLOWS_NULL_CWE")
+                                "Accepting null cwe by default for finding of title '"
+                                + self.title
+                                + "' found in file '"
+                                + str(self.file_path)
+                                + "'. This is because no configuration was found for scanner "
+                                + scan_type
+                                + " in HASHCODE_ALLOWS_NULL_CWE"
+                            )
                 else:
                     deduplicationLogger.debug(
                         "compute_hash_code - configuration error: some elements of HASHCODE_FIELDS_PER_SCANNER are not in the allowed list HASHCODE_ALLOWED_FIELDS. "
-                        "Using default fields")
+                        "Using default fields"
+                    )
             else:
                 deduplicationLogger.debug(
-                    "No configuration for hash_code computation found; using default fields for " + ('dynamic' if self.dynamic_finding else 'static') + ' scanners')
-            deduplicationLogger.debug("computing hash_code for finding id " + str(self.id) + " for scan_type " + scan_type + " based on: " + ', '.join(hashcodeFields))
-            fields_to_hash = ''
+                    "No configuration for hash_code computation found; using default fields for "
+                    + ("dynamic" if self.dynamic_finding else "static")
+                    + " scanners"
+                )
+            deduplicationLogger.debug(
+                "computing hash_code for finding id "
+                + str(self.id)
+                + " for scan_type "
+                + scan_type
+                + " based on: "
+                + ", ".join(hashcodeFields)
+            )
+            fields_to_hash = ""
             for hashcodeField in hashcodeFields:
-                if(hashcodeField != 'endpoints'):
+                if hashcodeField != "endpoints":
                     # Generically use the finding attribute having the same name, converts to str in case it's integer
                     fields_to_hash = fields_to_hash + str(getattr(self, hashcodeField))
-                    deduplicationLogger.debug(hashcodeField + ' : ' + str(getattr(self, hashcodeField)))
+                    deduplicationLogger.debug(
+                        hashcodeField + " : " + str(getattr(self, hashcodeField))
+                    )
                 else:
                     # For endpoints, need to compute the field
                     myEndpoints = self.get_endpoints()
                     fields_to_hash = fields_to_hash + myEndpoints
-                    deduplicationLogger.debug(hashcodeField + ' : ' + myEndpoints)
-            deduplicationLogger.debug("compute_hash_code - fields_to_hash = " + fields_to_hash)
+                    deduplicationLogger.debug(hashcodeField + " : " + myEndpoints)
+            deduplicationLogger.debug(
+                "compute_hash_code - fields_to_hash = " + fields_to_hash
+            )
             return self.hash_fields(fields_to_hash)
         else:
-            deduplicationLogger.debug("no or incomplete configuration per hash_code found; using legacy algorithm")
+            deduplicationLogger.debug(
+                "no or incomplete configuration per hash_code found; using legacy algorithm"
+            )
             return self.compute_hash_code_legacy()
 
     def compute_hash_code_legacy(self):
-        fields_to_hash = self.title + str(self.cwe) + str(self.line) + str(self.file_path) + self.description
+        fields_to_hash = (
+            self.title
+            + str(self.cwe)
+            + str(self.line)
+            + str(self.file_path)
+            + self.description
+        )
         if self.dynamic_finding:
-            deduplicationLogger.debug('dynamic finding, so including endpoints in hash_code computation for legacy algo')
+            deduplicationLogger.debug(
+                "dynamic finding, so including endpoints in hash_code computation for legacy algo"
+            )
             fields_to_hash = fields_to_hash + self.get_endpoints()
-        deduplicationLogger.debug("compute_hash_code_legacy - fields_to_hash = " + fields_to_hash)
+        deduplicationLogger.debug(
+            "compute_hash_code_legacy - fields_to_hash = " + fields_to_hash
+        )
         return self.hash_fields(fields_to_hash)
 
     # Get endpoints from self.unsaved_endpoints
     # This sometimes reports "None" for some endpoints but we keep it to avoid hash_code change due to this historically behavior
     def get_endpoints(self):
-        endpoint_str = ''
+        endpoint_str = ""
         if len(self.unsaved_endpoints) > 0 and self.id is None:
-            deduplicationLogger.debug("get_endpoints: there are unsaved_endpoints and self.id is None")
+            deduplicationLogger.debug(
+                "get_endpoints: there are unsaved_endpoints and self.id is None"
+            )
             for e in self.unsaved_endpoints:
                 endpoint_str += str(e.host_with_port)
         else:
-            deduplicationLogger.debug("get_endpoints: there aren't unsaved_endpoints or self.id is not None. endpoints count: " + str(self.endpoints.count()))
+            deduplicationLogger.debug(
+                "get_endpoints: there aren't unsaved_endpoints or self.id is not None. endpoints count: "
+                + str(self.endpoints.count())
+            )
             for e in self.endpoints.all():
                 endpoint_str += str(e.host_with_port)
         return endpoint_str
@@ -1849,25 +2542,32 @@ class Finding(models.Model):
     # Compute the hash_code from the fields to hash
     def hash_fields(self, fields_to_hash):
         # get bytes to hash
-        if(isinstance(fields_to_hash, str)):
-            hash_string = fields_to_hash.encode('utf-8').strip()
-        elif(isinstance(fields_to_hash, bytes)):
+        if isinstance(fields_to_hash, str):
+            hash_string = fields_to_hash.encode("utf-8").strip()
+        elif isinstance(fields_to_hash, bytes):
             hash_string = fields_to_hash.strip()
         else:
-            deduplicationLogger.debug("trying to convert hash_string of type " + str(type(fields_to_hash)) + " to str and then bytes")
-            hash_string = str(fields_to_hash).encode('utf-8').strip()
+            deduplicationLogger.debug(
+                "trying to convert hash_string of type "
+                + str(type(fields_to_hash))
+                + " to str and then bytes"
+            )
+            hash_string = str(fields_to_hash).encode("utf-8").strip()
         return hashlib.sha256(hash_string).hexdigest()
 
     def duplicate_finding_set(self):
         if self.duplicate:
             if self.duplicate_finding is not None:
-                originals = Finding.objects.get(
-                    id=self.duplicate_finding.id).original_finding.all().order_by('title')
+                originals = (
+                    Finding.objects.get(id=self.duplicate_finding.id)
+                    .original_finding.all()
+                    .order_by("title")
+                )
                 return originals  # we need to add the duplicate_finding  here as well
             else:
                 return []
         else:
-            return self.original_finding.all().order_by('title')
+            return self.original_finding.all().order_by("title")
 
     def get_scanner_confidence_text(self):
         scanner_confidence_text = ""
@@ -1884,30 +2584,30 @@ class Finding(models.Model):
 
     @staticmethod
     def get_numerical_severity(severity):
-        if severity == 'Critical':
-            return 'S0'
-        elif severity == 'High':
-            return 'S1'
-        elif severity == 'Medium':
-            return 'S2'
-        elif severity == 'Low':
-            return 'S3'
-        elif severity == 'Info':
-            return 'S4'
+        if severity == "Critical":
+            return "S0"
+        elif severity == "High":
+            return "S1"
+        elif severity == "Medium":
+            return "S2"
+        elif severity == "Low":
+            return "S3"
+        elif severity == "Info":
+            return "S4"
         else:
-            return 'S5'
+            return "S5"
 
     @staticmethod
     def get_number_severity(severity):
-        if severity == 'Critical':
+        if severity == "Critical":
             return 4
-        elif severity == 'High':
+        elif severity == "High":
             return 3
-        elif severity == 'Medium':
+        elif severity == "Medium":
             return 2
-        elif severity == 'Low':
+        elif severity == "Low":
             return 1
-        elif severity == 'Info':
+        elif severity == "Info":
             return 0
         else:
             return 5
@@ -1921,25 +2621,25 @@ class Finding(models.Model):
     def status(self):
         status = []
         if self.under_review:
-            status += ['Under Review']
+            status += ["Under Review"]
         if self.active:
-            status += ['Active']
+            status += ["Active"]
         else:
-            status += ['Inactive']
+            status += ["Inactive"]
         if self.verified:
-            status += ['Verified']
+            status += ["Verified"]
         if self.mitigated or self.is_Mitigated:
-            status += ['Mitigated']
+            status += ["Mitigated"]
         if self.false_p:
-            status += ['False Positive']
+            status += ["False Positive"]
         if self.out_of_scope:
-            status += ['Out Of Scope']
+            status += ["Out Of Scope"]
         if self.duplicate:
-            status += ['Duplicate']
+            status += ["Duplicate"]
         if self.risk_accepted:
-            status += ['Risk Accepted']
+            status += ["Risk Accepted"]
         if not len(status):
-            status += ['Initial']
+            status += ["Initial"]
 
         return ", ".join([str(s) for s in status])
 
@@ -1969,7 +2669,8 @@ class Finding(models.Model):
         sla_calculation = None
         severity = self.severity
         from dojo.utils import get_system_setting
-        sla_age = get_system_setting('sla_' + self.severity.lower())
+
+        sla_age = get_system_setting("sla_" + self.severity.lower())
         if sla_age:
             sla_calculation = sla_age - self.age
         return sla_calculation
@@ -1995,7 +2696,9 @@ class Finding(models.Model):
 
     def github_conf(self):
         try:
-            github_product_key = GITHUB_PKey.objects.get(product=self.test.engagement.product)
+            github_product_key = GITHUB_PKey.objects.get(
+                product=self.test.engagement.product
+            )
             github_conf = github_product_key.conf
         except:
             github_conf = None
@@ -2013,74 +2716,106 @@ class Finding(models.Model):
     @property
     def has_jira_issue(self):
         import dojo.jira_link.helper as jira_helper
+
         return jira_helper.has_jira_issue(self)
 
     @property
     def has_jira_configured(self):
         import dojo.jira_link.helper as jira_helper
+
         return jira_helper.has_jira_configured(self)
 
     def long_desc(self):
-        long_desc = ''
-        long_desc += '*' + self.title + '*\n\n'
-        long_desc += '*Severity:* ' + str(self.severity) + '\n\n'
-        long_desc += '*Cve:* ' + str(self.cve) + '\n\n'
-        long_desc += '*CVSSv3.0:* ' + str(self.cvssv3) + '\n\n'
-        long_desc += '*Product/Engagement:* ' + self.test.engagement.product.name + ' / ' + self.test.engagement.name + '\n\n'
+        long_desc = ""
+        long_desc += "*" + self.title + "*\n\n"
+        long_desc += "*Severity:* " + str(self.severity) + "\n\n"
+        long_desc += "*Cve:* " + str(self.cve) + "\n\n"
+        long_desc += "*CVSSv3.0:* " + str(self.cvssv3) + "\n\n"
+        long_desc += (
+            "*Product/Engagement:* "
+            + self.test.engagement.product.name
+            + " / "
+            + self.test.engagement.name
+            + "\n\n"
+        )
         if self.test.engagement.branch_tag:
-            long_desc += '*Branch/Tag:* ' + self.test.engagement.branch_tag + '\n\n'
+            long_desc += "*Branch/Tag:* " + self.test.engagement.branch_tag + "\n\n"
         if self.test.engagement.build_id:
-            long_desc += '*BuildID:* ' + self.test.engagement.build_id + '\n\n'
+            long_desc += "*BuildID:* " + self.test.engagement.build_id + "\n\n"
         if self.test.engagement.commit_hash:
-            long_desc += '*Commit hash:* ' + self.test.engagement.commit_hash + '\n\n'
-        long_desc += '*Systems*: \n\n'
+            long_desc += "*Commit hash:* " + self.test.engagement.commit_hash + "\n\n"
+        long_desc += "*Systems*: \n\n"
 
         for e in self.endpoints.all():
-            long_desc += str(e) + '\n\n'
-        long_desc += '*Description*: \n' + str(self.description) + '\n\n'
-        long_desc += '*Mitigation*: \n' + str(self.mitigation) + '\n\n'
-        long_desc += '*Impact*: \n' + str(self.impact) + '\n\n'
-        long_desc += '*References*:' + str(self.references)
+            long_desc += str(e) + "\n\n"
+        long_desc += "*Description*: \n" + str(self.description) + "\n\n"
+        long_desc += "*Mitigation*: \n" + str(self.mitigation) + "\n\n"
+        long_desc += "*Impact*: \n" + str(self.impact) + "\n\n"
+        long_desc += "*References*:" + str(self.references)
         return long_desc
 
-    def save(self, dedupe_option=True, false_history=False, rules_option=True,
-             issue_updater_option=True, push_to_jira=False, user=None, *args, **kwargs):
+    def save(
+        self,
+        dedupe_option=True,
+        false_history=False,
+        rules_option=True,
+        issue_updater_option=True,
+        push_to_jira=False,
+        user=None,
+        *args,
+        **kwargs
+    ):
         # Make changes to the finding before it's saved to add a CWE template
         new_finding = False
 
         if not user:
             from dojo.utils import get_current_user
+
             user = get_current_user()
-            logger.debug('finding.save() getting current user: %s', user)
+            logger.debug("finding.save() getting current user: %s", user)
 
         if self.pk is None:
             # We enter here during the first call from serializers.py
-            logger.debug("Saving finding of id " + str(self.id) + " dedupe_option:" + str(dedupe_option) + " (self.pk is None)")
+            logger.debug(
+                "Saving finding of id "
+                + str(self.id)
+                + " dedupe_option:"
+                + str(dedupe_option)
+                + " (self.pk is None)"
+            )
             false_history = True
             from dojo.utils import apply_cwe_to_template
+
             self = apply_cwe_to_template(self)
             # calling django.db.models superclass save method
             super(Finding, self).save(*args, **kwargs)
         else:
             # We enter here during the second call from serializers.py
-            logger.debug("Saving finding of id " + str(self.id) + " dedupe_option:" + str(dedupe_option) + " (self.pk is not None)")
+            logger.debug(
+                "Saving finding of id "
+                + str(self.id)
+                + " dedupe_option:"
+                + str(dedupe_option)
+                + " (self.pk is not None)"
+            )
             # calling django.db.models superclass save method
             super(Finding, self).save(*args, **kwargs)
 
             # Run async the tool issue update to update original issue with Defect Dojo updates
             if issue_updater_option:
                 from dojo.tools import tool_issue_updater
+
                 tool_issue_updater.async_tool_issue_update(self)
         if (self.file_path is not None) and (self.endpoints.count() == 0):
             self.static_finding = True
             self.dynamic_finding = False
-        elif (self.file_path is not None):
+        elif self.file_path is not None:
             self.static_finding = True
 
         # Finding.save is called once from serializers.py with dedupe_option=False because the finding is not ready yet, for example the endpoints are not built
         # It is then called a second time with dedupe_option defaulted to true; now we can compute the hash_code and run the deduplication
-        if(dedupe_option):
-            if (self.hash_code is not None):
+        if dedupe_option:
+            if self.hash_code is not None:
                 deduplicationLogger.debug("Hash_code already computed for finding")
             else:
                 self.hash_code = self.compute_hash_code()
@@ -2088,9 +2823,11 @@ class Finding(models.Model):
 
         if rules_option:
             from dojo.utils import do_apply_rules
+
             do_apply_rules(self, *args, **kwargs)
 
         from dojo.utils import calculate_grade
+
         calculate_grade(self.test.engagement.product)
 
         # Assign the numerical severity for correct sorting order
@@ -2101,27 +2838,36 @@ class Finding(models.Model):
         if dedupe_option and self.hash_code is not None:
             if system_settings.enable_deduplication:
                 from dojo.utils import do_dedupe_finding
+
                 do_dedupe_finding(self, *args, **kwargs)
             else:
-                deduplicationLogger.debug("skipping dedupe because it's disabled in system settings")
+                deduplicationLogger.debug(
+                    "skipping dedupe because it's disabled in system settings"
+                )
 
         if system_settings.false_positive_history and false_history:
             from dojo.utils import do_false_positive_history
+
             do_false_positive_history(self, *args, **kwargs)
         else:
-            deduplicationLogger.debug("skipping false positive history because it's disabled in system settings or false_history param is False")
+            deduplicationLogger.debug(
+                "skipping false positive history because it's disabled in system settings or false_history param is False"
+            )
 
         # Title Casing
         from titlecase import titlecase
+
         self.title = titlecase(self.title)
 
         from dojo.utils import calculate_grade
+
         calculate_grade(self.test.engagement.product)
 
         # Adding a snippet here for push to JIRA so that it's in one place
         if push_to_jira:
-            logger.debug('pushing finding %s to jira from finding.save()', self.pk)
+            logger.debug("pushing finding %s to jira from finding.save()", self.pk)
             import dojo.jira_link.helper as jira_helper
+
             jira_helper.push_to_jira(self)
 
     def delete(self, *args, **kwargs):
@@ -2130,12 +2876,12 @@ class Finding(models.Model):
             super(Finding, find).delete()
         super(Finding, self).delete(*args, **kwargs)
         from dojo.utils import calculate_grade
+
         calculate_grade(self.test.engagement.product)
 
     def clean(self):
         no_check = ["test", "reporter"]
-        bigfields = ["description", "mitigation", "references", "impact",
-                     "url"]
+        bigfields = ["description", "mitigation", "references", "impact", "url"]
         for field_obj in self._meta.fields:
             field = field_obj.name
             if field not in no_check:
@@ -2158,8 +2904,12 @@ class Finding(models.Model):
 
     def get_breadcrumbs(self):
         bc = self.test.get_breadcrumbs()
-        bc += [{'title': self.__unicode__(),
-                'url': reverse('view_finding', args=(self.id,))}]
+        bc += [
+            {
+                "title": self.__unicode__(),
+                "url": reverse("view_finding", args=(self.id,)),
+            }
+        ]
         return bc
 
     def get_report_requests(self):
@@ -2178,47 +2928,68 @@ class Finding(models.Model):
             reqres = self.burprawrequestresponse_set.first()
         res = base64.b64decode(reqres.burpResponseBase64)
         # Removes all blank lines
-        res = re.sub(r'\n\s*\n', '\n', res)
+        res = re.sub(r"\n\s*\n", "\n", res)
         return res
 
     def latest_note(self):
         if self.notes.all():
             note = self.notes.all()[0]
-            return note.date.strftime("%Y-%m-%d %H:%M:%S") + ': ' + note.author.get_full_name() + ' : ' + note.entry
+            return (
+                note.date.strftime("%Y-%m-%d %H:%M:%S")
+                + ": "
+                + note.author.get_full_name()
+                + " : "
+                + note.entry
+            )
 
-        return ''
+        return ""
 
     def get_sast_source_file_path_with_link(self):
         from dojo.utils import create_bleached_link
+
         if self.sast_source_file_path is None:
             return None
         if self.test.engagement.source_code_management_uri is None:
             return self.sast_source_file_path
-        return create_bleached_link(self.test.engagement.source_code_management_uri + '/' + self.sast_source_file_path, self.sast_source_file_path)
+        return create_bleached_link(
+            self.test.engagement.source_code_management_uri
+            + "/"
+            + self.sast_source_file_path,
+            self.sast_source_file_path,
+        )
 
     def get_file_path_with_link(self):
         from dojo.utils import create_bleached_link
+
         if self.file_path is None:
             return None
         if self.test.engagement.source_code_management_uri is None:
             return self.file_path
-        return create_bleached_link(self.test.engagement.source_code_management_uri + '/' + self.file_path, self.file_path)
+        return create_bleached_link(
+            self.test.engagement.source_code_management_uri + "/" + self.file_path,
+            self.file_path,
+        )
 
     def get_references_with_links(self):
         import re
         from dojo.utils import create_bleached_link
+
         if self.references is None:
             return None
-        matches = re.findall(r'([\(|\[]?(https?):((//)|(\\\\))+([\w\d:#@%/;$~_?\+-=\\\.&](#!)?)*[\)|\]]?)', self.references)
+        matches = re.findall(
+            r"([\(|\[]?(https?):((//)|(\\\\))+([\w\d:#@%/;$~_?\+-=\\\.&](#!)?)*[\)|\]]?)",
+            self.references,
+        )
         for match in matches:
             # Check if match isn't already a markdown link
-            if not (match[0].startswith('[') or match[0].startswith('(')):
-                self.references = self.references.replace(match[0], create_bleached_link(match[0], match[0]), 1)
+            if not (match[0].startswith("[") or match[0].startswith("(")):
+                self.references = self.references.replace(
+                    match[0], create_bleached_link(match[0], match[0]), 1
+                )
         return self.references
 
 
-Finding.endpoints.through.__unicode__ = lambda \
-    x: "Endpoint: " + x.endpoint.host
+Finding.endpoints.through.__unicode__ = lambda x: "Endpoint: " + x.endpoint.host
 
 
 class Stub_Finding(models.Model):
@@ -2227,10 +2998,12 @@ class Stub_Finding(models.Model):
     severity = models.CharField(max_length=200, blank=True, null=True)
     description = models.TextField(blank=True, null=True)
     test = models.ForeignKey(Test, editable=False, on_delete=models.CASCADE)
-    reporter = models.ForeignKey(User, editable=False, default=1, on_delete=models.CASCADE)
+    reporter = models.ForeignKey(
+        User, editable=False, default=1, on_delete=models.CASCADE
+    )
 
     class Meta:
-        ordering = ('-date', 'title')
+        ordering = ("-date", "title")
 
     def __unicode__(self):
         return self.title
@@ -2240,18 +3013,29 @@ class Stub_Finding(models.Model):
 
     def get_breadcrumbs(self):
         bc = self.test.get_breadcrumbs()
-        bc += [{'title': "Potential Finding: " + self.__unicode__(),
-                'url': reverse('view_potential_finding', args=(self.id,))}]
+        bc += [
+            {
+                "title": "Potential Finding: " + self.__unicode__(),
+                "url": reverse("view_potential_finding", args=(self.id,)),
+            }
+        ]
         return bc
 
 
 class Finding_Template(models.Model):
     title = models.TextField(max_length=1000)
     cwe = models.IntegerField(default=None, null=True, blank=True)
-    cve_regex = RegexValidator(regex=r'^[A-Z]{1,10}(-\d+)+$',
-                               message="Vulnerability ID must be entered in the format: 'ABC-9999-9999'.")
-    cve = models.CharField(validators=[cve_regex], max_length=28, null=True, blank=False)
-    cvssv3_regex = RegexValidator(regex=r'^AV:[NALP]|AC:[LH]|PR:[UNLH]|UI:[NR]|S:[UC]|[CIA]:[NLH]', message="CVSS must be entered in format: 'AV:N/AC:L/PR:N/UI:N/S:C/C:H/I:H/A:H'")
+    cve_regex = RegexValidator(
+        regex=r"^[A-Z]{1,10}(-\d+)+$",
+        message="Vulnerability ID must be entered in the format: 'ABC-9999-9999'.",
+    )
+    cve = models.CharField(
+        validators=[cve_regex], max_length=28, null=True, blank=False
+    )
+    cvssv3_regex = RegexValidator(
+        regex=r"^AV:[NALP]|AC:[LH]|PR:[UNLH]|UI:[NR]|S:[UC]|[CIA]:[NLH]",
+        message="CVSS must be entered in format: 'AV:N/AC:L/PR:N/UI:N/S:C/C:H/I:H/A:H'",
+    )
     cvssv3 = models.TextField(validators=[cvssv3_regex], max_length=117, null=True)
     severity = models.CharField(max_length=200, null=True, blank=True)
     description = models.TextField(null=True, blank=True)
@@ -2259,18 +3043,37 @@ class Finding_Template(models.Model):
     impact = models.TextField(null=True, blank=True)
     references = models.TextField(null=True, blank=True, db_column="refs")
     last_used = models.DateTimeField(null=True, editable=False)
-    numerical_severity = models.CharField(max_length=4, null=True, blank=True, editable=False)
-    template_match = models.BooleanField(default=False, verbose_name='Template Match Enabled', help_text="Enables this template for matching remediation advice. Match will be applied to all active, verified findings by CWE.")
-    template_match_title = models.BooleanField(default=False, verbose_name='Match Template by Title and CWE', help_text="Matches by title text (contains search) and CWE.")
+    numerical_severity = models.CharField(
+        max_length=4, null=True, blank=True, editable=False
+    )
+    template_match = models.BooleanField(
+        default=False,
+        verbose_name="Template Match Enabled",
+        help_text="Enables this template for matching remediation advice. Match will be applied to all active, verified findings by CWE.",
+    )
+    template_match_title = models.BooleanField(
+        default=False,
+        verbose_name="Match Template by Title and CWE",
+        help_text="Matches by title text (contains search) and CWE.",
+    )
 
-    tags_from_django_tagging = models.TextField(editable=False, blank=True, help_text=_('Temporary archive with tags from the previous tagging library we used'))
-    tags = TagField(blank=True, force_lowercase=True, help_text="Add tags that help describe this finding template. Choose from the list or add new tags. Press Enter key to add.")
+    tags_from_django_tagging = models.TextField(
+        editable=False,
+        blank=True,
+        help_text=_(
+            "Temporary archive with tags from the previous tagging library we used"
+        ),
+    )
+    tags = TagField(
+        blank=True,
+        force_lowercase=True,
+        help_text="Add tags that help describe this finding template. Choose from the list or add new tags. Press Enter key to add.",
+    )
 
-    SEVERITIES = {'Info': 4, 'Low': 3, 'Medium': 2,
-                  'High': 1, 'Critical': 0}
+    SEVERITIES = {"Info": 4, "Low": 3, "Medium": 2, "High": 1, "Critical": 0}
 
     class Meta:
-        ordering = ['-cwe']
+        ordering = ["-cwe"]
 
     def __unicode__(self):
         return self.title
@@ -2279,122 +3082,207 @@ class Finding_Template(models.Model):
         return self.title
 
     def get_breadcrumbs(self):
-        bc = [{'title': self.__unicode__(),
-               'url': reverse('view_template', args=(self.id,))}]
+        bc = [
+            {
+                "title": self.__unicode__(),
+                "url": reverse("view_template", args=(self.id,)),
+            }
+        ]
         return bc
 
     def get_absolute_url(self):
         from django.urls import reverse
-        return reverse('edit_template', args=[str(self.id)])
+
+        return reverse("edit_template", args=[str(self.id)])
 
 
 class Check_List(models.Model):
-    session_management = models.CharField(max_length=50, default='none')
-    session_issues = models.ManyToManyField(Finding,
-                                            related_name='session_issues',
-                                            blank=True)
-    encryption_crypto = models.CharField(max_length=50, default='none')
-    crypto_issues = models.ManyToManyField(Finding,
-                                           related_name='crypto_issues',
-                                           blank=True)
-    configuration_management = models.CharField(max_length=50, default='')
-    config_issues = models.ManyToManyField(Finding,
-                                           related_name='config_issues',
-                                           blank=True)
-    authentication = models.CharField(max_length=50, default='none')
-    auth_issues = models.ManyToManyField(Finding,
-                                         related_name='auth_issues',
-                                         blank=True)
-    authorization_and_access_control = models.CharField(max_length=50,
-                                                        default='none')
-    author_issues = models.ManyToManyField(Finding,
-                                           related_name='author_issues',
-                                           blank=True)
-    data_input_sanitization_validation = models.CharField(max_length=50,
-                                                          default='none')
-    data_issues = models.ManyToManyField(Finding, related_name='data_issues',
-                                         blank=True)
-    sensitive_data = models.CharField(max_length=50, default='none')
-    sensitive_issues = models.ManyToManyField(Finding,
-                                              related_name='sensitive_issues',
-                                              blank=True)
-    other = models.CharField(max_length=50, default='none')
-    other_issues = models.ManyToManyField(Finding, related_name='other_issues',
-                                          blank=True)
-    engagement = models.ForeignKey(Engagement, editable=False,
-                                   related_name='eng_for_check', on_delete=models.CASCADE)
+    session_management = models.CharField(max_length=50, default="none")
+    session_issues = models.ManyToManyField(
+        Finding, related_name="session_issues", blank=True
+    )
+    encryption_crypto = models.CharField(max_length=50, default="none")
+    crypto_issues = models.ManyToManyField(
+        Finding, related_name="crypto_issues", blank=True
+    )
+    configuration_management = models.CharField(max_length=50, default="")
+    config_issues = models.ManyToManyField(
+        Finding, related_name="config_issues", blank=True
+    )
+    authentication = models.CharField(max_length=50, default="none")
+    auth_issues = models.ManyToManyField(
+        Finding, related_name="auth_issues", blank=True
+    )
+    authorization_and_access_control = models.CharField(max_length=50, default="none")
+    author_issues = models.ManyToManyField(
+        Finding, related_name="author_issues", blank=True
+    )
+    data_input_sanitization_validation = models.CharField(max_length=50, default="none")
+    data_issues = models.ManyToManyField(
+        Finding, related_name="data_issues", blank=True
+    )
+    sensitive_data = models.CharField(max_length=50, default="none")
+    sensitive_issues = models.ManyToManyField(
+        Finding, related_name="sensitive_issues", blank=True
+    )
+    other = models.CharField(max_length=50, default="none")
+    other_issues = models.ManyToManyField(
+        Finding, related_name="other_issues", blank=True
+    )
+    engagement = models.ForeignKey(
+        Engagement,
+        editable=False,
+        related_name="eng_for_check",
+        on_delete=models.CASCADE,
+    )
 
     @staticmethod
     def get_status(pass_fail):
-        if pass_fail == 'Pass':
-            return 'success'
-        elif pass_fail == 'Fail':
-            return 'danger'
+        if pass_fail == "Pass":
+            return "success"
+        elif pass_fail == "Fail":
+            return "danger"
         else:
-            return 'warning'
+            return "warning"
 
     def get_breadcrumb(self):
         bc = self.engagement.get_breadcrumb()
-        bc += [{'title': "Check List",
-                'url': reverse('complete_checklist',
-                               args=(self.engagement.id,))}]
+        bc += [
+            {
+                "title": "Check List",
+                "url": reverse("complete_checklist", args=(self.engagement.id,)),
+            }
+        ]
         return bc
 
 
 class BurpRawRequestResponse(models.Model):
-    finding = models.ForeignKey(Finding, blank=True, null=True, on_delete=models.CASCADE)
+    finding = models.ForeignKey(
+        Finding, blank=True, null=True, on_delete=models.CASCADE
+    )
     burpRequestBase64 = models.BinaryField()
     burpResponseBase64 = models.BinaryField()
 
     def get_request(self):
-        return str(base64.b64decode(self.burpRequestBase64), errors='ignore')
+        return str(base64.b64decode(self.burpRequestBase64), errors="ignore")
 
     def get_response(self):
-        res = str(base64.b64decode(self.burpResponseBase64), errors='ignore')
+        res = str(base64.b64decode(self.burpResponseBase64), errors="ignore")
         # Removes all blank lines
-        res = re.sub(r'\n\s*\n', '\n', res)
+        res = re.sub(r"\n\s*\n", "\n", res)
         return res
 
 
 class Risk_Acceptance(models.Model):
-    TREATMENT_ACCEPT = 'A'
-    TREATMENT_AVOID = 'V'
-    TREATMENT_MITIGATE = 'M'
-    TREATMENT_FIX = 'F'
-    TREATMENT_TRANSFER = 'T'
+    TREATMENT_ACCEPT = "A"
+    TREATMENT_AVOID = "V"
+    TREATMENT_MITIGATE = "M"
+    TREATMENT_FIX = "F"
+    TREATMENT_TRANSFER = "T"
 
     TREATMENT_CHOICES = [
-        (TREATMENT_ACCEPT, 'Accept (The risk is acknowledged, yet remains)'),
-        (TREATMENT_AVOID, 'Avoid (Do not engage with whatever creates the risk)'),
-        (TREATMENT_MITIGATE, 'Mitigate (The risk still exists, yet compensating controls make it less of a threat)'),
-        (TREATMENT_FIX, 'Fix (The risk is eradicated)'),
-        (TREATMENT_TRANSFER, 'Transfer (The risk is transferred to a 3rd party)'),
+        (TREATMENT_ACCEPT, "Accept (The risk is acknowledged, yet remains)"),
+        (TREATMENT_AVOID, "Avoid (Do not engage with whatever creates the risk)"),
+        (
+            TREATMENT_MITIGATE,
+            "Mitigate (The risk still exists, yet compensating controls make it less of a threat)",
+        ),
+        (TREATMENT_FIX, "Fix (The risk is eradicated)"),
+        (TREATMENT_TRANSFER, "Transfer (The risk is transferred to a 3rd party)"),
     ]
 
-    name = models.CharField(max_length=100, null=False, blank=False, help_text="Descriptive name which in the future may also be used to group risk acceptances together across engagements and products")
+    name = models.CharField(
+        max_length=100,
+        null=False,
+        blank=False,
+        help_text="Descriptive name which in the future may also be used to group risk acceptances together across engagements and products",
+    )
 
     accepted_findings = models.ManyToManyField(Finding)
 
-    recommendation = models.CharField(choices=TREATMENT_CHOICES, max_length=2, null=False, default=TREATMENT_FIX, help_text="Recommendation from the security team.", verbose_name="Security Recommendation")
+    recommendation = models.CharField(
+        choices=TREATMENT_CHOICES,
+        max_length=2,
+        null=False,
+        default=TREATMENT_FIX,
+        help_text="Recommendation from the security team.",
+        verbose_name="Security Recommendation",
+    )
 
-    recommendation_details = models.TextField(null=True,
-                                      blank=True,
-                                      help_text="Explanation of security recommendation", verbose_name="Security Recommendation Details")
+    recommendation_details = models.TextField(
+        null=True,
+        blank=True,
+        help_text="Explanation of security recommendation",
+        verbose_name="Security Recommendation Details",
+    )
 
-    decision = models.CharField(choices=TREATMENT_CHOICES, max_length=2, null=False, default=TREATMENT_ACCEPT, help_text="Risk treatment decision by risk owner")
-    decision_details = models.TextField(default=None, blank=True, null=True, help_text="If a compensating control exists to mitigate the finding or reduce risk, then list the compensating control(s).")
+    decision = models.CharField(
+        choices=TREATMENT_CHOICES,
+        max_length=2,
+        null=False,
+        default=TREATMENT_ACCEPT,
+        help_text="Risk treatment decision by risk owner",
+    )
+    decision_details = models.TextField(
+        default=None,
+        blank=True,
+        null=True,
+        help_text="If a compensating control exists to mitigate the finding or reduce risk, then list the compensating control(s).",
+    )
 
-    accepted_by = models.CharField(max_length=200, default=None, null=True, blank=True, verbose_name='Accepted By', help_text="The person that accepts the risk, can be outside of DefectDojo.")
-    path = models.FileField(upload_to='risk/%Y/%m/%d',
-                            editable=True, null=True,
-                            blank=True, verbose_name="Proof")
-    owner = models.ForeignKey(Dojo_User, editable=True, on_delete=models.CASCADE, help_text="User in DefectDojo owning this acceptance. Only the owner and staff users can edit the risk acceptance.")
+    accepted_by = models.CharField(
+        max_length=200,
+        default=None,
+        null=True,
+        blank=True,
+        verbose_name="Accepted By",
+        help_text="The person that accepts the risk, can be outside of DefectDojo.",
+    )
+    path = models.FileField(
+        upload_to="risk/%Y/%m/%d",
+        editable=True,
+        null=True,
+        blank=True,
+        verbose_name="Proof",
+    )
+    owner = models.ForeignKey(
+        Dojo_User,
+        editable=True,
+        on_delete=models.CASCADE,
+        help_text="User in DefectDojo owning this acceptance. Only the owner and staff users can edit the risk acceptance.",
+    )
 
-    expiration_date = models.DateTimeField(default=None, null=True, blank=True, help_text="When the risk acceptance expires, the findings will be reactivated (unless disabled below).")
-    expiration_date_warned = models.DateTimeField(default=None, null=True, blank=True, help_text="(readonly) Date at which notice about the risk acceptance expiration was sent.")
-    expiration_date_handled = models.DateTimeField(default=None, null=True, blank=True, help_text="(readonly) When the risk acceptance expiration was handled (manually or by the daily job).")
-    reactivate_expired = models.BooleanField(null=False, blank=False, default=True, verbose_name="Reactivate findings on expiration", help_text="Reactivate findings when risk acceptance expires?")
-    restart_sla_expired = models.BooleanField(default=False, null=False, verbose_name="Restart SLA on expiration", help_text="When enabled, the SLA for findings is restarted when the risk acceptance expires.")
+    expiration_date = models.DateTimeField(
+        default=None,
+        null=True,
+        blank=True,
+        help_text="When the risk acceptance expires, the findings will be reactivated (unless disabled below).",
+    )
+    expiration_date_warned = models.DateTimeField(
+        default=None,
+        null=True,
+        blank=True,
+        help_text="(readonly) Date at which notice about the risk acceptance expiration was sent.",
+    )
+    expiration_date_handled = models.DateTimeField(
+        default=None,
+        null=True,
+        blank=True,
+        help_text="(readonly) When the risk acceptance expiration was handled (manually or by the daily job).",
+    )
+    reactivate_expired = models.BooleanField(
+        null=False,
+        blank=False,
+        default=True,
+        verbose_name="Reactivate findings on expiration",
+        help_text="Reactivate findings when risk acceptance expires?",
+    )
+    restart_sla_expired = models.BooleanField(
+        default=False,
+        null=False,
+        verbose_name="Restart SLA on expiration",
+        help_text="When enabled, the SLA for findings is restarted when the risk acceptance expires.",
+    )
 
     notes = models.ManyToManyField(Notes, editable=False)
     created = models.DateTimeField(null=False, editable=False, auto_now_add=True)
@@ -2414,13 +3302,31 @@ class Risk_Acceptance(models.Model):
 
     @property
     def name_and_expiration_info(self):
-        return str(self.name) + (' (expired ' if self.is_expired else ' (expires ') + (timezone.localtime(self.expiration_date).strftime("%b %d, %Y") if self.expiration_date else 'Never') + ')'
+        return (
+            str(self.name)
+            + (" (expired " if self.is_expired else " (expires ")
+            + (
+                timezone.localtime(self.expiration_date).strftime("%b %d, %Y")
+                if self.expiration_date
+                else "Never"
+            )
+            + ")"
+        )
 
     def get_breadcrumbs(self):
         bc = self.engagement_set.first().get_breadcrumbs()
-        bc += [{'title': self.__unicode__(),
-                'url': reverse('view_risk_acceptance', args=(
-                    self.engagement_set.first().product.id, self.id,))}]
+        bc += [
+            {
+                "title": self.__unicode__(),
+                "url": reverse(
+                    "view_risk_acceptance",
+                    args=(
+                        self.engagement_set.first().product.id,
+                        self.id,
+                    ),
+                ),
+            }
+        ]
         return bc
 
     @property
@@ -2439,13 +3345,14 @@ class Risk_Acceptance(models.Model):
 
 class Report(models.Model):
     name = models.CharField(max_length=200)
-    type = models.CharField(max_length=100, default='Finding')
-    format = models.CharField(max_length=15, default='AsciiDoc')
+    type = models.CharField(max_length=100, default="Finding")
+    format = models.CharField(max_length=15, default="AsciiDoc")
     requester = models.ForeignKey(User, on_delete=models.CASCADE)
     task_id = models.CharField(max_length=50)
-    file = models.FileField(upload_to='reports/%Y/%m/%d',
-                            verbose_name='Report File', null=True)
-    status = models.CharField(max_length=10, default='requested')
+    file = models.FileField(
+        upload_to="reports/%Y/%m/%d", verbose_name="Report File", null=True
+    )
+    status = models.CharField(max_length=10, default="requested")
     options = models.TextField()
     datetime = models.DateTimeField(auto_now_add=True)
     done_datetime = models.DateTimeField(null=True)
@@ -2457,54 +3364,68 @@ class Report(models.Model):
         return self.name
 
     def get_url(self):
-        return reverse('download_report', args=(self.id,))
+        return reverse("download_report", args=(self.id,))
 
     class Meta:
-        ordering = ['-datetime']
+        ordering = ["-datetime"]
 
 
 class FindingImage(models.Model):
-    image = models.ImageField(upload_to=UniqueUploadNameProvider('finding_images'))
+    image = models.ImageField(upload_to=UniqueUploadNameProvider("finding_images"))
     caption = models.CharField(max_length=500, blank=True)
-    image_thumbnail = ImageSpecField(source='image',
-                                     processors=[ResizeToCover(100, 100)],
-                                     format='JPEG',
-                                     options={'quality': 70})
-    image_small = ImageSpecField(source='image',
-                                 processors=[ResizeToCover(640, 480)],
-                                 format='JPEG',
-                                 options={'quality': 100})
-    image_medium = ImageSpecField(source='image',
-                                  processors=[ResizeToCover(800, 600)],
-                                  format='JPEG',
-                                  options={'quality': 100})
-    image_large = ImageSpecField(source='image',
-                                 processors=[ResizeToCover(1024, 768)],
-                                 format='JPEG',
-                                 options={'quality': 100})
+    image_thumbnail = ImageSpecField(
+        source="image",
+        processors=[ResizeToCover(100, 100)],
+        format="JPEG",
+        options={"quality": 70},
+    )
+    image_small = ImageSpecField(
+        source="image",
+        processors=[ResizeToCover(640, 480)],
+        format="JPEG",
+        options={"quality": 100},
+    )
+    image_medium = ImageSpecField(
+        source="image",
+        processors=[ResizeToCover(800, 600)],
+        format="JPEG",
+        options={"quality": 100},
+    )
+    image_large = ImageSpecField(
+        source="image",
+        processors=[ResizeToCover(1024, 768)],
+        format="JPEG",
+        options={"quality": 100},
+    )
 
     def __unicode__(self):
-        return self.image.name or 'No Image'
+        return self.image.name or "No Image"
 
     def __str__(self):
-        return self.image.name or 'No Image'
+        return self.image.name or "No Image"
 
 
 class FindingImageAccessToken(models.Model):
     """This will allow reports to request the images without exposing the
     media root to the world without
     authentication"""
+
     user = models.ForeignKey(User, null=False, blank=False, on_delete=models.CASCADE)
-    image = models.ForeignKey(FindingImage, null=False, blank=False, on_delete=models.CASCADE)
+    image = models.ForeignKey(
+        FindingImage, null=False, blank=False, on_delete=models.CASCADE
+    )
     token = models.CharField(max_length=255)
-    size = models.CharField(max_length=9,
-                            choices=(
-                                ('small', 'Small'),
-                                ('medium', 'Medium'),
-                                ('large', 'Large'),
-                                ('thumbnail', 'Thumbnail'),
-                                ('original', 'Original')),
-                            default='medium')
+    size = models.CharField(
+        max_length=9,
+        choices=(
+            ("small", "Small"),
+            ("medium", "Medium"),
+            ("large", "Large"),
+            ("thumbnail", "Thumbnail"),
+            ("original", "Original"),
+        ),
+        default="medium",
+    )
 
     def save(self, *args, **kwargs):
         if not self.token:
@@ -2514,12 +3435,22 @@ class FindingImageAccessToken(models.Model):
 
 class BannerConf(models.Model):
     banner_enable = models.BooleanField(default=False, null=True, blank=True)
-    banner_message = models.CharField(max_length=500, help_text="This message will be displayed on the login page", default='')
+    banner_message = models.CharField(
+        max_length=500,
+        help_text="This message will be displayed on the login page",
+        default="",
+    )
 
 
 class GITHUB_Conf(models.Model):
-    configuration_name = models.CharField(max_length=2000, help_text="Enter a name to give to this configuration", default='')
-    api_key = models.CharField(max_length=2000, help_text="Enter your Github API Key", default='')
+    configuration_name = models.CharField(
+        max_length=2000,
+        help_text="Enter a name to give to this configuration",
+        default="",
+    )
+    api_key = models.CharField(
+        max_length=2000, help_text="Enter your Github API Key", default=""
+    )
 
     def __unicode__(self):
         return self.configuration_name
@@ -2531,13 +3462,23 @@ class GITHUB_Conf(models.Model):
 class GITHUB_Issue(models.Model):
     issue_id = models.CharField(max_length=200)
     issue_url = models.URLField(max_length=2000, verbose_name="GitHub issue URL")
-    finding = models.OneToOneField(Finding, null=True, blank=True, on_delete=models.CASCADE)
+    finding = models.OneToOneField(
+        Finding, null=True, blank=True, on_delete=models.CASCADE
+    )
 
     def __unicode__(self):
-        return str(self.github_issue_id) + '| GitHub Issue URL: ' + str(self.github_issue_url)
+        return (
+            str(self.github_issue_id)
+            + "| GitHub Issue URL: "
+            + str(self.github_issue_url)
+        )
 
     def __str__(self):
-        return str(self.github_issue_id) + '| GitHub Issue URL: ' + str(self.github_issue_url)
+        return (
+            str(self.github_issue_id)
+            + "| GitHub Issue URL: "
+            + str(self.github_issue_url)
+        )
 
 
 class GITHUB_Clone(models.Model):
@@ -2555,10 +3496,24 @@ class GITHUB_Details_Cache(models.Model):
 class GITHUB_PKey(models.Model):
     product = models.ForeignKey(Product, on_delete=models.CASCADE)
 
-    git_project = models.CharField(max_length=200, blank=True, verbose_name="Github project", help_text="Specify your project location. (:user/:repo)")
-    git_conf = models.ForeignKey(GITHUB_Conf, verbose_name="Github Configuration",
-                                 null=True, blank=True, on_delete=models.CASCADE)
-    git_push_notes = models.BooleanField(default=False, blank=True, help_text="Notes added to findings will be automatically added to the corresponding github issue")
+    git_project = models.CharField(
+        max_length=200,
+        blank=True,
+        verbose_name="Github project",
+        help_text="Specify your project location. (:user/:repo)",
+    )
+    git_conf = models.ForeignKey(
+        GITHUB_Conf,
+        verbose_name="Github Configuration",
+        null=True,
+        blank=True,
+        on_delete=models.CASCADE,
+    )
+    git_push_notes = models.BooleanField(
+        default=False,
+        blank=True,
+        help_text="Notes added to findings will be automatically added to the corresponding github issue",
+    )
 
     def __unicode__(self):
         return self.product.name + " | " + self.git_project
@@ -2568,46 +3523,98 @@ class GITHUB_PKey(models.Model):
 
 
 class JIRA_Instance(models.Model):
-    configuration_name = models.CharField(max_length=2000, help_text="Enter a name to give to this configuration", default='')
-    url = models.URLField(max_length=2000, verbose_name="JIRA URL", help_text="For configuring Jira, view: https://defectdojo.readthedocs.io/en/latest/features.html#jira-integration")
+    configuration_name = models.CharField(
+        max_length=2000,
+        help_text="Enter a name to give to this configuration",
+        default="",
+    )
+    url = models.URLField(
+        max_length=2000,
+        verbose_name="JIRA URL",
+        help_text="For configuring Jira, view: https://defectdojo.readthedocs.io/en/latest/features.html#jira-integration",
+    )
     username = models.CharField(max_length=2000)
     password = models.CharField(max_length=2000)
 
-    if hasattr(settings, 'JIRA_ISSUE_TYPE_CHOICES_CONFIG'):
+    if hasattr(settings, "JIRA_ISSUE_TYPE_CHOICES_CONFIG"):
         default_issue_type_choices = settings.JIRA_ISSUE_TYPE_CHOICES_CONFIG
     else:
         default_issue_type_choices = (
-                                        ('Task', 'Task'),
-                                        ('Story', 'Story'),
-                                        ('Epic', 'Epic'),
-                                        ('Spike', 'Spike'),
-                                        ('Bug', 'Bug'),
-                                        ('Security', 'Security')
-                                    )
-    default_issue_type = models.CharField(max_length=15,
-                                          choices=default_issue_type_choices,
-                                          default='Bug',
-                                          help_text='You can define extra issue types in settings.py')
-    epic_name_id = models.IntegerField(help_text="To obtain the 'Epic name id' visit https://<YOUR JIRA URL>/rest/api/2/field and search for Epic Name. Copy the number out of cf[number] and paste it here.")
-    open_status_key = models.IntegerField(help_text="To obtain the 'open status key' visit https://<YOUR JIRA URL>/rest/api/latest/issue/<ANY VALID ISSUE KEY>/transitions?expand=transitions.fields")
-    close_status_key = models.IntegerField(help_text="To obtain the 'open status key' visit https://<YOUR JIRA URL>/rest/api/latest/issue/<ANY VALID ISSUE KEY>/transitions?expand=transitions.fields")
-    info_mapping_severity = models.CharField(max_length=200, help_text="Maps to the 'Priority' field in Jira. For example: Info")
-    low_mapping_severity = models.CharField(max_length=200, help_text="Maps to the 'Priority' field in Jira. For example: Low")
-    medium_mapping_severity = models.CharField(max_length=200, help_text="Maps to the 'Priority' field in Jira. For example: Medium")
-    high_mapping_severity = models.CharField(max_length=200, help_text="Maps to the 'Priority' field in Jira. For example: High")
-    critical_mapping_severity = models.CharField(max_length=200, help_text="Maps to the 'Priority' field in Jira. For example: Critical")
-    finding_text = models.TextField(null=True, blank=True, help_text="Additional text that will be added to the finding in Jira. For example including how the finding was created or who to contact for more information.")
-    accepted_mapping_resolution = models.CharField(null=True, blank=True, max_length=300, help_text="JIRA resolution names (comma-separated values) that maps to an Accepted Finding")
-    false_positive_mapping_resolution = models.CharField(null=True, blank=True, max_length=300, help_text="JIRA resolution names (comma-separated values) that maps to a False Positive Finding")
-    global_jira_sla_notification = models.BooleanField(default=True, blank=False, verbose_name="Globally send SLA notifications as comment?", help_text="This setting can be overidden at the Product level")
+            ("Task", "Task"),
+            ("Story", "Story"),
+            ("Epic", "Epic"),
+            ("Spike", "Spike"),
+            ("Bug", "Bug"),
+            ("Security", "Security"),
+        )
+    default_issue_type = models.CharField(
+        max_length=15,
+        choices=default_issue_type_choices,
+        default="Bug",
+        help_text="You can define extra issue types in settings.py",
+    )
+    epic_name_id = models.IntegerField(
+        help_text="To obtain the 'Epic name id' visit https://<YOUR JIRA URL>/rest/api/2/field and search for Epic Name. Copy the number out of cf[number] and paste it here."
+    )
+    open_status_key = models.IntegerField(
+        help_text="To obtain the 'open status key' visit https://<YOUR JIRA URL>/rest/api/latest/issue/<ANY VALID ISSUE KEY>/transitions?expand=transitions.fields"
+    )
+    close_status_key = models.IntegerField(
+        help_text="To obtain the 'open status key' visit https://<YOUR JIRA URL>/rest/api/latest/issue/<ANY VALID ISSUE KEY>/transitions?expand=transitions.fields"
+    )
+    info_mapping_severity = models.CharField(
+        max_length=200,
+        help_text="Maps to the 'Priority' field in Jira. For example: Info",
+    )
+    low_mapping_severity = models.CharField(
+        max_length=200,
+        help_text="Maps to the 'Priority' field in Jira. For example: Low",
+    )
+    medium_mapping_severity = models.CharField(
+        max_length=200,
+        help_text="Maps to the 'Priority' field in Jira. For example: Medium",
+    )
+    high_mapping_severity = models.CharField(
+        max_length=200,
+        help_text="Maps to the 'Priority' field in Jira. For example: High",
+    )
+    critical_mapping_severity = models.CharField(
+        max_length=200,
+        help_text="Maps to the 'Priority' field in Jira. For example: Critical",
+    )
+    finding_text = models.TextField(
+        null=True,
+        blank=True,
+        help_text="Additional text that will be added to the finding in Jira. For example including how the finding was created or who to contact for more information.",
+    )
+    accepted_mapping_resolution = models.CharField(
+        null=True,
+        blank=True,
+        max_length=300,
+        help_text="JIRA resolution names (comma-separated values) that maps to an Accepted Finding",
+    )
+    false_positive_mapping_resolution = models.CharField(
+        null=True,
+        blank=True,
+        max_length=300,
+        help_text="JIRA resolution names (comma-separated values) that maps to a False Positive Finding",
+    )
+    global_jira_sla_notification = models.BooleanField(
+        default=True,
+        blank=False,
+        verbose_name="Globally send SLA notifications as comment?",
+        help_text="This setting can be overidden at the Product level",
+    )
 
     @property
     def accepted_resolutions(self):
-        return [m.strip() for m in (self.accepted_mapping_resolution or '').split(',')]
+        return [m.strip() for m in (self.accepted_mapping_resolution or "").split(",")]
 
     @property
     def false_positive_resolutions(self):
-        return [m.strip() for m in (self.false_positive_mapping_resolution or '').split(',')]
+        return [
+            m.strip() for m in (self.false_positive_mapping_resolution or "").split(",")
+        ]
 
     def __unicode__(self):
         return self.configuration_name + " | " + self.url + " | " + self.username
@@ -2616,18 +3623,18 @@ class JIRA_Instance(models.Model):
         return self.configuration_name + " | " + self.url + " | " + self.username
 
     def get_priority(self, status):
-        if status == 'Info':
+        if status == "Info":
             return self.info_mapping_severity
-        elif status == 'Low':
+        elif status == "Low":
             return self.low_mapping_severity
-        elif status == 'Medium':
+        elif status == "Medium":
             return self.medium_mapping_severity
-        elif status == 'High':
+        elif status == "High":
             return self.high_mapping_severity
-        elif status == 'Critical':
+        elif status == "Critical":
             return self.critical_mapping_severity
         else:
-            return 'N/A'
+            return "N/A"
 
 
 # declare form here as we can't import forms.py due to circular imports not even locally
@@ -2642,13 +3649,13 @@ class JIRAForm_Admin(forms.ModelForm):
         if self.instance:
             # keep password from db to use if the user entered no password
             self.password_from_db = self.instance.password
-            self.fields['password'].required = False
+            self.fields["password"].required = False
 
     def clean(self):
         # self.fields['endpoints'].queryset = Endpoint.objects.all()
         cleaned_data = super().clean()
-        if not cleaned_data['password']:
-            cleaned_data['password'] = self.password_from_db
+        if not cleaned_data["password"]:
+            cleaned_data["password"] = self.password_from_db
 
         return cleaned_data
 
@@ -2658,19 +3665,34 @@ class JIRA_Instance_Admin(admin.ModelAdmin):
 
 
 class JIRA_Project(models.Model):
-    jira_instance = models.ForeignKey(JIRA_Instance, verbose_name="JIRA Instance",
-                             null=True, blank=True, on_delete=models.CASCADE)
+    jira_instance = models.ForeignKey(
+        JIRA_Instance,
+        verbose_name="JIRA Instance",
+        null=True,
+        blank=True,
+        on_delete=models.CASCADE,
+    )
     project_key = models.CharField(max_length=200, blank=True)
     product = models.ForeignKey(Product, on_delete=models.CASCADE, null=True)
-    engagement = models.OneToOneField(Engagement, on_delete=models.CASCADE, null=True, blank=True)
+    engagement = models.OneToOneField(
+        Engagement, on_delete=models.CASCADE, null=True, blank=True
+    )
     component = models.CharField(max_length=200, blank=True)
-    push_all_issues = models.BooleanField(default=False, blank=True,
-         help_text="Automatically maintain parity with JIRA. Always create and update JIRA tickets for findings in this Product.")
-    enable_engagement_epic_mapping = models.BooleanField(default=False,
-                                                         blank=True)
+    push_all_issues = models.BooleanField(
+        default=False,
+        blank=True,
+        help_text="Automatically maintain parity with JIRA. Always create and update JIRA tickets for findings in this Product.",
+    )
+    enable_engagement_epic_mapping = models.BooleanField(default=False, blank=True)
     push_notes = models.BooleanField(default=False, blank=True)
-    product_jira_sla_notification = models.BooleanField(default=True, blank=False, verbose_name="Send SLA notifications as comment?")
-    risk_acceptance_expiration_notification = models.BooleanField(default=False, blank=False, verbose_name="Send Risk Acceptance expiration notifications as comment?")
+    product_jira_sla_notification = models.BooleanField(
+        default=True, blank=False, verbose_name="Send SLA notifications as comment?"
+    )
+    risk_acceptance_expiration_notification = models.BooleanField(
+        default=False,
+        blank=False,
+        verbose_name="Send Risk Acceptance expiration notifications as comment?",
+    )
 
     @property
     def conf(self):
@@ -2678,13 +3700,19 @@ class JIRA_Project(models.Model):
 
     def clean(self):
         if not self.jira_instance:
-            raise ValidationError('Cannot save JIRA_Project without JIRA_Instance')
+            raise ValidationError("Cannot save JIRA_Project without JIRA_Instance")
 
     def __unicode__(self):
-        return ('%s: ' + self.project_key + '(%s)') % (str(self.id), str(self.jira_instance.url) if self.jira_instance else 'None')
+        return ("%s: " + self.project_key + "(%s)") % (
+            str(self.id),
+            str(self.jira_instance.url) if self.jira_instance else "None",
+        )
 
     def __str__(self):
-        return ('%s: ' + self.project_key + '(%s)') % (str(self.id), str(self.jira_instance.url) if self.jira_instance else 'None')
+        return ("%s: " + self.project_key + "(%s)") % (
+            str(self.id),
+            str(self.jira_instance.url) if self.jira_instance else "None",
+        )
 
 
 # declare form here as we can't import forms.py due to circular imports not even locally
@@ -2699,13 +3727,13 @@ class JIRAForm_Admin(forms.ModelForm):
         if self.instance:
             # keep password from db to use if the user entered no password
             self.password_from_db = self.instance.password
-            self.fields['password'].required = False
+            self.fields["password"].required = False
 
     def clean(self):
         # self.fields['endpoints'].queryset = Endpoint.objects.all()
         cleaned_data = super().clean()
-        if not cleaned_data['password']:
-            cleaned_data['password'] = self.password_from_db
+        if not cleaned_data["password"]:
+            cleaned_data["password"] = self.password_from_db
 
         return cleaned_data
 
@@ -2715,71 +3743,154 @@ class JIRA_Conf_Admin(admin.ModelAdmin):
 
 
 class JIRA_Issue(models.Model):
-    jira_project = models.ForeignKey(JIRA_Project, on_delete=models.SET_NULL, null=True)  # just to be sure we don't delete JIRA_Issue if a jira_project is deleted
+    jira_project = models.ForeignKey(
+        JIRA_Project, on_delete=models.SET_NULL, null=True
+    )  # just to be sure we don't delete JIRA_Issue if a jira_project is deleted
     jira_id = models.CharField(max_length=200)
     jira_key = models.CharField(max_length=200)
-    finding = models.OneToOneField(Finding, null=True, blank=True, on_delete=models.CASCADE)
-    engagement = models.OneToOneField(Engagement, null=True, blank=True, on_delete=models.CASCADE)
+    finding = models.OneToOneField(
+        Finding, null=True, blank=True, on_delete=models.CASCADE
+    )
+    engagement = models.OneToOneField(
+        Engagement, null=True, blank=True, on_delete=models.CASCADE
+    )
 
-    jira_creation = models.DateTimeField(editable=True,
-                                         null=True,
-                                         verbose_name="Jira creation",
-                                         help_text="The date a Jira issue was created from this finding.")
-    jira_change = models.DateTimeField(editable=True,
-                                       null=True,
-                                       verbose_name="Jira last update",
-                                       help_text="The date the linked Jira issue was last modified.")
+    jira_creation = models.DateTimeField(
+        editable=True,
+        null=True,
+        verbose_name="Jira creation",
+        help_text="The date a Jira issue was created from this finding.",
+    )
+    jira_change = models.DateTimeField(
+        editable=True,
+        null=True,
+        verbose_name="Jira last update",
+        help_text="The date the linked Jira issue was last modified.",
+    )
 
     def __unicode__(self):
         text = ""
         if self.finding:
-            text = self.finding.test.engagement.product.name + " | Finding: " + self.finding.title + ", ID: " + str(self.finding.id)
+            text = (
+                self.finding.test.engagement.product.name
+                + " | Finding: "
+                + self.finding.title
+                + ", ID: "
+                + str(self.finding.id)
+            )
         elif self.engagement:
-            text = self.engagement.product.name + " | Engagement: " + self.engagement.name + ", ID: " + str(self.engagement.id)
+            text = (
+                self.engagement.product.name
+                + " | Engagement: "
+                + self.engagement.name
+                + ", ID: "
+                + str(self.engagement.id)
+            )
         return text + " | Jira Key: " + str(self.jira_key)
 
     def __str__(self):
         text = ""
         if self.finding:
-            text = self.finding.test.engagement.product.name + " | Finding: " + self.finding.title + ", ID: " + str(self.finding.id)
+            text = (
+                self.finding.test.engagement.product.name
+                + " | Finding: "
+                + self.finding.title
+                + ", ID: "
+                + str(self.finding.id)
+            )
         elif self.engagement:
-            text = self.engagement.product.name + " | Engagement: " + self.engagement.name + ", ID: " + str(self.engagement.id)
+            text = (
+                self.engagement.product.name
+                + " | Engagement: "
+                + self.engagement.name
+                + ", ID: "
+                + str(self.engagement.id)
+            )
         return text + " | Jira Key: " + str(self.jira_key)
 
 
 NOTIFICATION_CHOICES = (
-    ("slack", "slack"), ("msteams", "msteams"), ("mail", "mail"),
-    ("alert", "alert")
+    ("slack", "slack"),
+    ("msteams", "msteams"),
+    ("mail", "mail"),
+    ("alert", "alert"),
 )
 
 
 class Notifications(models.Model):
-    product_type_added = MultiSelectField(choices=NOTIFICATION_CHOICES, default='alert', blank=True)
-    product_added = MultiSelectField(choices=NOTIFICATION_CHOICES, default='alert', blank=True)
-    engagement_added = MultiSelectField(choices=NOTIFICATION_CHOICES, default='alert', blank=True)
-    test_added = MultiSelectField(choices=NOTIFICATION_CHOICES, default='alert', blank=True)
-    scan_added = MultiSelectField(choices=NOTIFICATION_CHOICES, default='alert', blank=True, help_text='Triggered whenever an (re-)import has been done that created/updated/closed findings.')
-    report_created = MultiSelectField(choices=NOTIFICATION_CHOICES, default='alert', blank=True)
-    jira_update = MultiSelectField(choices=NOTIFICATION_CHOICES, default='alert', blank=True, verbose_name="JIRA problems", help_text="JIRA sync happens in the background, errors will be shown as notifications/alerts so make sure to subscribe")
-    upcoming_engagement = MultiSelectField(choices=NOTIFICATION_CHOICES, default='alert', blank=True)
-    stale_engagement = MultiSelectField(choices=NOTIFICATION_CHOICES, default='alert', blank=True)
-    auto_close_engagement = MultiSelectField(choices=NOTIFICATION_CHOICES, default='alert', blank=True)
-    user_mentioned = MultiSelectField(choices=NOTIFICATION_CHOICES, default='alert', blank=True)
-    code_review = MultiSelectField(choices=NOTIFICATION_CHOICES, default='alert', blank=True)
-    review_requested = MultiSelectField(choices=NOTIFICATION_CHOICES, default='alert', blank=True)
-    other = MultiSelectField(choices=NOTIFICATION_CHOICES, default='alert', blank=True)
-    user = models.ForeignKey(Dojo_User, default=None, null=True, editable=False, on_delete=models.CASCADE)
-    product = models.ForeignKey(Product, default=None, null=True, editable=False, on_delete=models.CASCADE)
-    sla_breach = MultiSelectField(choices=NOTIFICATION_CHOICES, default='alert', blank=True,
+    product_type_added = MultiSelectField(
+        choices=NOTIFICATION_CHOICES, default="alert", blank=True
+    )
+    product_added = MultiSelectField(
+        choices=NOTIFICATION_CHOICES, default="alert", blank=True
+    )
+    engagement_added = MultiSelectField(
+        choices=NOTIFICATION_CHOICES, default="alert", blank=True
+    )
+    test_added = MultiSelectField(
+        choices=NOTIFICATION_CHOICES, default="alert", blank=True
+    )
+    scan_added = MultiSelectField(
+        choices=NOTIFICATION_CHOICES,
+        default="alert",
+        blank=True,
+        help_text="Triggered whenever an (re-)import has been done that created/updated/closed findings.",
+    )
+    report_created = MultiSelectField(
+        choices=NOTIFICATION_CHOICES, default="alert", blank=True
+    )
+    jira_update = MultiSelectField(
+        choices=NOTIFICATION_CHOICES,
+        default="alert",
+        blank=True,
+        verbose_name="JIRA problems",
+        help_text="JIRA sync happens in the background, errors will be shown as notifications/alerts so make sure to subscribe",
+    )
+    upcoming_engagement = MultiSelectField(
+        choices=NOTIFICATION_CHOICES, default="alert", blank=True
+    )
+    stale_engagement = MultiSelectField(
+        choices=NOTIFICATION_CHOICES, default="alert", blank=True
+    )
+    auto_close_engagement = MultiSelectField(
+        choices=NOTIFICATION_CHOICES, default="alert", blank=True
+    )
+    user_mentioned = MultiSelectField(
+        choices=NOTIFICATION_CHOICES, default="alert", blank=True
+    )
+    code_review = MultiSelectField(
+        choices=NOTIFICATION_CHOICES, default="alert", blank=True
+    )
+    review_requested = MultiSelectField(
+        choices=NOTIFICATION_CHOICES, default="alert", blank=True
+    )
+    other = MultiSelectField(choices=NOTIFICATION_CHOICES, default="alert", blank=True)
+    user = models.ForeignKey(
+        Dojo_User, default=None, null=True, editable=False, on_delete=models.CASCADE
+    )
+    product = models.ForeignKey(
+        Product, default=None, null=True, editable=False, on_delete=models.CASCADE
+    )
+    sla_breach = MultiSelectField(
+        choices=NOTIFICATION_CHOICES,
+        default="alert",
+        blank=True,
         verbose_name="SLA breach",
-        help_text="Get notified of (upcoming) SLA breaches")
-    risk_acceptance_expiration = MultiSelectField(choices=NOTIFICATION_CHOICES, default='alert', blank=True,
+        help_text="Get notified of (upcoming) SLA breaches",
+    )
+    risk_acceptance_expiration = MultiSelectField(
+        choices=NOTIFICATION_CHOICES,
+        default="alert",
+        blank=True,
         verbose_name="Risk Acceptance Expiration",
-        help_text="Get notified of (upcoming) Risk Acceptance expiries")
+        help_text="Get notified of (upcoming) Risk Acceptance expiries",
+    )
 
     class Meta:
         constraints = [
-            models.UniqueConstraint(fields=['user', 'product'], name="notifications_user_product")
+            models.UniqueConstraint(
+                fields=["user", "product"], name="notifications_user_product"
+            )
         ]
 
     @classmethod
@@ -2797,22 +3908,54 @@ class Notifications(models.Model):
                 # TODO This concat looks  better, but requires Python 3.6+
                 # result.scan_added = [*result.scan_added, *notifications.scan_added]
                 from dojo.utils import merge_sets_safe
-                result.product_type_added = merge_sets_safe(result.product_type_added, notifications.product_type_added)
-                result.product_added = merge_sets_safe(result.product_added, notifications.product_added)
-                result.engagement_added = merge_sets_safe(result.engagement_added, notifications.engagement_added)
-                result.test_added = merge_sets_safe(result.test_added, notifications.test_added)
-                result.scan_added = merge_sets_safe(result.scan_added, notifications.scan_added)
-                result.report_created = merge_sets_safe(result.report_created, notifications.report_created)
-                result.jira_update = merge_sets_safe(result.jira_update, notifications.jira_update)
-                result.upcoming_engagement = merge_sets_safe(result.upcoming_engagement, notifications.upcoming_engagement)
-                result.stale_engagement = merge_sets_safe(result.stale_engagement, notifications.stale_engagement)
-                result.auto_close_engagement = merge_sets_safe(result.auto_close_engagement, notifications.auto_close_engagement)
-                result.user_mentioned = merge_sets_safe(result.user_mentioned, notifications.user_mentioned)
-                result.code_review = merge_sets_safe(result.code_review, notifications.code_review)
-                result.review_requested = merge_sets_safe(result.review_requested, notifications.review_requested)
+
+                result.product_type_added = merge_sets_safe(
+                    result.product_type_added, notifications.product_type_added
+                )
+                result.product_added = merge_sets_safe(
+                    result.product_added, notifications.product_added
+                )
+                result.engagement_added = merge_sets_safe(
+                    result.engagement_added, notifications.engagement_added
+                )
+                result.test_added = merge_sets_safe(
+                    result.test_added, notifications.test_added
+                )
+                result.scan_added = merge_sets_safe(
+                    result.scan_added, notifications.scan_added
+                )
+                result.report_created = merge_sets_safe(
+                    result.report_created, notifications.report_created
+                )
+                result.jira_update = merge_sets_safe(
+                    result.jira_update, notifications.jira_update
+                )
+                result.upcoming_engagement = merge_sets_safe(
+                    result.upcoming_engagement, notifications.upcoming_engagement
+                )
+                result.stale_engagement = merge_sets_safe(
+                    result.stale_engagement, notifications.stale_engagement
+                )
+                result.auto_close_engagement = merge_sets_safe(
+                    result.auto_close_engagement, notifications.auto_close_engagement
+                )
+                result.user_mentioned = merge_sets_safe(
+                    result.user_mentioned, notifications.user_mentioned
+                )
+                result.code_review = merge_sets_safe(
+                    result.code_review, notifications.code_review
+                )
+                result.review_requested = merge_sets_safe(
+                    result.review_requested, notifications.review_requested
+                )
                 result.other = merge_sets_safe(result.other, notifications.other)
-                result.sla_breach = merge_sets_safe(result.sla_breach, notifications.sla_breach)
-                result.risk_acceptance_expiration = merge_sets_safe(result.risk_acceptance_expiration, notifications.risk_acceptance_expiration)
+                result.sla_breach = merge_sets_safe(
+                    result.sla_breach, notifications.sla_breach
+                )
+                result.risk_acceptance_expiration = merge_sets_safe(
+                    result.risk_acceptance_expiration,
+                    notifications.risk_acceptance_expiration,
+                )
 
         return result
 
@@ -2821,35 +3964,44 @@ class Tool_Product_Settings(models.Model):
     name = models.CharField(max_length=200, null=False)
     description = models.CharField(max_length=2000, null=True, blank=True)
     url = models.CharField(max_length=2000, null=True, blank=True)
-    product = models.ForeignKey(Product, default=1, editable=False, on_delete=models.CASCADE)
-    tool_configuration = models.ForeignKey(Tool_Configuration, null=False,
-                                           related_name='tool_configuration', on_delete=models.CASCADE)
+    product = models.ForeignKey(
+        Product, default=1, editable=False, on_delete=models.CASCADE
+    )
+    tool_configuration = models.ForeignKey(
+        Tool_Configuration,
+        null=False,
+        related_name="tool_configuration",
+        on_delete=models.CASCADE,
+    )
     tool_project_id = models.CharField(max_length=200, null=True, blank=True)
     notes = models.ManyToManyField(Notes, blank=True, editable=False)
 
     class Meta:
-        ordering = ['name']
+        ordering = ["name"]
 
 
 class Tool_Product_History(models.Model):
-    product = models.ForeignKey(Tool_Product_Settings, editable=False, on_delete=models.CASCADE)
+    product = models.ForeignKey(
+        Tool_Product_Settings, editable=False, on_delete=models.CASCADE
+    )
     last_scan = models.DateTimeField(null=False, editable=False, default=now)
     succesfull = models.BooleanField(default=True, verbose_name="Succesfully")
-    configuration_details = models.CharField(max_length=2000, null=True,
-                                             blank=True)
+    configuration_details = models.CharField(max_length=2000, null=True, blank=True)
 
 
 class Alerts(models.Model):
-    title = models.CharField(max_length=250, default='', null=False)
+    title = models.CharField(max_length=250, default="", null=False)
     description = models.CharField(max_length=2000, null=True)
     url = models.URLField(max_length=2000, null=True)
-    source = models.CharField(max_length=100, default='Generic')
-    icon = models.CharField(max_length=25, default='icon-user-check')
-    user_id = models.ForeignKey(User, null=True, editable=False, on_delete=models.CASCADE)
+    source = models.CharField(max_length=100, default="Generic")
+    icon = models.CharField(max_length=25, default="icon-user-check")
+    user_id = models.ForeignKey(
+        User, null=True, editable=False, on_delete=models.CASCADE
+    )
     created = models.DateTimeField(null=False, editable=False, default=now)
 
     class Meta:
-        ordering = ['-created']
+        ordering = ["-created"]
 
 
 class Cred_User(models.Model):
@@ -2857,19 +4009,22 @@ class Cred_User(models.Model):
     username = models.CharField(max_length=200, null=False)
     password = models.CharField(max_length=600, null=False)
     role = models.CharField(max_length=200, null=False)
-    authentication = models.CharField(max_length=15,
-                                      choices=(
-                                          ('Form', 'Form Authentication'),
-                                          ('SSO', 'SSO Redirect')),
-                                      default='Form')
-    http_authentication = models.CharField(max_length=15,
-                                           choices=(
-                                               ('Basic', 'Basic'),
-                                               ('NTLM', 'NTLM')),
-                                           null=True, blank=True)
+    authentication = models.CharField(
+        max_length=15,
+        choices=(("Form", "Form Authentication"), ("SSO", "SSO Redirect")),
+        default="Form",
+    )
+    http_authentication = models.CharField(
+        max_length=15,
+        choices=(("Basic", "Basic"), ("NTLM", "NTLM")),
+        null=True,
+        blank=True,
+    )
     description = models.CharField(max_length=2000, null=True, blank=True)
     url = models.URLField(max_length=2000, null=False)
-    environment = models.ForeignKey(Development_Environment, null=False, on_delete=models.CASCADE)
+    environment = models.ForeignKey(
+        Development_Environment, null=False, on_delete=models.CASCADE
+    )
     login_regex = models.CharField(max_length=200, null=True, blank=True)
     logout_regex = models.CharField(max_length=200, null=True, blank=True)
     notes = models.ManyToManyField(Notes, blank=True, editable=False)
@@ -2880,7 +4035,7 @@ class Cred_User(models.Model):
     #    verbose_name="Selenium Script File")
 
     class Meta:
-        ordering = ['name']
+        ordering = ["name"]
 
     def __unicode__(self):
         return self.name + " (" + self.role + ")"
@@ -2890,18 +4045,32 @@ class Cred_User(models.Model):
 
 
 class Cred_Mapping(models.Model):
-    cred_id = models.ForeignKey(Cred_User, null=False,
-                                related_name="cred_user",
-                                verbose_name="Credential", on_delete=models.CASCADE)
-    product = models.ForeignKey(Product, null=True, blank=True,
-                                related_name="product", on_delete=models.CASCADE)
-    finding = models.ForeignKey(Finding, null=True, blank=True,
-                                related_name="finding", on_delete=models.CASCADE)
-    engagement = models.ForeignKey(Engagement, null=True, blank=True,
-                                   related_name="engagement", on_delete=models.CASCADE)
-    test = models.ForeignKey(Test, null=True, blank=True, related_name="test", on_delete=models.CASCADE)
-    is_authn_provider = models.BooleanField(default=False,
-                                            verbose_name="Authentication Provider")
+    cred_id = models.ForeignKey(
+        Cred_User,
+        null=False,
+        related_name="cred_user",
+        verbose_name="Credential",
+        on_delete=models.CASCADE,
+    )
+    product = models.ForeignKey(
+        Product, null=True, blank=True, related_name="product", on_delete=models.CASCADE
+    )
+    finding = models.ForeignKey(
+        Finding, null=True, blank=True, related_name="finding", on_delete=models.CASCADE
+    )
+    engagement = models.ForeignKey(
+        Engagement,
+        null=True,
+        blank=True,
+        related_name="engagement",
+        on_delete=models.CASCADE,
+    )
+    test = models.ForeignKey(
+        Test, null=True, blank=True, related_name="test", on_delete=models.CASCADE
+    )
+    is_authn_provider = models.BooleanField(
+        default=False, verbose_name="Authentication Provider"
+    )
     url = models.URLField(max_length=2000, null=True, blank=True)
 
     def __unicode__(self):
@@ -2913,7 +4082,7 @@ class Cred_Mapping(models.Model):
 
 class Language_Type(models.Model):
     language = models.CharField(max_length=100, null=False)
-    color = models.CharField(max_length=7, null=True, verbose_name='HTML color')
+    color = models.CharField(max_length=7, null=True, verbose_name="HTML color")
 
     def __unicode__(self):
         return self.language
@@ -2925,11 +4094,19 @@ class Language_Type(models.Model):
 class Languages(models.Model):
     language = models.ForeignKey(Language_Type, on_delete=models.CASCADE)
     product = models.ForeignKey(Product, on_delete=models.CASCADE)
-    user = models.ForeignKey(User, editable=True, blank=True, null=True, on_delete=models.CASCADE)
-    files = models.IntegerField(blank=True, null=True, verbose_name='Number of files')
-    blank = models.IntegerField(blank=True, null=True, verbose_name='Number of blank lines')
-    comment = models.IntegerField(blank=True, null=True, verbose_name='Number of comment lines')
-    code = models.IntegerField(blank=True, null=True, verbose_name='Number of code lines')
+    user = models.ForeignKey(
+        User, editable=True, blank=True, null=True, on_delete=models.CASCADE
+    )
+    files = models.IntegerField(blank=True, null=True, verbose_name="Number of files")
+    blank = models.IntegerField(
+        blank=True, null=True, verbose_name="Number of blank lines"
+    )
+    comment = models.IntegerField(
+        blank=True, null=True, verbose_name="Number of comment lines"
+    )
+    code = models.IntegerField(
+        blank=True, null=True, verbose_name="Number of code lines"
+    )
     created = models.DateTimeField(null=False, editable=False, default=now)
 
     def __unicode__(self):
@@ -2939,21 +4116,31 @@ class Languages(models.Model):
         return self.language.language
 
     class Meta:
-        unique_together = [('language', 'product')]
+        unique_together = [("language", "product")]
 
 
 class App_Analysis(models.Model):
     product = models.ForeignKey(Product, on_delete=models.CASCADE)
     name = models.CharField(max_length=200, null=False)
     user = models.ForeignKey(User, editable=True, on_delete=models.CASCADE)
-    confidence = models.IntegerField(blank=True, null=True, verbose_name='Confidence level')
-    version = models.CharField(max_length=200, null=True, blank=True, verbose_name='Version Number')
+    confidence = models.IntegerField(
+        blank=True, null=True, verbose_name="Confidence level"
+    )
+    version = models.CharField(
+        max_length=200, null=True, blank=True, verbose_name="Version Number"
+    )
     icon = models.CharField(max_length=200, null=True, blank=True)
     website = models.URLField(max_length=400, null=True, blank=True)
     website_found = models.URLField(max_length=400, null=True, blank=True)
     created = models.DateTimeField(null=False, editable=False, default=now)
 
-    tags_from_django_tagging = models.TextField(editable=False, blank=True, help_text=_('Temporary archive with tags from the previous tagging library we used'))
+    tags_from_django_tagging = models.TextField(
+        editable=False,
+        blank=True,
+        help_text=_(
+            "Temporary archive with tags from the previous tagging library we used"
+        ),
+    )
     tags = TagField(blank=True, force_lowercase=True)
 
     def __unicode__(self):
@@ -2977,17 +4164,30 @@ class Objects_Review(models.Model):
 class Objects_Product(models.Model):
     product = models.ForeignKey(Product, on_delete=models.CASCADE)
     name = models.CharField(max_length=100, null=True, blank=True)
-    path = models.CharField(max_length=600, verbose_name='Full file path',
-                            null=True, blank=True)
-    folder = models.CharField(max_length=400, verbose_name='Folder',
-                              null=True, blank=True)
-    artifact = models.CharField(max_length=400, verbose_name='Artifact',
-                                null=True, blank=True)
+    path = models.CharField(
+        max_length=600, verbose_name="Full file path", null=True, blank=True
+    )
+    folder = models.CharField(
+        max_length=400, verbose_name="Folder", null=True, blank=True
+    )
+    artifact = models.CharField(
+        max_length=400, verbose_name="Artifact", null=True, blank=True
+    )
     review_status = models.ForeignKey(Objects_Review, on_delete=models.CASCADE)
     created = models.DateTimeField(null=False, editable=False, default=now)
 
-    tags_from_django_tagging = models.TextField(editable=False, blank=True, help_text=_('Temporary archive with tags from the previous tagging library we used'))
-    tags = TagField(blank=True, force_lowercase=True, help_text="Add tags that help describe this object. Choose from the list or add new tags. Press Enter key to add.")
+    tags_from_django_tagging = models.TextField(
+        editable=False,
+        blank=True,
+        help_text=_(
+            "Temporary archive with tags from the previous tagging library we used"
+        ),
+    )
+    tags = TagField(
+        blank=True,
+        force_lowercase=True,
+        help_text="Add tags that help describe this object. Choose from the list or add new tags. Press Enter key to add.",
+    )
 
     def __unicode__(self):
         name = None
@@ -3050,7 +4250,7 @@ class Testing_Guide_Category(models.Model):
     updated = models.DateTimeField(editable=False, default=now)
 
     class Meta:
-        ordering = ('name',)
+        ordering = ("name",)
 
     def __unicode__(self):
         return self.name
@@ -3060,32 +4260,40 @@ class Testing_Guide_Category(models.Model):
 
 
 class Testing_Guide(models.Model):
-    testing_guide_category = models.ForeignKey(Testing_Guide_Category, on_delete=models.CASCADE)
-    identifier = models.CharField(max_length=20, blank=True, null=True, help_text="Test Unique Identifier")
+    testing_guide_category = models.ForeignKey(
+        Testing_Guide_Category, on_delete=models.CASCADE
+    )
+    identifier = models.CharField(
+        max_length=20, blank=True, null=True, help_text="Test Unique Identifier"
+    )
     name = models.CharField(max_length=400, help_text="Name of the test")
     summary = models.CharField(max_length=800, help_text="Summary of the test")
     objective = models.CharField(max_length=800, help_text="Objective of the test")
     how_to_test = models.TextField(default=None, help_text="How to test the objective")
-    results_expected = models.CharField(max_length=800, help_text="What the results look like for a test")
+    results_expected = models.CharField(
+        max_length=800, help_text="What the results look like for a test"
+    )
     created = models.DateTimeField(null=False, editable=False, default=now)
     updated = models.DateTimeField(editable=False, default=now)
 
     def __unicode__(self):
-        return self.testing_guide_category.name + ': ' + self.name
+        return self.testing_guide_category.name + ": " + self.name
 
     def __str__(self):
-        return self.testing_guide_category.name + ': ' + self.name
+        return self.testing_guide_category.name + ": " + self.name
 
 
 class Benchmark_Type(models.Model):
     name = models.CharField(max_length=300)
     version = models.CharField(max_length=15)
-    source = (('PCI', 'PCI'),
-              ('OWASP ASVS', 'OWASP ASVS'),
-              ('OWASP Mobile ASVS', 'OWASP Mobile ASVS'))
-    benchmark_source = models.CharField(max_length=20, blank=False,
-                                        null=True, choices=source,
-                                        default='OWASP ASVS')
+    source = (
+        ("PCI", "PCI"),
+        ("OWASP ASVS", "OWASP ASVS"),
+        ("OWASP Mobile ASVS", "OWASP Mobile ASVS"),
+    )
+    benchmark_source = models.CharField(
+        max_length=20, blank=False, null=True, choices=source, default="OWASP ASVS"
+    )
     created = models.DateTimeField(null=False, editable=False, default=now)
     updated = models.DateTimeField(editable=False, default=now)
     enabled = models.BooleanField(default=True)
@@ -3098,7 +4306,9 @@ class Benchmark_Type(models.Model):
 
 
 class Benchmark_Category(models.Model):
-    type = models.ForeignKey(Benchmark_Type, verbose_name='Benchmark Type', on_delete=models.CASCADE)
+    type = models.ForeignKey(
+        Benchmark_Type, verbose_name="Benchmark Type", on_delete=models.CASCADE
+    )
     name = models.CharField(max_length=300)
     objective = models.TextField()
     references = models.TextField(blank=True, null=True)
@@ -3107,13 +4317,13 @@ class Benchmark_Category(models.Model):
     updated = models.DateTimeField(editable=False, default=now)
 
     class Meta:
-        ordering = ('name',)
+        ordering = ("name",)
 
     def __unicode__(self):
-        return self.name + ': ' + self.type.name
+        return self.name + ": " + self.type.name
 
     def __str__(self):
-        return self.name + ': ' + self.type.name
+        return self.name + ": " + self.type.name
 
 
 class Benchmark_Requirement(models.Model):
@@ -3131,69 +4341,107 @@ class Benchmark_Requirement(models.Model):
     updated = models.DateTimeField(editable=False, default=now)
 
     def __unicode__(self):
-        return str(self.objective_number) + ': ' + self.category.name
+        return str(self.objective_number) + ": " + self.category.name
 
     def __str__(self):
-        return str(self.objective_number) + ': ' + self.category.name
+        return str(self.objective_number) + ": " + self.category.name
 
 
 class Benchmark_Product(models.Model):
     product = models.ForeignKey(Product, on_delete=models.CASCADE)
     control = models.ForeignKey(Benchmark_Requirement, on_delete=models.CASCADE)
-    pass_fail = models.BooleanField(default=False, verbose_name='Pass',
-                                    help_text='Does the product meet the requirement?')
-    enabled = models.BooleanField(default=True,
-                                  help_text='Applicable for this specific product.')
+    pass_fail = models.BooleanField(
+        default=False,
+        verbose_name="Pass",
+        help_text="Does the product meet the requirement?",
+    )
+    enabled = models.BooleanField(
+        default=True, help_text="Applicable for this specific product."
+    )
     notes = models.ManyToManyField(Notes, blank=True, editable=False)
     created = models.DateTimeField(null=False, editable=False, default=now)
     updated = models.DateTimeField(editable=False, default=now)
 
     def __unicode__(self):
-        return self.product.name + ': ' + self.control.objective_number + ': ' + self.control.category.name
+        return (
+            self.product.name
+            + ": "
+            + self.control.objective_number
+            + ": "
+            + self.control.category.name
+        )
 
     def __str__(self):
-        return self.product.name + ': ' + self.control.objective_number + ': ' + self.control.category.name
+        return (
+            self.product.name
+            + ": "
+            + self.control.objective_number
+            + ": "
+            + self.control.category.name
+        )
 
     class Meta:
-        unique_together = [('product', 'control')]
+        unique_together = [("product", "control")]
 
 
 class Benchmark_Product_Summary(models.Model):
     product = models.ForeignKey(Product, on_delete=models.CASCADE)
     benchmark_type = models.ForeignKey(Benchmark_Type, on_delete=models.CASCADE)
-    asvs_level = (('Level 1', 'Level 1'),
-                    ('Level 2', 'Level 2'),
-                    ('Level 3', 'Level 3'))
-    desired_level = models.CharField(max_length=15,
-                                     null=False, choices=asvs_level,
-                                     default='Level 1')
-    current_level = models.CharField(max_length=15, blank=True,
-                                     null=True, choices=asvs_level,
-                                     default='None')
-    asvs_level_1_benchmark = models.IntegerField(null=False, default=0, help_text="Total number of active benchmarks for this application.")
-    asvs_level_1_score = models.IntegerField(null=False, default=0, help_text="ASVS Level 1 Score")
-    asvs_level_2_benchmark = models.IntegerField(null=False, default=0, help_text="Total number of active benchmarks for this application.")
-    asvs_level_2_score = models.IntegerField(null=False, default=0, help_text="ASVS Level 2 Score")
-    asvs_level_3_benchmark = models.IntegerField(null=False, default=0, help_text="Total number of active benchmarks for this application.")
-    asvs_level_3_score = models.IntegerField(null=False, default=0, help_text="ASVS Level 3 Score")
-    publish = models.BooleanField(default=False, help_text='Publish score to Product.')
+    asvs_level = (
+        ("Level 1", "Level 1"),
+        ("Level 2", "Level 2"),
+        ("Level 3", "Level 3"),
+    )
+    desired_level = models.CharField(
+        max_length=15, null=False, choices=asvs_level, default="Level 1"
+    )
+    current_level = models.CharField(
+        max_length=15, blank=True, null=True, choices=asvs_level, default="None"
+    )
+    asvs_level_1_benchmark = models.IntegerField(
+        null=False,
+        default=0,
+        help_text="Total number of active benchmarks for this application.",
+    )
+    asvs_level_1_score = models.IntegerField(
+        null=False, default=0, help_text="ASVS Level 1 Score"
+    )
+    asvs_level_2_benchmark = models.IntegerField(
+        null=False,
+        default=0,
+        help_text="Total number of active benchmarks for this application.",
+    )
+    asvs_level_2_score = models.IntegerField(
+        null=False, default=0, help_text="ASVS Level 2 Score"
+    )
+    asvs_level_3_benchmark = models.IntegerField(
+        null=False,
+        default=0,
+        help_text="Total number of active benchmarks for this application.",
+    )
+    asvs_level_3_score = models.IntegerField(
+        null=False, default=0, help_text="ASVS Level 3 Score"
+    )
+    publish = models.BooleanField(default=False, help_text="Publish score to Product.")
     created = models.DateTimeField(null=False, editable=False, default=now)
     updated = models.DateTimeField(editable=False, default=now)
 
     def __unicode__(self):
-        return self.product.name + ': ' + self.benchmark_type.name
+        return self.product.name + ": " + self.benchmark_type.name
 
     def __str__(self):
-        return self.product.name + ': ' + self.benchmark_type.name
+        return self.product.name + ": " + self.benchmark_type.name
 
     class Meta:
-        unique_together = [('product', 'benchmark_type')]
+        unique_together = [("product", "benchmark_type")]
 
 
 # product_opts = [f.name for f in Product._meta.fields]
 # test_opts = [f.name for f in Test._meta.fields]
 # test_type_opts = [f.name for f in Test_Type._meta.fields]
-finding_opts = [f.name for f in Finding._meta.fields if f.name not in ['tags_from_django_tagging']]
+finding_opts = [
+    f.name for f in Finding._meta.fields if f.name not in ["tags_from_django_tagging"]
+]
 # endpoint_opts = [f.name for f in Endpoint._meta.fields]
 # engagement_opts = [f.name for f in Engagement._meta.fields]
 # product_type_opts = [f.name for f in Product_Type._meta.fields]
@@ -3202,11 +4450,9 @@ finding_opts = [f.name for f in Finding._meta.fields if f.name not in ['tags_fro
 all_options = []
 for x in finding_opts:
     all_options.append((x, x))
-operator_options = (('Matches', 'Matches'),
-                    ('Contains', 'Contains'))
-application_options = (('Append', 'Append'),
-                      ('Replace', 'Replace'))
-blank_options = (('', ''),)
+operator_options = (("Matches", "Matches"), ("Contains", "Contains"))
+application_options = (("Append", "Append"), ("Replace", "Replace"))
+blank_options = (("", ""),)
 
 
 class Rule(models.Model):
@@ -3222,7 +4468,7 @@ class Rule(models.Model):
                             ('Finding', 'Finding'), ('Endpoint', 'Endpoint'),
                             ('Product Type', 'Product_Type'), ('Test Type', 'Test_Type'))
     """
-    model_object_options = (('Finding', 'Finding'),)
+    model_object_options = (("Finding", "Finding"),)
     model_object = models.CharField(max_length=30, choices=model_object_options)
     match_field = models.CharField(max_length=200, choices=all_options)
     match_text = models.TextField()
@@ -3231,8 +4477,10 @@ class Rule(models.Model):
     # TODO: Add or ?
     # and_rules = models.ManyToManyField('self')
     applied_field = models.CharField(max_length=200, choices=(all_options))
-    child_rules = models.ManyToManyField('self', editable=False)
-    parent_rule = models.ForeignKey('self', editable=False, null=True, on_delete=models.CASCADE)
+    child_rules = models.ManyToManyField("self", editable=False)
+    parent_rule = models.ForeignKey(
+        "self", editable=False, null=True, on_delete=models.CASCADE
+    )
 
 
 class Child_Rule(models.Model):
@@ -3244,19 +4492,20 @@ class Child_Rule(models.Model):
                             ('Finding', 'Finding'), ('Endpoint', 'Endpoint'),
                             ('Product Type', 'Product_Type'), ('Test Type', 'Test_Type'))
     """
-    model_object_options = (('Finding', 'Finding'),)
+    model_object_options = (("Finding", "Finding"),)
     model_object = models.CharField(max_length=30, choices=model_object_options)
     match_field = models.CharField(max_length=200, choices=all_options)
     match_text = models.TextField()
     # TODO: Add or ?
     # and_rules = models.ManyToManyField('self')
-    parent_rule = models.ForeignKey(Rule, editable=False, null=True, on_delete=models.CASCADE)
+    parent_rule = models.ForeignKey(
+        Rule, editable=False, null=True, on_delete=models.CASCADE
+    )
 
 
 class FieldRule(models.Model):
     field = models.CharField(max_length=200)
-    update_options = (('Append', 'Append'),
-                        ('Replace', 'Replace'))
+    update_options = (("Append", "Append"), ("Replace", "Replace"))
     update_type = models.CharField(max_length=30, choices=update_options)
     text = models.CharField(max_length=200)
 
@@ -3265,22 +4514,23 @@ class FieldRule(models.Model):
 # Defect Dojo Engaegment Surveys
 # ==============================
 
+
 class Question(PolymorphicModel, TimeStampedModel):
-    '''
-        Represents a question.
-    '''
+    """
+    Represents a question.
+    """
 
     class Meta:
-        ordering = ['order']
+        ordering = ["order"]
 
-    order = models.PositiveIntegerField(default=1,
-                                        help_text='The render order')
+    order = models.PositiveIntegerField(default=1, help_text="The render order")
 
     optional = models.BooleanField(
         default=False,
-        help_text="If selected, user doesn't have to answer this question")
+        help_text="If selected, user doesn't have to answer this question",
+    )
 
-    text = models.TextField(blank=False, help_text='The question text', default='')
+    text = models.TextField(blank=False, help_text="The question text", default="")
 
     def __unicode__(self):
         return self.text
@@ -3290,29 +4540,30 @@ class Question(PolymorphicModel, TimeStampedModel):
 
 
 class TextQuestion(Question):
-    '''
+    """
     Question with a text answer
-    '''
+    """
 
     def get_form(self):
-        '''
+        """
         Returns the form for this model
-        '''
+        """
         from .forms import TextQuestionForm
+
         return TextQuestionForm
 
 
 class Choice(TimeStampedModel):
-    '''
+    """
     Model to store the choices for multi choice questions
-    '''
+    """
 
     order = models.PositiveIntegerField(default=1)
 
     label = models.TextField(default="")
 
     class Meta:
-        ordering = ['order']
+        ordering = ["order"]
 
     def __unicode__(self):
         return self.label
@@ -3322,37 +4573,41 @@ class Choice(TimeStampedModel):
 
 
 class ChoiceQuestion(Question):
-    '''
+    """
     Question with answers that are chosen from a list of choices defined
     by the user.
-    '''
+    """
 
-    multichoice = models.BooleanField(default=False,
-                                      help_text="Select one or more")
+    multichoice = models.BooleanField(default=False, help_text="Select one or more")
 
     choices = models.ManyToManyField(Choice)
 
     def get_form(self):
-        '''
+        """
         Returns the form for this model
-        '''
+        """
 
         from .forms import ChoiceQuestionForm
+
         return ChoiceQuestionForm
 
 
 # meant to be a abstract survey, identified by name for purpose
 class Engagement_Survey(models.Model):
-    name = models.CharField(max_length=200, null=False, blank=False,
-                            editable=True, default='')
-    description = models.TextField(editable=True, default='')
+    name = models.CharField(
+        max_length=200, null=False, blank=False, editable=True, default=""
+    )
+    description = models.TextField(editable=True, default="")
     questions = models.ManyToManyField(Question)
     active = models.BooleanField(default=True)
 
     class Meta:
         verbose_name = "Engagement Survey"
         verbose_name_plural = "Engagement Surveys"
-        ordering = ('-active', 'name',)
+        ordering = (
+            "-active",
+            "name",
+        )
 
     def __unicode__(self):
         return self.name
@@ -3363,20 +4618,38 @@ class Engagement_Survey(models.Model):
 
 # meant to be an answered survey tied to an engagement
 
+
 class Answered_Survey(models.Model):
     # tie this to a specific engagement
-    engagement = models.ForeignKey(Engagement, related_name='engagement+',
-                                   null=True, blank=False, editable=True,
-                                   on_delete=models.CASCADE)
+    engagement = models.ForeignKey(
+        Engagement,
+        related_name="engagement+",
+        null=True,
+        blank=False,
+        editable=True,
+        on_delete=models.CASCADE,
+    )
     # what surveys have been answered
     survey = models.ForeignKey(Engagement_Survey, on_delete=models.CASCADE)
-    assignee = models.ForeignKey(User, related_name='assignee',
-                                  null=True, blank=True, editable=True,
-                                  default=None, on_delete=models.CASCADE)
+    assignee = models.ForeignKey(
+        User,
+        related_name="assignee",
+        null=True,
+        blank=True,
+        editable=True,
+        default=None,
+        on_delete=models.CASCADE,
+    )
     # who answered it
-    responder = models.ForeignKey(User, related_name='responder',
-                                  null=True, blank=True, editable=True,
-                                  default=None, on_delete=models.CASCADE)
+    responder = models.ForeignKey(
+        User,
+        related_name="responder",
+        null=True,
+        blank=True,
+        editable=True,
+        default=None,
+        on_delete=models.CASCADE,
+    )
     completed = models.BooleanField(default=False)
     answered_on = models.DateField(null=True)
 
@@ -3409,21 +4682,17 @@ class General_Survey(models.Model):
 
 
 class Answer(PolymorphicModel, TimeStampedModel):
-    ''' Base Answer model
-    '''
+    """Base Answer model"""
+
     question = models.ForeignKey(Question, on_delete=models.CASCADE)
 
-    answered_survey = models.ForeignKey(Answered_Survey,
-                                        null=False,
-                                        blank=False,
-                                        on_delete=models.CASCADE)
+    answered_survey = models.ForeignKey(
+        Answered_Survey, null=False, blank=False, on_delete=models.CASCADE
+    )
 
 
 class TextAnswer(Answer):
-    answer = models.TextField(
-        blank=False,
-        help_text='The answer text',
-        default='')
+    answer = models.TextField(blank=False, help_text="The answer text", default="")
 
     def __unicode__(self):
         return self.answer
@@ -3431,20 +4700,20 @@ class TextAnswer(Answer):
 
 class ChoiceAnswer(Answer):
     answer = models.ManyToManyField(
-        Choice,
-        help_text='The selected choices as the answer')
+        Choice, help_text="The selected choices as the answer"
+    )
 
     def __unicode__(self):
         if len(self.answer.all()):
             return str(self.answer.all()[0])
         else:
-            return 'No Response'
+            return "No Response"
 
 
 def enable_disable_auditlog(enable=True):
     if enable:
         # Register for automatic logging to database
-        logger.info('enabling audit logging')
+        logger.info("enabling audit logging")
         auditlog.register(Dojo_User)
         auditlog.register(Endpoint)
         auditlog.register(Engagement)
@@ -3455,7 +4724,7 @@ def enable_disable_auditlog(enable=True):
         auditlog.register(Finding_Template)
         auditlog.register(Cred_User)
     else:
-        logger.info('disabling audit logging')
+        logger.info("disabling audit logging")
         auditlog.unregister(Dojo_User)
         auditlog.unregister(Endpoint)
         auditlog.unregister(Engagement)
@@ -3468,7 +4737,10 @@ def enable_disable_auditlog(enable=True):
 
 
 from dojo.utils import get_system_setting
-enable_disable_auditlog(enable=get_system_setting('enable_auditlog'))  # on startup choose safe to retrieve system settiung)
+
+enable_disable_auditlog(
+    enable=get_system_setting("enable_auditlog")
+)  # on startup choose safe to retrieve system settiung)
 
 tagulous.admin.register(Product.tags)
 tagulous.admin.register(Test.tags)

@@ -6,18 +6,18 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('dojo', '0008_finding_mitigation'),
+        ("dojo", "0008_finding_mitigation"),
     ]
 
     operations = [
         migrations.AddField(
-            model_name='endpoint',
-            name='remediated',
+            model_name="endpoint",
+            name="remediated",
             field=models.BooleanField(blank=True, default=False),
         ),
         migrations.AlterField(
-            model_name='finding',
-            name='dynamic_finding',
+            model_name="finding",
+            name="dynamic_finding",
             field=models.BooleanField(default=True),
         ),
     ]

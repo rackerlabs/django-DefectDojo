@@ -6,18 +6,27 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('dojo', '0066_django_tagulous'),
+        ("dojo", "0066_django_tagulous"),
     ]
 
     operations = [
         migrations.AlterField(
-            model_name='system_settings',
-            name='delete_dupulicates',
-            field=models.BooleanField(default=False, help_text='Requires next setting: maximum number of duplicates to retain.'),
+            model_name="system_settings",
+            name="delete_dupulicates",
+            field=models.BooleanField(
+                default=False,
+                help_text="Requires next setting: maximum number of duplicates to retain.",
+            ),
         ),
         migrations.AlterField(
-            model_name='system_settings',
-            name='max_dupes',
-            field=models.IntegerField(blank=True, default=10, help_text='When enabled, if a single issue reaches the maximum number of duplicates, the oldest will be deleted. Duplicate will not be deleted when left empty. A value of 0 will remove all duplicates.', null=True, verbose_name='Max Duplicates'),
+            model_name="system_settings",
+            name="max_dupes",
+            field=models.IntegerField(
+                blank=True,
+                default=10,
+                help_text="When enabled, if a single issue reaches the maximum number of duplicates, the oldest will be deleted. Duplicate will not be deleted when left empty. A value of 0 will remove all duplicates.",
+                null=True,
+                verbose_name="Max Duplicates",
+            ),
         ),
     ]

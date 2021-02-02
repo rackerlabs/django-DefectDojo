@@ -10,47 +10,85 @@ class Migration(migrations.Migration):
 
     dependencies = [
         migrations.swappable_dependency(settings.AUTH_USER_MODEL),
-        ('dojo', '0006_django2_upgrade'),
+        ("dojo", "0006_django2_upgrade"),
     ]
 
     operations = [
         migrations.AddField(
-            model_name='notes',
-            name='edit_time',
-            field=models.DateTimeField(default=dojo.models.get_current_datetime, editable=False, null=True),
+            model_name="notes",
+            name="edit_time",
+            field=models.DateTimeField(
+                default=dojo.models.get_current_datetime, editable=False, null=True
+            ),
         ),
         migrations.AddField(
-            model_name='notes',
-            name='edited',
+            model_name="notes",
+            name="edited",
             field=models.BooleanField(default=False),
         ),
         migrations.AddField(
-            model_name='notes',
-            name='editor',
-            field=models.ForeignKey(editable=False, null=True, on_delete=django.db.models.deletion.CASCADE, related_name='author_notes_set', to=settings.AUTH_USER_MODEL),
+            model_name="notes",
+            name="editor",
+            field=models.ForeignKey(
+                editable=False,
+                null=True,
+                on_delete=django.db.models.deletion.CASCADE,
+                related_name="author_notes_set",
+                to=settings.AUTH_USER_MODEL,
+            ),
         ),
         migrations.AddField(
-            model_name='notes',
-            name='private',
+            model_name="notes",
+            name="private",
             field=models.BooleanField(default=False),
         ),
         migrations.AlterField(
-            model_name='notes',
-            name='author',
-            field=models.ForeignKey(editable=False, on_delete=django.db.models.deletion.CASCADE, related_name='editor_notes_set', to=settings.AUTH_USER_MODEL),
+            model_name="notes",
+            name="author",
+            field=models.ForeignKey(
+                editable=False,
+                on_delete=django.db.models.deletion.CASCADE,
+                related_name="editor_notes_set",
+                to=settings.AUTH_USER_MODEL,
+            ),
         ),
         migrations.CreateModel(
-            name='NoteHistory',
+            name="NoteHistory",
             fields=[
-                ('id', models.AutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('data', models.TextField()),
-                ('time', models.DateTimeField(default=dojo.models.get_current_datetime, editable=False, null=True)),
-                ('current_editor', models.ForeignKey(editable=False, null=True, on_delete=django.db.models.deletion.CASCADE, to=settings.AUTH_USER_MODEL)),
+                (
+                    "id",
+                    models.AutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
+                ("data", models.TextField()),
+                (
+                    "time",
+                    models.DateTimeField(
+                        default=dojo.models.get_current_datetime,
+                        editable=False,
+                        null=True,
+                    ),
+                ),
+                (
+                    "current_editor",
+                    models.ForeignKey(
+                        editable=False,
+                        null=True,
+                        on_delete=django.db.models.deletion.CASCADE,
+                        to=settings.AUTH_USER_MODEL,
+                    ),
+                ),
             ],
         ),
         migrations.AddField(
-            model_name='notes',
-            name='history',
-            field=models.ManyToManyField(blank=True, editable=False, to='dojo.NoteHistory'),
+            model_name="notes",
+            name="history",
+            field=models.ManyToManyField(
+                blank=True, editable=False, to="dojo.NoteHistory"
+            ),
         ),
     ]

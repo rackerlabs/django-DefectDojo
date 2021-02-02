@@ -15,9 +15,9 @@ class VariousPagesTest(BaseTestCase):
 
 def suite():
     suite = unittest.TestSuite()
-    suite.addTest(BaseTestCase('test_login'))
-    suite.addTest(VariousPagesTest('test_user_status'))
-    suite.addTest(VariousPagesTest('test_calendar_status'))
+    suite.addTest(BaseTestCase("test_login"))
+    suite.addTest(VariousPagesTest("test_user_status"))
+    suite.addTest(VariousPagesTest("test_calendar_status"))
     return suite
 
 

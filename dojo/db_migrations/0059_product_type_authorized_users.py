@@ -8,13 +8,13 @@ class Migration(migrations.Migration):
 
     dependencies = [
         migrations.swappable_dependency(settings.AUTH_USER_MODEL),
-        ('dojo', '0058_document_finding_model'),
+        ("dojo", "0058_document_finding_model"),
     ]
 
     operations = [
         migrations.AddField(
-            model_name='product_type',
-            name='authorized_users',
+            model_name="product_type",
+            name="authorized_users",
             field=models.ManyToManyField(blank=True, to=settings.AUTH_USER_MODEL),
         ),
     ]

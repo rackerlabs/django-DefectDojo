@@ -4,7 +4,6 @@ from dojo.models import Test
 
 
 class TestBanditParser(TestCase):
-
     def test_bandit_parser_has_no_finding(self):
         testfile = open("dojo/unittests/scans/bandit/no_vuln.json")
         parser = BanditParser()

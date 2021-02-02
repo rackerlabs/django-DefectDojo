@@ -4,7 +4,6 @@ from dojo.tools.mobsf.parser import MobSFParser
 
 
 class TestMobSFParser(TestCase):
-
     def test_parse_file(self):
         test = Test()
         engagement = Engagement()

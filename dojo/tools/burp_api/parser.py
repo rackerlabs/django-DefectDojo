@@ -81,13 +81,16 @@ class BurpApiParser(object):
                 # manage endpoints
                 if "origin" in issue and "path" in issue:
                     parts = urlparse(issue.get("origin") + issue.get("path"))
-                    finding.unsaved_endpoints = [Endpoint(protocol=parts.scheme,
-                                                            host=parts.netloc,
-                                                            path=parts.path,
-                                                            query=parts.query,
-                                                            fragment=parts.fragment,
-                                                            product=test.engagement.product)
-                                                 ]
+                    finding.unsaved_endpoints = [
+                        Endpoint(
+                            protocol=parts.scheme,
+                            host=parts.netloc,
+                            path=parts.path,
+                            query=parts.query,
+                            fragment=parts.fragment,
+                            product=test.engagement.product,
+                        )
+                    ]
                 items.append(finding)
         return items
 
@@ -107,10 +110,10 @@ def convert_severity(issue):
              ]
           },
     """
-    value = issue.get('severity', 'info').lower()
+    value = issue.get("severity", "info").lower()
     if value in ["high", "medium", "low", "info"]:
         return value.title()
-    return 'Info'
+    return "Info"
 
 
 def convert_confidence(issue):
@@ -126,7 +129,7 @@ def convert_confidence(issue):
              ]
           },
     """
-    value = issue.get('confidence', 'undefined').lower()
+    value = issue.get("confidence", "undefined").lower()
     if "certain" == value:
         return 2
     elif "firm" == value:

@@ -14,20 +14,29 @@ from dojo.models import Engagement, Risk_Acceptance, User
 from django.utils import timezone
 
 
-AcceptedRisk = NamedTuple('AcceptedRisk', (('cve', str), ('justification', str), ('accepted_by', str)))
+AcceptedRisk = NamedTuple(
+    "AcceptedRisk", (("cve", str), ("justification", str), ("accepted_by", str))
+)
 
 
 class AcceptedRiskSerializer(serializers.Serializer):
-    cve = serializers.CharField(max_length=28, label='CVE', help_text='CVE or vulnerability id to accept findings for')
-    justification = serializers.CharField(help_text='Justification for accepting findings with this CVE')
-    accepted_by = serializers.CharField(max_length=200, help_text='Name or email of person who accepts the risk')
+    cve = serializers.CharField(
+        max_length=28,
+        label="CVE",
+        help_text="CVE or vulnerability id to accept findings for",
+    )
+    justification = serializers.CharField(
+        help_text="Justification for accepting findings with this CVE"
+    )
+    accepted_by = serializers.CharField(
+        max_length=200, help_text="Name or email of person who accepts the risk"
+    )
 
     def create(self, validated_data):
         return AcceptedRisk(**validated_data)
 
 
 class AcceptedRisksMixin(ABC):
-
     @property
     @abstractmethod
     def risk_application_model_class(self):
@@ -37,7 +46,12 @@ class AcceptedRisksMixin(ABC):
         request_body=AcceptedRiskSerializer(many=True),
         responses={status.HTTP_201_CREATED: RiskAcceptanceSerializer},
     )
-    @action(methods=['post'], detail=True, permission_classes=[IsAdminUser], serializer_class=AcceptedRiskSerializer)
+    @action(
+        methods=["post"],
+        detail=True,
+        permission_classes=[IsAdminUser],
+        serializer_class=AcceptedRiskSerializer,
+    )
     def accept_risks(self, request, pk=None):
         model = get_object_or_404(self.risk_application_model_class, pk=pk)
         serializer = AcceptedRiskSerializer(data=request.data, many=True)
@@ -54,12 +68,16 @@ class AcceptedRisksMixin(ABC):
 
 
 class AcceptedFindingsMixin(ABC):
-
     @swagger_auto_schema(
         request_body=AcceptedRiskSerializer(many=True),
         responses={status.HTTP_201_CREATED: RiskAcceptanceSerializer},
     )
-    @action(methods=['post'], detail=False, permission_classes=[IsAdminUser], serializer_class=AcceptedRiskSerializer)
+    @action(
+        methods=["post"],
+        detail=False,
+        permission_classes=[IsAdminUser],
+        serializer_class=AcceptedRiskSerializer,
+    )
     def accept_risks(self, request):
         serializer = AcceptedRiskSerializer(data=request.data, many=True)
         if serializer.is_valid():
@@ -77,18 +95,27 @@ class AcceptedFindingsMixin(ABC):
         return Response(result.data)
 
 
-def _accept_risks(accepted_risks: List[AcceptedRisk], base_findings: QuerySet, owner: User):
+def _accept_risks(
+    accepted_risks: List[AcceptedRisk], base_findings: QuerySet, owner: User
+):
     accepted = []
     for risk in accepted_risks:
         findings = base_findings.filter(cve=risk.cve)
         if findings.exists():
             # TODO we could use risk.cve to name the risk_acceptance, but would need to check for existing risk_acceptances in that case
             # so for now we add some timestamp based suffix
-            name = risk.cve + ' via api at ' + timezone.now().strftime('%b %d, %Y, %H:%M:%S')
-            acceptance = Risk_Acceptance.objects.create(owner=owner, name=name[:100],
-                                                        decision=Risk_Acceptance.TREATMENT_ACCEPT,
-                                                        decision_details=risk.justification,
-                                                        accepted_by=risk.accepted_by[:200])
+            name = (
+                risk.cve
+                + " via api at "
+                + timezone.now().strftime("%b %d, %Y, %H:%M:%S")
+            )
+            acceptance = Risk_Acceptance.objects.create(
+                owner=owner,
+                name=name[:100],
+                decision=Risk_Acceptance.TREATMENT_ACCEPT,
+                decision_details=risk.justification,
+                accepted_by=risk.accepted_by[:200],
+            )
             acceptance.accepted_findings.set(findings)
             findings.update(risk_accepted=True)
             acceptance.save()

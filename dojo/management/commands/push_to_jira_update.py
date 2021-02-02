@@ -5,7 +5,7 @@ from dojo.models import Finding
 from dojo.utils import get_system_setting
 import dojo.jira_link.helper as jira_helper
 
-locale = timezone(get_system_setting('time_zone'))
+locale = timezone(get_system_setting("time_zone"))
 
 """
 Author: Aaron Weaver
@@ -14,7 +14,7 @@ This script will locate open, active findings and update them in Jira. Useful if
 
 
 class Command(BaseCommand):
-    help = 'No input commands for Jira bulk update.'
+    help = "No input commands for Jira bulk update."
 
     def handle(self, *args, **options):
 

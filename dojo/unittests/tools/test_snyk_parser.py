@@ -4,7 +4,6 @@ from dojo.models import Test
 
 
 class TestSnykParser(TestCase):
-
     def test_snykParser_single_has_no_finding(self):
         testfile = open("dojo/unittests/scans/snyk/single_project_no_vulns.json")
         parser = SnykParser()
@@ -73,12 +72,12 @@ class TestSnykParser(TestCase):
             finding.mitigation,
         )
         self.assertEqual(
-            "**SNYK ID**: https://app.snyk.io/vuln/SNYK-JAVA-ORGAPACHESANTUARIO-460281\n\n**GitHub " +
-            "Commit**: https://github.com/apache/santuario-java/commit/52ae824cf5f5c873a0e37bb33fedcc3b387" +
-            "cdba6\n**GitHub Commit**: https://github.com/apache/santuario-java/commit/c5210f77a77105fba81" +
-            "311d16c07ceacc21f39d5\n**Possible Jira Issue**: https://issues.apache.org/jira/browse/SANTUARIO-" +
-            "504?jql=project%20%3D%20SANTUARIO\n**Security Release**: http://santuario.apache.org/secadv.data/" +
-            "CVE-2019-12400.asc?version=1&modificationDate=1566573083000&api=v2\n",
+            "**SNYK ID**: https://app.snyk.io/vuln/SNYK-JAVA-ORGAPACHESANTUARIO-460281\n\n**GitHub "
+            + "Commit**: https://github.com/apache/santuario-java/commit/52ae824cf5f5c873a0e37bb33fedcc3b387"
+            + "cdba6\n**GitHub Commit**: https://github.com/apache/santuario-java/commit/c5210f77a77105fba81"
+            + "311d16c07ceacc21f39d5\n**Possible Jira Issue**: https://issues.apache.org/jira/browse/SANTUARIO-"
+            + "504?jql=project%20%3D%20SANTUARIO\n**Security Release**: http://santuario.apache.org/secadv.data/"
+            + "CVE-2019-12400.asc?version=1&modificationDate=1566573083000&api=v2\n",
             finding.references,
         )
         self.assertEqual(

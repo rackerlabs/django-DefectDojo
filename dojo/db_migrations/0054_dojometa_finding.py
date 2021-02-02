@@ -7,17 +7,27 @@ import django.db.models.deletion
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('dojo', '0053_engagement_notes'),
+        ("dojo", "0053_engagement_notes"),
     ]
 
     operations = [
         migrations.AddField(
-            model_name='dojometa',
-            name='finding',
-            field=models.ForeignKey(editable=False, null=True, on_delete=django.db.models.deletion.CASCADE, related_name='finding_meta', to='dojo.Finding'),
+            model_name="dojometa",
+            name="finding",
+            field=models.ForeignKey(
+                editable=False,
+                null=True,
+                on_delete=django.db.models.deletion.CASCADE,
+                related_name="finding_meta",
+                to="dojo.Finding",
+            ),
         ),
         migrations.AlterUniqueTogether(
-            name='dojometa',
-            unique_together={('endpoint', 'name'), ('product', 'name'), ('finding', 'name')},
+            name="dojometa",
+            unique_together={
+                ("endpoint", "name"),
+                ("product", "name"),
+                ("finding", "name"),
+            },
         ),
     ]

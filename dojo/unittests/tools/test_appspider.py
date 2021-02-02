@@ -4,7 +4,6 @@ from dojo.models import Product, Engagement, Test, Finding
 
 
 class TestAppSpiderXMLParser(TestCase):
-
     def test_appspider_parser_has_one_finding(self):
         test = Test()
         test.engagement = Engagement()

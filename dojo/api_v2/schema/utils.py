@@ -5,9 +5,12 @@ class LazySchemaRef:
     """Utility class to support SchemaRef definition without knowing the resolver.
     The reference can be evaluated later in the context of a swagger generator
     """
+
     def __init__(self, schema_name, ignore_unresolved=False):
         # Bind curried version of the SchemaRef init
-        self.schema_ref = lambda resolver: SchemaRef(resolver, schema_name, ignore_unresolved)
+        self.schema_ref = lambda resolver: SchemaRef(
+            resolver, schema_name, ignore_unresolved
+        )
 
     def apply(self, resolver):
         """Resolve the LazySchemaRef with the given resolver
@@ -53,6 +56,8 @@ def resolve_lazy_ref(schema, resolver):
         for prop_name, prop in schema["properties"].items():
             schema["properties"][prop_name] = resolve_lazy_ref(prop, resolver)
     if "additionalProperties" in schema:
-        schema["additionalProperties"] = resolve_lazy_ref(schema["additionalProperties"], resolver)
+        schema["additionalProperties"] = resolve_lazy_ref(
+            schema["additionalProperties"], resolver
+        )
 
     return schema

@@ -1,20 +1,21 @@
 from django import template
 from dojo.models import Endpoint_Status
+
 register = template.Library()
 
 
-@register.filter(name='has_endpoints')
+@register.filter(name="has_endpoints")
 def has_endpoints(finding):
     return True if finding.endpoints.all() else False
 
 
-@register.filter(name='get_vulnerable_endpoints')
+@register.filter(name="get_vulnerable_endpoints")
 def get_vulnerable_endpoints(finding):
     status_list = finding.endpoint_status.all().filter(mitigated=False)
     return [status.endpoint for status in status_list]
 
 
-@register.filter(name='get_mitigated_endpoints')
+@register.filter(name="get_mitigated_endpoints")
 def get_mitigated_endpoints(finding):
     status_list = finding.endpoint_status.all().filter(mitigated=True)
     return [status.endpoint for status in status_list]

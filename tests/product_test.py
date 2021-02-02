@@ -12,10 +12,10 @@ class WaitForPageLoad(object):
         self.timeout = time.time() + timeout
 
     def __enter__(self):
-        self.old_page = self.browser.find_element_by_tag_name('html')
+        self.old_page = self.browser.find_element_by_tag_name("html")
 
     def page_has_loaded(self):
-        new_page = self.browser.find_element_by_tag_name('html')
+        new_page = self.browser.find_element_by_tag_name("html")
         return new_page.id != self.old_page.id
 
     def __exit__(self, *_):
@@ -24,13 +24,10 @@ class WaitForPageLoad(object):
                 return True
             else:
                 time.sleep(0.2)
-        raise Exception(
-            'Timeout waiting for {}s'.format(self.timeout)
-        )
+        raise Exception("Timeout waiting for {}s".format(self.timeout))
 
 
 class ProductTest(BaseTestCase):
-
     @on_exception_html_source_logger
     def test_create_product(self):
         # make sure no left overs from previous runs are left behind
@@ -48,18 +45,26 @@ class ProductTest(BaseTestCase):
         driver.find_element_by_id("id_name").send_keys("QA Test")
         # Tab into the description area to fill some text
         # Couldnt find a way to get into the box with selenium
-        driver.find_element_by_id("id_name").send_keys("\tThis is just a test. Be very afraid.")
+        driver.find_element_by_id("id_name").send_keys(
+            "\tThis is just a test. Be very afraid."
+        )
         # Select an option in the poroduct type
         # some wild guess to print some debug info
-        Select(driver.find_element_by_id("id_prod_type")).select_by_visible_text("Research and Development")
+        Select(driver.find_element_by_id("id_prod_type")).select_by_visible_text(
+            "Research and Development"
+        )
         # "Click" the submit button to complete the transaction
         driver.find_element_by_css_selector("input.btn.btn-primary").click()
         # Query the site to determine if the product has been added
 
         # Assert ot the query to dtermine status of failure
         # Also confirm success even if Product is returned as already exists for test sake
-        self.assertTrue(self.is_success_message_present(text='Product added successfully') or
-            self.is_success_message_present(text='Product with this Name already exists.'))
+        self.assertTrue(
+            self.is_success_message_present(text="Product added successfully")
+            or self.is_success_message_present(
+                text="Product with this Name already exists."
+            )
+        )
         self.assertFalse(self.is_error_message_present())
 
     @on_exception_html_source_logger
@@ -101,8 +106,12 @@ class ProductTest(BaseTestCase):
         # Query the site to determine if the product has been added
 
         # Assert ot the query to dtermine status of failure
-        self.assertTrue(self.is_success_message_present(text='Product updated successfully') or
-            self.is_success_message_present(text='Product with this Name already exists.'))
+        self.assertTrue(
+            self.is_success_message_present(text="Product updated successfully")
+            or self.is_success_message_present(
+                text="Product with this Name already exists."
+            )
+        )
         self.assertFalse(self.is_error_message_present())
 
     @on_exception_html_source_logger
@@ -129,19 +138,25 @@ class ProductTest(BaseTestCase):
         # engagement description
         # Tab into the description area to fill some text
         # Couldnt find a way to get into the box with selenium
-        driver.find_element_by_id("id_name").send_keys(Keys.TAB, "Running Test on product before approving and push to production.")
+        driver.find_element_by_id("id_name").send_keys(
+            Keys.TAB, "Running Test on product before approving and push to production."
+        )
         # engagement target start and target end already have defaults
         # we can safely skip
         # Testing Lead: This can be the logged in user
-        Select(driver.find_element_by_id("id_lead")).select_by_visible_text('admin')
+        Select(driver.find_element_by_id("id_lead")).select_by_visible_text("admin")
         # engagement status
-        Select(driver.find_element_by_id("id_status")).select_by_visible_text("In Progress")
+        Select(driver.find_element_by_id("id_status")).select_by_visible_text(
+            "In Progress"
+        )
         # "Click" the Done button to Add the engagement
         driver.find_element_by_css_selector("input.btn.btn-primary").click()
         # Query the site to determine if the product has been added
 
         # Assert of the query to dtermine status of failure
-        self.assertTrue(self.is_success_message_present(text='Engagement added successfully'))
+        self.assertTrue(
+            self.is_success_message_present(text="Engagement added successfully")
+        )
 
     @on_exception_html_source_logger
     def test_add_product_finding(self):
@@ -166,17 +181,27 @@ class ProductTest(BaseTestCase):
         # finding Severity
         Select(driver.find_element_by_id("id_severity")).select_by_visible_text("High")
         # finding Description
-        driver.find_element_by_id("id_severity").send_keys(Keys.TAB, "This is just a Test Case Finding")
+        driver.find_element_by_id("id_severity").send_keys(
+            Keys.TAB, "This is just a Test Case Finding"
+        )
         # Finding Mitigation
         # Use Javascript to bypass the editor by making Setting textArea style from none to inline
         # Any Text written to textarea automatically reflects in Editor field.
-        driver.execute_script("document.getElementsByName('mitigation')[0].style.display = 'inline'")
-        driver.find_element_by_name("mitigation").send_keys(Keys.TAB, "How to mitigate this finding")
+        driver.execute_script(
+            "document.getElementsByName('mitigation')[0].style.display = 'inline'"
+        )
+        driver.find_element_by_name("mitigation").send_keys(
+            Keys.TAB, "How to mitigate this finding"
+        )
         # Finding Impact
         # Use Javascript to bypass the editor by making Setting textArea style from none to inline
         # Any Text written to textarea automatically reflects in Editor field.
-        driver.execute_script("document.getElementsByName('impact')[0].style.display = 'inline'")
-        driver.find_element_by_name("impact").send_keys(Keys.TAB, "This has a very critical effect on production")
+        driver.execute_script(
+            "document.getElementsByName('impact')[0].style.display = 'inline'"
+        )
+        driver.find_element_by_name("impact").send_keys(
+            Keys.TAB, "This has a very critical effect on production"
+        )
         # Add an endpoint
         main_window_handle = driver.current_window_handle
         driver.find_element_by_id("add_id_endpoints").click()
@@ -197,7 +222,7 @@ class ProductTest(BaseTestCase):
         # Query the site to determine if the finding has been added
 
         # Assert to the query to dtermine status of failure
-        self.assertTrue(self.is_text_present_on_page(text='App Vulnerable to XSS'))
+        self.assertTrue(self.is_text_present_on_page(text="App Vulnerable to XSS"))
 
     @on_exception_html_source_logger
     def test_add_product_endpoints(self):
@@ -215,13 +240,17 @@ class ProductTest(BaseTestCase):
         # Keep a good practice of clearing field before entering value
         # Endpoints
         driver.find_element_by_id("id_endpoint").clear()
-        driver.find_element_by_id("id_endpoint").send_keys("strange.prod.dev\n123.45.6.30")
+        driver.find_element_by_id("id_endpoint").send_keys(
+            "strange.prod.dev\n123.45.6.30"
+        )
         # submit
         driver.find_element_by_css_selector("input.btn.btn-primary").click()
         # Query the site to determine if the finding has been added
 
         # Assert ot the query to dtermine status of failure
-        self.assertTrue(self.is_success_message_present(text='Endpoint added successfully'))
+        self.assertTrue(
+            self.is_success_message_present(text="Endpoint added successfully")
+        )
 
     @on_exception_html_source_logger
     def test_add_product_custom_field(self):
@@ -249,8 +278,12 @@ class ProductTest(BaseTestCase):
 
         # Assert ot the query to dtermine status of failure
         # Also confirm success even if variable is returned as already exists for test sake
-        self.assertTrue(self.is_success_message_present(text='Metadata added successfully') or
-            self.is_success_message_present(text='A metadata entry with the same name exists already for this object.'))
+        self.assertTrue(
+            self.is_success_message_present(text="Metadata added successfully")
+            or self.is_success_message_present(
+                text="A metadata entry with the same name exists already for this object."
+            )
+        )
 
     @on_exception_html_source_logger
     def test_edit_product_custom_field(self):
@@ -274,8 +307,12 @@ class ProductTest(BaseTestCase):
         # Query the site to determine if the finding has been added
 
         # Assert ot the query to dtermine success or failure
-        self.assertTrue(self.is_success_message_present(text='Metadata edited successfully') or
-            self.is_success_message_present(text='A metadata entry with the same name exists already for this object.'))
+        self.assertTrue(
+            self.is_success_message_present(text="Metadata edited successfully")
+            or self.is_success_message_present(
+                text="A metadata entry with the same name exists already for this object."
+            )
+        )
 
     @on_exception_html_source_logger
     def test_add_product_tracking_files(self):
@@ -296,13 +333,17 @@ class ProductTest(BaseTestCase):
         driver.find_element_by_id("id_path").clear()
         driver.find_element_by_id("id_path").send_keys("/strange/folder/")
         # REview Status
-        Select(driver.find_element_by_id("id_review_status")).select_by_visible_text("Untracked")
+        Select(driver.find_element_by_id("id_review_status")).select_by_visible_text(
+            "Untracked"
+        )
         # submit
         driver.find_element_by_css_selector("input.btn.btn-primary").click()
         # Query the site to determine if the finding has been added
 
         # Assert ot the query to dtermine status of failure
-        self.assertTrue(self.is_success_message_present(text='Added Tracked File to a Product'))
+        self.assertTrue(
+            self.is_success_message_present(text="Added Tracked File to a Product")
+        )
 
     @on_exception_html_source_logger
     def test_edit_product_tracking_files(self):
@@ -328,7 +369,11 @@ class ProductTest(BaseTestCase):
         # Query the site to determine if the Tracking file has been updated
 
         # Assert ot the query to dtermine status of failure
-        self.assertTrue(self.is_success_message_present(text='Tool Product Configuration Successfully Updated'))
+        self.assertTrue(
+            self.is_success_message_present(
+                text="Tool Product Configuration Successfully Updated"
+            )
+        )
 
     def test_product_metrics(self):
         # Test To Edit Product Tracking Files
@@ -340,7 +385,7 @@ class ProductTest(BaseTestCase):
         driver.find_element_by_link_text("QA Test").click()
         # "Click" the dropdown option
         # driver.find_element_by_xpath("//span[contains(., 'Metrics')]").click()
-        driver.find_element_by_partial_link_text('Metrics').click()
+        driver.find_element_by_partial_link_text("Metrics").click()
 
     @on_exception_html_source_logger
     def test_delete_product(self, name="QA Test"):
@@ -351,7 +396,7 @@ class ProductTest(BaseTestCase):
         driver.find_element_by_link_text(name).click()
         # Click the drop down menu
         # driver.execute_script("window.scrollTo(0, 0)")
-        driver.find_element_by_id('dropdownMenu1').click()
+        driver.find_element_by_id("dropdownMenu1").click()
         # "Click" the Delete option
         driver.find_element_by_link_text("Delete").click()
         # "Click" the delete button to complete the transaction
@@ -359,7 +404,9 @@ class ProductTest(BaseTestCase):
         # Query the site to determine if the product has been added
 
         # Assert ot the query to determine status of failure
-        self.assertTrue(self.is_success_message_present(text='Product and relationships removed.'))
+        self.assertTrue(
+            self.is_success_message_present(text="Product and relationships removed.")
+        )
 
     @on_exception_html_source_logger
     def test_product_notifications_change(self):
@@ -370,20 +417,52 @@ class ProductTest(BaseTestCase):
         # Select the specific product to delete
         driver.find_element_by_link_text("QA Test").click()
 
-        driver.find_element_by_xpath("//input[@name='engagement_added' and @value='mail']").click()
+        driver.find_element_by_xpath(
+            "//input[@name='engagement_added' and @value='mail']"
+        ).click()
         # clicking == ajax call to submit, but I think selenium gets this
 
-        self.assertTrue(self.is_success_message_present(text='Notification settings updated'))
-        self.assertTrue(driver.find_element_by_xpath("//input[@name='engagement_added' and @value='mail']").is_selected())
-        self.assertFalse(driver.find_element_by_xpath("//input[@name='scan_added' and @value='mail']").is_selected())
-        self.assertFalse(driver.find_element_by_xpath("//input[@name='test_added' and @value='mail']").is_selected())
+        self.assertTrue(
+            self.is_success_message_present(text="Notification settings updated")
+        )
+        self.assertTrue(
+            driver.find_element_by_xpath(
+                "//input[@name='engagement_added' and @value='mail']"
+            ).is_selected()
+        )
+        self.assertFalse(
+            driver.find_element_by_xpath(
+                "//input[@name='scan_added' and @value='mail']"
+            ).is_selected()
+        )
+        self.assertFalse(
+            driver.find_element_by_xpath(
+                "//input[@name='test_added' and @value='mail']"
+            ).is_selected()
+        )
 
-        driver.find_element_by_xpath("//input[@name='scan_added' and @value='mail']").click()
+        driver.find_element_by_xpath(
+            "//input[@name='scan_added' and @value='mail']"
+        ).click()
 
-        self.assertTrue(self.is_success_message_present(text='Notification settings updated'))
-        self.assertTrue(driver.find_element_by_xpath("//input[@name='engagement_added' and @value='mail']").is_selected())
-        self.assertTrue(driver.find_element_by_xpath("//input[@name='scan_added' and @value='mail']").is_selected())
-        self.assertFalse(driver.find_element_by_xpath("//input[@name='test_added' and @value='mail']").is_selected())
+        self.assertTrue(
+            self.is_success_message_present(text="Notification settings updated")
+        )
+        self.assertTrue(
+            driver.find_element_by_xpath(
+                "//input[@name='engagement_added' and @value='mail']"
+            ).is_selected()
+        )
+        self.assertTrue(
+            driver.find_element_by_xpath(
+                "//input[@name='scan_added' and @value='mail']"
+            ).is_selected()
+        )
+        self.assertFalse(
+            driver.find_element_by_xpath(
+                "//input[@name='test_added' and @value='mail']"
+            ).is_selected()
+        )
 
     def test_critical_product_metrics(self):
         # Test To Edit Product Tracking Files
@@ -443,40 +522,40 @@ class ProductTest(BaseTestCase):
 def add_product_tests_to_suite(suite):
     # Add each test and the suite to be run
     # success and failure is output by the test
-    suite.addTest(BaseTestCase('test_login'))
-    suite.addTest(ProductTest('test_create_product'))
-    suite.addTest(ProductTest('test_edit_product_description'))
-    suite.addTest(ProductTest('test_add_product_engagement'))
-    suite.addTest(ProductTest('test_add_product_finding'))
-    suite.addTest(ProductTest('test_add_product_endpoints'))
-    suite.addTest(ProductTest('test_add_product_custom_field'))
-    suite.addTest(ProductTest('test_edit_product_custom_field'))
-    suite.addTest(ProductTest('test_add_product_tracking_files'))
-    suite.addTest(ProductTest('test_edit_product_tracking_files'))
-    suite.addTest(ProductTest('test_list_products'))
-    suite.addTest(ProductTest('test_list_components'))
-    suite.addTest(ProductTest('test_product_notifications_change'))
-    suite.addTest(ProductTest('test_product_metrics'))
+    suite.addTest(BaseTestCase("test_login"))
+    suite.addTest(ProductTest("test_create_product"))
+    suite.addTest(ProductTest("test_edit_product_description"))
+    suite.addTest(ProductTest("test_add_product_engagement"))
+    suite.addTest(ProductTest("test_add_product_finding"))
+    suite.addTest(ProductTest("test_add_product_endpoints"))
+    suite.addTest(ProductTest("test_add_product_custom_field"))
+    suite.addTest(ProductTest("test_edit_product_custom_field"))
+    suite.addTest(ProductTest("test_add_product_tracking_files"))
+    suite.addTest(ProductTest("test_edit_product_tracking_files"))
+    suite.addTest(ProductTest("test_list_products"))
+    suite.addTest(ProductTest("test_list_components"))
+    suite.addTest(ProductTest("test_product_notifications_change"))
+    suite.addTest(ProductTest("test_product_metrics"))
 
     # we add metrics tests here as we now have a product that triggers some logic inside metrics
-    suite.addTest(ProductTest('test_critical_product_metrics'))
-    suite.addTest(ProductTest('test_product_type_metrics'))
-    suite.addTest(ProductTest('test_product_type_counts_metrics'))
-    suite.addTest(ProductTest('test_simple_metrics'))
-    suite.addTest(ProductTest('test_engineer_metrics'))
-    suite.addTest(ProductTest('test_security_research_metrics'))
-    suite.addTest(ProductTest('test_metrics_dashboard'))
+    suite.addTest(ProductTest("test_critical_product_metrics"))
+    suite.addTest(ProductTest("test_product_type_metrics"))
+    suite.addTest(ProductTest("test_product_type_counts_metrics"))
+    suite.addTest(ProductTest("test_simple_metrics"))
+    suite.addTest(ProductTest("test_engineer_metrics"))
+    suite.addTest(ProductTest("test_security_research_metrics"))
+    suite.addTest(ProductTest("test_metrics_dashboard"))
 
-    suite.addTest(ProductTest('test_delete_product'))
+    suite.addTest(ProductTest("test_delete_product"))
     return suite
 
 
 def suite():
     suite = unittest.TestSuite()
     add_product_tests_to_suite(suite)
-    suite.addTest(ProductTest('enable_jira'))
-    suite.addTest(ProductTest('enable_github'))
-    suite.addTest(ProductTest('enable_block_execution'))
+    suite.addTest(ProductTest("enable_jira"))
+    suite.addTest(ProductTest("enable_github"))
+    suite.addTest(ProductTest("enable_block_execution"))
     add_product_tests_to_suite(suite)
 
     return suite

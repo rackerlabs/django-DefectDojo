@@ -4,7 +4,6 @@ from dojo.models import Test
 
 
 class TestDrHeaderJSONParser(TestCase):
-
     def test_parse_file_has_many_finding_one_tool(self):
         testfile = open("dojo/unittests/scans/drheader/scan.json")
         parser = DrHeaderJSONParser()

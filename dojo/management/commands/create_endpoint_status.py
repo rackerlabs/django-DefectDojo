@@ -12,11 +12,13 @@ upgrading to 1.7.0>= as it is unnecessary for fresh installs
 
 
 class Command(BaseCommand):
-    help = 'Create status objects for Endpoints for easier tracking'
+    help = "Create status objects for Endpoints for easier tracking"
 
     def handle(self, *args, **options):
         # Get a list of findings that have endpoints
-        findings = Finding.objects.annotate(count=Count('endpoints')).filter(count__gt=0)
+        findings = Finding.objects.annotate(count=Count("endpoints")).filter(
+            count__gt=0
+        )
         for finding in findings:
             # Get the list of endpoints on the current finding
             endpoints = finding.endpoints.all()

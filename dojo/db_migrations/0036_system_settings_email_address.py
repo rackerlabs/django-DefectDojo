@@ -6,13 +6,13 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('dojo', '0035_push_all_issues_help_text_rename_gh_fields'),
+        ("dojo", "0035_push_all_issues_help_text_rename_gh_fields"),
     ]
 
     operations = [
         migrations.AddField(
-            model_name='system_settings',
-            name='email_address',
+            model_name="system_settings",
+            name="email_address",
             field=models.EmailField(blank=True, max_length=100),
         ),
     ]

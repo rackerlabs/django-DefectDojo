@@ -25,9 +25,9 @@ class ColumnMappingStrategy(object):
 
     @staticmethod
     def evaluate_bool_value(column_value):
-        if column_value.lower() == 'true':
+        if column_value.lower() == "true":
             return True
-        elif column_value.lower() == 'false':
+        elif column_value.lower() == "false":
             return False
         else:
             return None
@@ -41,9 +41,8 @@ class ColumnMappingStrategy(object):
 
 
 class DateColumnMappingStrategy(ColumnMappingStrategy):
-
     def __init__(self):
-        self.mapped_column = 'timestamp'
+        self.mapped_column = "timestamp"
         super(DateColumnMappingStrategy, self).__init__()
 
     def map_column_value(self, finding, column_value):
@@ -51,9 +50,8 @@ class DateColumnMappingStrategy(ColumnMappingStrategy):
 
 
 class TitleColumnMappingStrategy(ColumnMappingStrategy):
-
     def __init__(self):
-        self.mapped_column = 'nvt name'
+        self.mapped_column = "nvt name"
         super(TitleColumnMappingStrategy, self).__init__()
 
     def map_column_value(self, finding, column_value):
@@ -61,9 +59,8 @@ class TitleColumnMappingStrategy(ColumnMappingStrategy):
 
 
 class CweColumnMappingStrategy(ColumnMappingStrategy):
-
     def __init__(self):
-        self.mapped_column = 'cweid'
+        self.mapped_column = "cweid"
         super(CweColumnMappingStrategy, self).__init__()
 
     def map_column_value(self, finding, column_value):
@@ -72,9 +69,8 @@ class CweColumnMappingStrategy(ColumnMappingStrategy):
 
 
 class UrlColumnMappingStrategy(ColumnMappingStrategy):
-
     def __init__(self):
-        self.mapped_column = 'ip'
+        self.mapped_column = "ip"
         super(UrlColumnMappingStrategy, self).__init__()
 
     def is_valid_ipv4_address(self, address):
@@ -101,7 +97,8 @@ class UrlColumnMappingStrategy(ColumnMappingStrategy):
         if not self.is_valid_ipv4_address(url):
             rhost = re.match(
                 r"(http|https|ftp)\://([a-zA-Z0-9\.\-]+(\:[a-zA-Z0-9\.&amp;%\$\-]+)*@)*((25[0-5]|2[0-4][0-9]|[0-1]{1}[0-9]{2}|[1-9]{1}[0-9]{1}|[1-9])\.(25[0-5]|2[0-4][0-9]|[0-1]{1}[0-9]{2}|[1-9]{1}[0-9]{1}|[1-9]|0)\.(25[0-5]|2[0-4][0-9]|[0-1]{1}[0-9]{2}|[1-9]{1}[0-9]{1}|[1-9]|0)\.(25[0-5]|2[0-4][0-9]|[0-1]{1}[0-9]{2}|[1-9]{1}[0-9]{1}|[0-9])|localhost|([a-zA-Z0-9\-]+\.)*[a-zA-Z0-9\-]+\.(com|edu|gov|int|mil|net|org|biz|arpa|info|name|pro|aero|coop|museum|[a-zA-Z]{2}))[\:]*([0-9]+)*([/]*($|[a-zA-Z0-9\.\,\?\'\\\+&amp;%\$#\=~_\-]+)).*?$",
-                url)
+                url,
+            )
 
             if rhost:
                 protocol = o.scheme
@@ -111,29 +108,33 @@ class UrlColumnMappingStrategy(ColumnMappingStrategy):
                 fragment = o.fragment
 
                 port = 80
-                if protocol == 'https':
+                if protocol == "https":
                     port = 443
 
                 if rhost[11] is not None:
                     port = rhost[11]
 
                 try:
-                    dupe_endpoint = Endpoint.objects.get(protocol=protocol,
-                                                         host=host + (":" + port) if port is not None else "",
-                                                         query=query,
-                                                         fragment=fragment,
-                                                         path=path,
-                                                         product=finding.test.engagement.product)
+                    dupe_endpoint = Endpoint.objects.get(
+                        protocol=protocol,
+                        host=host + (":" + port) if port is not None else "",
+                        query=query,
+                        fragment=fragment,
+                        path=path,
+                        product=finding.test.engagement.product,
+                    )
                 except:
                     dupe_endpoint = None
 
                 if not dupe_endpoint:
-                    endpoint = Endpoint(protocol=protocol,
-                                        host=host + (":" + str(port)) if port is not None else "",
-                                        query=query,
-                                        fragment=fragment,
-                                        path=path,
-                                        product=finding.test.engagement.product)
+                    endpoint = Endpoint(
+                        protocol=protocol,
+                        host=host + (":" + str(port)) if port is not None else "",
+                        query=query,
+                        fragment=fragment,
+                        path=path,
+                        product=finding.test.engagement.product,
+                    )
                 else:
                     endpoint = dupe_endpoint
 
@@ -147,17 +148,21 @@ class UrlColumnMappingStrategy(ColumnMappingStrategy):
         # URL is an IP so save as an IP endpoint
         elif self.is_valid_ipv4_address(url):
             try:
-                dupe_endpoint = Endpoint.objects.get(protocol=None,
-                                                     host=url,
-                                                     path=None,
-                                                     query=None,
-                                                     fragment=None,
-                                                     product=finding.test.engagement.product)
+                dupe_endpoint = Endpoint.objects.get(
+                    protocol=None,
+                    host=url,
+                    path=None,
+                    query=None,
+                    fragment=None,
+                    product=finding.test.engagement.product,
+                )
             except:
                 dupe_endpoint = None
 
             if not dupe_endpoint:
-                endpoints = [Endpoint(host=url, product=finding.test.engagement.product)]
+                endpoints = [
+                    Endpoint(host=url, product=finding.test.engagement.product)
+                ]
             else:
                 endpoints = [dupe_endpoint]
 
@@ -165,27 +170,25 @@ class UrlColumnMappingStrategy(ColumnMappingStrategy):
 
 
 class SeverityColumnMappingStrategy(ColumnMappingStrategy):
-
     @staticmethod
     def is_valid_severity(severity):
-        valid_severity = ('Info', 'Low', 'Medium', 'High', 'Critical')
+        valid_severity = ("Info", "Low", "Medium", "High", "Critical")
         return severity in valid_severity
 
     def __init__(self):
-        self.mapped_column = 'severity'
+        self.mapped_column = "severity"
         super(SeverityColumnMappingStrategy, self).__init__()
 
     def map_column_value(self, finding, column_value):
         if self.is_valid_severity(column_value):
             finding.severity = column_value
         else:
-            finding.severity = 'Info'
+            finding.severity = "Info"
 
 
 class DescriptionColumnMappingStrategy(ColumnMappingStrategy):
-
     def __init__(self):
-        self.mapped_column = 'summary'
+        self.mapped_column = "summary"
         super(DescriptionColumnMappingStrategy, self).__init__()
 
     def map_column_value(self, finding, column_value):
@@ -193,9 +196,8 @@ class DescriptionColumnMappingStrategy(ColumnMappingStrategy):
 
 
 class MitigationColumnMappingStrategy(ColumnMappingStrategy):
-
     def __init__(self):
-        self.mapped_column = 'solution'
+        self.mapped_column = "solution"
         super(MitigationColumnMappingStrategy, self).__init__()
 
     def map_column_value(self, finding, column_value):
@@ -203,9 +205,8 @@ class MitigationColumnMappingStrategy(ColumnMappingStrategy):
 
 
 class ImpactColumnMappingStrategy(ColumnMappingStrategy):
-
     def __init__(self):
-        self.mapped_column = 'vulnerability insight'
+        self.mapped_column = "vulnerability insight"
         super(ImpactColumnMappingStrategy, self).__init__()
 
     def map_column_value(self, finding, column_value):
@@ -213,9 +214,8 @@ class ImpactColumnMappingStrategy(ColumnMappingStrategy):
 
 
 class ReferencesColumnMappingStrategy(ColumnMappingStrategy):
-
     def __init__(self):
-        self.mapped_column = 'specific result'
+        self.mapped_column = "specific result"
         super(ReferencesColumnMappingStrategy, self).__init__()
 
     def map_column_value(self, finding, column_value):
@@ -223,9 +223,8 @@ class ReferencesColumnMappingStrategy(ColumnMappingStrategy):
 
 
 class ActiveColumnMappingStrategy(ColumnMappingStrategy):
-
     def __init__(self):
-        self.mapped_column = 'active'
+        self.mapped_column = "active"
         super(ActiveColumnMappingStrategy, self).__init__()
 
     def map_column_value(self, finding, column_value):
@@ -233,9 +232,8 @@ class ActiveColumnMappingStrategy(ColumnMappingStrategy):
 
 
 class VerifiedColumnMappingStrategy(ColumnMappingStrategy):
-
     def __init__(self):
-        self.mapped_column = 'verified'
+        self.mapped_column = "verified"
         super(VerifiedColumnMappingStrategy, self).__init__()
 
     def map_column_value(self, finding, column_value):
@@ -243,9 +241,8 @@ class VerifiedColumnMappingStrategy(ColumnMappingStrategy):
 
 
 class FalsePositiveColumnMappingStrategy(ColumnMappingStrategy):
-
     def __init__(self):
-        self.mapped_column = 'falsepositive'
+        self.mapped_column = "falsepositive"
         super(FalsePositiveColumnMappingStrategy, self).__init__()
 
     def map_column_value(self, finding, column_value):
@@ -253,9 +250,8 @@ class FalsePositiveColumnMappingStrategy(ColumnMappingStrategy):
 
 
 class DuplicateColumnMappingStrategy(ColumnMappingStrategy):
-
     def __init__(self):
-        self.mapped_column = 'duplicate'
+        self.mapped_column = "duplicate"
         super(DuplicateColumnMappingStrategy, self).__init__()
 
     def map_column_value(self, finding, column_value):
@@ -263,7 +259,6 @@ class DuplicateColumnMappingStrategy(ColumnMappingStrategy):
 
 
 class OpenVASUploadCsvParser(object):
-
     def create_chain(self):
         date_column_strategy = DateColumnMappingStrategy()
         title_column_strategy = TitleColumnMappingStrategy()
@@ -311,9 +306,9 @@ class OpenVASUploadCsvParser(object):
         if filename is None:
             return ()
 
-        content = open(filename.temporary_file_path(), 'rb')
-        reportCSV = io.TextIOWrapper(content, encoding='utf-8 ', errors='replace')
-        reader = csv.reader(reportCSV, delimiter=',', quotechar='"')
+        content = open(filename.temporary_file_path(), "rb")
+        reportCSV = io.TextIOWrapper(content, encoding="utf-8 ", errors="replace")
+        reader = csv.reader(reportCSV, delimiter=",", quotechar='"')
 
         row_number = 0
         for row in reader:
@@ -326,7 +321,9 @@ class OpenVASUploadCsvParser(object):
 
             column_number = 0
             for column in row:
-                self.chain.process_column(self.column_names[column_number], column, finding)
+                self.chain.process_column(
+                    self.column_names[column_number], column, finding
+                )
                 column_number += 1
 
             if finding is not None and row_number > 0:
@@ -337,7 +334,17 @@ class OpenVASUploadCsvParser(object):
                 if finding.description is None:
                     finding.description = ""
 
-                key = hashlib.md5((finding.url + '|' + finding.severity + '|' + finding.title + '|' + finding.description).encode('utf-8')).hexdigest()
+                key = hashlib.md5(
+                    (
+                        finding.url
+                        + "|"
+                        + finding.severity
+                        + "|"
+                        + finding.title
+                        + "|"
+                        + finding.description
+                    ).encode("utf-8")
+                ).hexdigest()
 
                 if key not in dupes:
                     dupes[key] = finding

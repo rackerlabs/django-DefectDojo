@@ -6,11 +6,11 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('dojo', '0060_false_p_dedupe_indices'),
+        ("dojo", "0060_false_p_dedupe_indices"),
     ]
 
     def disable_webhook_secret_for_existing_installs(apps, schema_editor):
-        system_settings = apps.get_model('dojo', 'system_settings')
+        system_settings = apps.get_model("dojo", "system_settings")
         try:
             # for existing install we disable the webhook security as we don't want to break those installs
             ss = system_settings.objects.all().first()
@@ -24,20 +24,32 @@ class Migration(migrations.Migration):
 
     operations = [
         migrations.AddField(
-            model_name='system_settings',
-            name='disable_jira_webhook_secret',
-            field=models.BooleanField(default=False, help_text='Allows incoming requests without a secret (discouraged legacy behaviour)', verbose_name='Disable web hook secret'),
+            model_name="system_settings",
+            name="disable_jira_webhook_secret",
+            field=models.BooleanField(
+                default=False,
+                help_text="Allows incoming requests without a secret (discouraged legacy behaviour)",
+                verbose_name="Disable web hook secret",
+            ),
         ),
         migrations.AddField(
-            model_name='system_settings',
-            name='jira_webhook_secret',
-            field=models.CharField(help_text='Secret needed in URL for incoming JIRA Webhook', max_length=64, null=True, verbose_name='JIRA Webhook URL'),
+            model_name="system_settings",
+            name="jira_webhook_secret",
+            field=models.CharField(
+                help_text="Secret needed in URL for incoming JIRA Webhook",
+                max_length=64,
+                null=True,
+                verbose_name="JIRA Webhook URL",
+            ),
         ),
         migrations.AlterField(
-            model_name='system_settings',
-            name='enable_jira_web_hook',
-            field=models.BooleanField(default=False, help_text='Please note: It is strongly recommended to use a secret below and / or IP whitelist the JIRA server using a proxy such as Nginx.', verbose_name='Enable JIRA web hook'),
+            model_name="system_settings",
+            name="enable_jira_web_hook",
+            field=models.BooleanField(
+                default=False,
+                help_text="Please note: It is strongly recommended to use a secret below and / or IP whitelist the JIRA server using a proxy such as Nginx.",
+                verbose_name="Enable JIRA web hook",
+            ),
         ),
-
-        migrations.RunPython(disable_webhook_secret_for_existing_installs)
+        migrations.RunPython(disable_webhook_secret_for_existing_installs),
     ]

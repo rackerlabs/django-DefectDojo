@@ -1,4 +1,4 @@
-__author__ = 'Aaron Weaver'
+__author__ = "Aaron Weaver"
 
 import json
 from datetime import datetime
@@ -13,7 +13,7 @@ class MobSFParser(object):
     def get_findings(self, filename, test):
         tree = filename.read()
         try:
-            data = json.loads(str(tree, 'utf-8'))
+            data = json.loads(str(tree, "utf-8"))
         except:
             data = json.loads(tree)
         find_date = datetime.now()
@@ -22,45 +22,78 @@ class MobSFParser(object):
         if "name" in data:
             test_description = "**Info:**\n"
             if "packagename" in data:
-                test_description = "%s  **Package Name:** %s\n" % (test_description, data["packagename"])
+                test_description = "%s  **Package Name:** %s\n" % (
+                    test_description,
+                    data["packagename"],
+                )
 
             if "mainactivity" in data:
-                test_description = "%s  **Main Activity:** %s\n" % (test_description, data["mainactivity"])
+                test_description = "%s  **Main Activity:** %s\n" % (
+                    test_description,
+                    data["mainactivity"],
+                )
 
             if "pltfm" in data:
-                test_description = "%s  **Platform:** %s\n" % (test_description, data["pltfm"])
+                test_description = "%s  **Platform:** %s\n" % (
+                    test_description,
+                    data["pltfm"],
+                )
 
             if "sdk" in data:
                 test_description = "%s  **SDK:** %s\n" % (test_description, data["sdk"])
 
             if "min" in data:
-                test_description = "%s  **Min SDK:** %s\n" % (test_description, data["min"])
+                test_description = "%s  **Min SDK:** %s\n" % (
+                    test_description,
+                    data["min"],
+                )
 
             if "targetsdk" in data:
-                test_description = "%s  **Target SDK:** %s\n" % (test_description, data["targetsdk"])
+                test_description = "%s  **Target SDK:** %s\n" % (
+                    test_description,
+                    data["targetsdk"],
+                )
 
             if "minsdk" in data:
-                test_description = "%s  **Min SDK:** %s\n" % (test_description, data["minsdk"])
+                test_description = "%s  **Min SDK:** %s\n" % (
+                    test_description,
+                    data["minsdk"],
+                )
 
             if "maxsdk" in data:
-                test_description = "%s  **Max SDK:** %s\n" % (test_description, data["maxsdk"])
+                test_description = "%s  **Max SDK:** %s\n" % (
+                    test_description,
+                    data["maxsdk"],
+                )
 
             test_description = "%s\n**File Information:**\n" % (test_description)
 
             if "name" in data:
-                test_description = "%s  **Name:** %s\n" % (test_description, data["name"])
+                test_description = "%s  **Name:** %s\n" % (
+                    test_description,
+                    data["name"],
+                )
 
             if "md5" in data:
                 test_description = "%s  **MD5:** %s\n" % (test_description, data["md5"])
 
             if "sha1" in data:
-                test_description = "%s  **SHA-1:** %s\n" % (test_description, data["sha1"])
+                test_description = "%s  **SHA-1:** %s\n" % (
+                    test_description,
+                    data["sha1"],
+                )
 
             if "sha256" in data:
-                test_description = "%s  **SHA-256:** %s\n" % (test_description, data["sha256"])
+                test_description = "%s  **SHA-256:** %s\n" % (
+                    test_description,
+                    data["sha256"],
+                )
 
             if "size" in data:
-                test_description = "%s  **Size:** %s\n" % (test_description, data["size"])
+                test_description = "%s  **Size:** %s\n" % (
+                    test_description,
+                    data["size"],
+                )
 
             if "urls" in data:
                 curl = ""
@@ -69,10 +102,16 @@ class MobSFParser(object):
                         curl = "%s\n" % (curl)
 
                 if curl:
-                    test_description = "%s\n**URL's:**\n %s\n" % (test_description, curl)
+                    test_description = "%s\n**URL's:**\n %s\n" % (
+                        test_description,
+                        curl,
+                    )
 
             if "bin_anal" in data:
-                test_description = "%s  \n**Binary Analysis:** %s\n" % (test_description, data["bin_anal"])
+                test_description = "%s  \n**Binary Analysis:** %s\n" % (
+                    test_description,
+                    data["bin_anal"],
+                )
 
         test.description = strip_tags(test_description)
 
@@ -85,9 +124,18 @@ class MobSFParser(object):
                     mobsf_item = {
                         "category": "Mobile Permissions",
                         "title": details.get("name", ""),
-                        "severity": self.getSeverityForPermission(details.get("status")),
-                        "description": "**Permission Type:** " + details.get("name", "") + " (" + details.get("status", "") + ")\n\n**Description:** " + details.get("description", "") + "\n\n**Reason:** " + details.get("reason", ""),
-                        "file_path": None
+                        "severity": self.getSeverityForPermission(
+                            details.get("status")
+                        ),
+                        "description": "**Permission Type:** "
+                        + details.get("name", "")
+                        + " ("
+                        + details.get("status", "")
+                        + ")\n\n**Description:** "
+                        + details.get("description", "")
+                        + "\n\n**Reason:** "
+                        + details.get("reason", ""),
+                        "file_path": None,
                     }
                     mobsf_findings.append(mobsf_item)
             else:
@@ -95,9 +143,14 @@ class MobSFParser(object):
                     mobsf_item = {
                         "category": "Mobile Permissions",
                         "title": permission,
-                        "severity": self.getSeverityForPermission(details.get("status", "")),
-                        "description": "**Permission Type:** " + permission + "\n\n**Description:** " + details.get("description", ""),
-                        "file_path": None
+                        "severity": self.getSeverityForPermission(
+                            details.get("status", "")
+                        ),
+                        "description": "**Permission Type:** "
+                        + permission
+                        + "\n\n**Description:** "
+                        + details.get("description", ""),
+                        "file_path": None,
                     }
                     mobsf_findings.append(mobsf_item)
 
@@ -105,7 +158,7 @@ class MobSFParser(object):
         if "insecure_connections" in data:
             for details in data["insecure_connections"]:
                 insecure_urls = ""
-                for url in details.split(','):
+                for url in details.split(","):
                     insecure_urls = insecure_urls + url + "\n"
 
                 mobsf_item = {
@@ -113,7 +166,7 @@ class MobSFParser(object):
                     "title": "Insecure Connections",
                     "severity": "Low",
                     "description": insecure_urls,
-                    "file_path": None
+                    "file_path": None,
                 }
                 mobsf_findings.append(mobsf_item)
 
@@ -125,14 +178,22 @@ class MobSFParser(object):
                         if "name" != binary_analysis_type:
                             mobsf_item = {
                                 "category": "Binary Analysis",
-                                "title": details[binary_analysis_type]["description"].split(".")[0],
-                                "severity": details[binary_analysis_type]["severity"].replace("warning", "low").title(),
-                                "description": details[binary_analysis_type]["description"],
-                                "file_path": details["name"]
+                                "title": details[binary_analysis_type][
+                                    "description"
+                                ].split(".")[0],
+                                "severity": details[binary_analysis_type]["severity"]
+                                .replace("warning", "low")
+                                .title(),
+                                "description": details[binary_analysis_type][
+                                    "description"
+                                ],
+                                "file_path": details["name"],
                             }
                             mobsf_findings.append(mobsf_item)
             else:
-                for binary_analysis_type, details in list(data["binary_analysis"].items()):
+                for binary_analysis_type, details in list(
+                    data["binary_analysis"].items()
+                ):
                     # "Binary makes use of insecure API(s)":{
                     #     "detailed_desc":"The binary may contain the following insecure API(s) _vsprintf.",
                     #     "severity":"high",
@@ -146,7 +207,7 @@ class MobSFParser(object):
                         "title": details["detailed_desc"],
                         "severity": details["severity"].replace("good", "info").title(),
                         "description": details["detailed_desc"],
-                        "file_path": None
+                        "file_path": None,
                     }
                     mobsf_findings.append(mobsf_item)
 
@@ -176,9 +237,14 @@ class MobSFParser(object):
                 mobsf_item = {
                     "category": "Android API",
                     "title": details["metadata"]["description"],
-                    "severity": details["metadata"]["severity"].replace("warning", "low").title(),
-                    "description": "**API:** " + api + "\n\n**Description:** " + details["metadata"]["description"],
-                    "file_path": None
+                    "severity": details["metadata"]["severity"]
+                    .replace("warning", "low")
+                    .title(),
+                    "description": "**API:** "
+                    + api
+                    + "\n\n**Description:** "
+                    + details["metadata"]["description"],
+                    "file_path": None,
                 }
                 mobsf_findings.append(mobsf_item)
 
@@ -190,7 +256,7 @@ class MobSFParser(object):
                     "title": details["title"],
                     "severity": details["stat"],
                     "description": details["desc"],
-                    "file_path": None
+                    "file_path": None,
                 }
                 mobsf_findings.append(mobsf_item)
 
@@ -212,7 +278,7 @@ class MobSFParser(object):
                     "title": title,
                     "severity": finding["level"],
                     "description": description,
-                    "file_path": file_path
+                    "file_path": file_path,
                 }
 
                 mobsf_findings.append(mobsf_item)
@@ -233,18 +299,20 @@ class MobSFParser(object):
                 if description is not None:
                     find.description += description
             else:
-                find = Finding(title=Truncator(title).words(5),
-                               cwe=919,  # Weaknesses in Mobile Applications
-                               test=test,
-                               active=False,
-                               verified=False,
-                               description=description,
-                               severity=sev,
-                               numerical_severity=Finding.get_numerical_severity(sev),
-                               references=None,
-                               date=find_date,
-                               file_path=file_path,
-                               static_finding=True)
+                find = Finding(
+                    title=Truncator(title).words(5),
+                    cwe=919,  # Weaknesses in Mobile Applications
+                    test=test,
+                    active=False,
+                    verified=False,
+                    description=description,
+                    severity=sev,
+                    numerical_severity=Finding.get_numerical_severity(sev),
+                    references=None,
+                    date=find_date,
+                    file_path=file_path,
+                    static_finding=True,
+                )
                 dupes[dupe_key] = find
         self.items = list(dupes.values())
 

@@ -6,7 +6,9 @@ from django.conf import settings
 logger = logging.getLogger(__name__)
 
 
-def update_finding_status(new_state_finding, request_user, old_state_finding=None) -> bool:
+def update_finding_status(
+    new_state_finding, request_user, old_state_finding=None
+) -> bool:
     finding_status_changed = False
 
     if old_state_finding is not None:
@@ -36,7 +38,9 @@ def update_finding_status(new_state_finding, request_user, old_state_finding=Non
         new_state_finding.mitigated = datetime.datetime.now()
         new_state_finding.mitigated_by = request_user
         if settings.USE_TZ:
-            new_state_finding.mitigated = timezone.make_aware(new_state_finding.mitigated, timezone.get_default_timezone())
+            new_state_finding.mitigated = timezone.make_aware(
+                new_state_finding.mitigated, timezone.get_default_timezone()
+            )
     elif not new_state_finding.is_Mitigated and new_state_finding.mitigated is not None:
         finding_status_changed = True
         new_state_finding.mitigated = None

@@ -14,7 +14,6 @@ class TestFile(object):
 
 
 class TestDependencyCheckParser(TestCase):
-
     def test_parse_file_with_no_vulnerabilities_has_no_findings(self):
         content = """<?xml version="1.0"?>
 <analysis xmlns="https://jeremylong.github.io/DependencyCheck/dependency-check.1.3.xsd">

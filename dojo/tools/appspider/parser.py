@@ -9,6 +9,7 @@ from dojo.models import Endpoint, Finding
 
 class AppSpiderXMLParser(object):
     """Parser for Rapid7 AppSpider reports"""
+
     def get_findings(self, filename, test):
 
         if filename is None:
@@ -18,12 +19,14 @@ class AppSpiderXMLParser(object):
         root = vscan.getroot()
 
         if "VulnSummary" not in str(root.tag):
-            raise NamespaceErr('Please ensure that you are uploading AppSpider\'s VulnerabilitiesSummary.xml file.'
-                               'At this time it is the only file that is consumable by DefectDojo.')
+            raise NamespaceErr(
+                "Please ensure that you are uploading AppSpider's VulnerabilitiesSummary.xml file."
+                "At this time it is the only file that is consumable by DefectDojo."
+            )
 
         dupes = dict()
 
-        for finding in root.iter('Vuln'):
+        for finding in root.iter("Vuln"):
             severity = self.convert_severity(finding.find("AttackScore").text)
             title = finding.find("VulnType").text
             description = finding.find("Description").text
@@ -39,11 +42,11 @@ class AppSpiderXMLParser(object):
             unsaved_req_resp = list()
 
             if title is None:
-                title = ''
+                title = ""
             if description is None:
-                description = ''
+                description = ""
             if mitigation is None:
-                mitigation = ''
+                mitigation = ""
 
             if dupe_key in dupes:
                 find = dupes[dupe_key]
@@ -52,17 +55,19 @@ class AppSpiderXMLParser(object):
                 unsaved_req_resp.append(find.unsaved_req_resp)
 
             else:
-                find = Finding(title=title,
-                               test=test,
-                               active=False,
-                               verified=False,
-                               description=html2text.html2text(description),
-                               severity=severity,
-                               numerical_severity=Finding.get_numerical_severity(severity),
-                               mitigation=html2text.html2text(mitigation),
-                               impact="N/A",
-                               references=None,
-                               cwe=cwe)
+                find = Finding(
+                    title=title,
+                    test=test,
+                    active=False,
+                    verified=False,
+                    description=html2text.html2text(description),
+                    severity=severity,
+                    numerical_severity=Finding.get_numerical_severity(severity),
+                    mitigation=html2text.html2text(mitigation),
+                    impact="N/A",
+                    references=None,
+                    cwe=cwe,
+                )
                 find.unsaved_endpoints = unsaved_endpoints
                 find.unsaved_req_resp = unsaved_req_resp
                 dupes[dupe_key] = find
@@ -73,12 +78,16 @@ class AppSpiderXMLParser(object):
 
                     find.unsaved_req_resp.append({"req": req, "resp": resp})
 
-                find.unsaved_endpoints.append(Endpoint(protocol=parts.scheme,
-                                                       host=parts.netloc,
-                                                       path=parts.path,
-                                                       query=parts.query,
-                                                       fragment=parts.fragment,
-                                                       product=test.engagement.product))
+                find.unsaved_endpoints.append(
+                    Endpoint(
+                        protocol=parts.scheme,
+                        host=parts.netloc,
+                        path=parts.path,
+                        query=parts.query,
+                        fragment=parts.fragment,
+                        product=test.engagement.product,
+                    )
+                )
 
         return list(dupes.values())
 

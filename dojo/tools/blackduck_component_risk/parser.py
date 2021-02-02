@@ -8,6 +8,7 @@ class BlackduckHubParser(object):
     Can import as exported from Blackduck:
     - from a zip file containing a security.csv, sources.csv and components.csv
     """
+
     def get_findings(self, filename, test):
         """
         Function initializes the parser with a file and sets the
@@ -50,7 +51,7 @@ class BlackduckHubParser(object):
             for id, src in sources.items():
                 if id in component_id:
                     source = src
-            if component.get('Component policy status') == "In Violation":
+            if component.get("Component policy status") == "In Violation":
                 # We have us a license risk:
                 title = self.license_title(component)
                 description = self.license_description(component, source)
@@ -58,18 +59,20 @@ class BlackduckHubParser(object):
                 mitigation = self.license_mitigation(component)
                 impact = "N/A"
                 references = self.license_references(component)
-                finding = Finding(title=title,
-                                  test=test,
-                                  active=False,
-                                  verified=False,
-                                  description=description,
-                                  severity=severity,
-                                  numerical_severity=Finding.get_numerical_severity(severity),
-                                  mitigation=mitigation,
-                                  impact=impact,
-                                  references=references,
-                                  static_finding=True,
-                                  unique_id_from_tool=component_id)
+                finding = Finding(
+                    title=title,
+                    test=test,
+                    active=False,
+                    verified=False,
+                    description=description,
+                    severity=severity,
+                    numerical_severity=Finding.get_numerical_severity(severity),
+                    mitigation=mitigation,
+                    impact=impact,
+                    references=references,
+                    static_finding=True,
+                    unique_id_from_tool=component_id,
+                )
                 license_risk.append(finding)
             elif "None" not in self.license_severity(component):
                 # We have a license risk for review, but not directly "In Violation"
@@ -79,18 +82,20 @@ class BlackduckHubParser(object):
                 mitigation = self.license_mitigation(component, False)
                 impact = "N/A"
                 references = self.license_references(component)
-                finding = Finding(title=title,
-                                  test=test,
-                                  active=False,
-                                  verified=False,
-                                  description=description,
-                                  severity=severity,
-                                  numerical_severity=Finding.get_numerical_severity(severity),
-                                  mitigation=mitigation,
-                                  impact=impact,
-                                  references=references,
-                                  static_finding=True,
-                                  unique_id_from_tool=component_id)
+                finding = Finding(
+                    title=title,
+                    test=test,
+                    active=False,
+                    verified=False,
+                    description=description,
+                    severity=severity,
+                    numerical_severity=Finding.get_numerical_severity(severity),
+                    mitigation=mitigation,
+                    impact=impact,
+                    references=references,
+                    static_finding=True,
+                    unique_id_from_tool=component_id,
+                )
                 license_risk.append(finding)
         items.extend(license_risk)
 
@@ -105,19 +110,21 @@ class BlackduckHubParser(object):
             references = self.security_references(vulns)
             file_path = self.security_filepath(vulns)
 
-            finding = Finding(title=title,
-                              test=test,
-                              active=False,
-                              verified=False,
-                              description=description,
-                              severity=severity,
-                              numerical_severity=Finding.get_numerical_severity(severity),
-                              mitigation=mitigation,
-                              impact=impact,
-                              references=references,
-                              static_finding=True,
-                              file_path=file_path,
-                              unique_id_from_tool=component_id)
+            finding = Finding(
+                title=title,
+                test=test,
+                active=False,
+                verified=False,
+                description=description,
+                severity=severity,
+                numerical_severity=Finding.get_numerical_severity(severity),
+                mitigation=mitigation,
+                impact=impact,
+                references=references,
+                static_finding=True,
+                file_path=file_path,
+                unique_id_from_tool=component_id,
+            )
             security_risk.append(finding)
         items.extend(security_risk)
         return items
@@ -129,8 +136,9 @@ class BlackduckHubParser(object):
         :param component: Dictionary containing all components.
         :return:
         """
-        return "License Risk: {}:{}".format(component.get('Component name'),
-                                            component.get('Component version name'))
+        return "License Risk: {}:{}".format(
+            component.get("Component name"), component.get("Component version name")
+        )
 
     def license_description(self, component, source):
         """
@@ -138,19 +146,21 @@ class BlackduckHubParser(object):
         :param component: Dictionary containing all components.
         :return:
         """
-        desc = "**License Name:** {}  \n".format(component.get('License names'))
-        desc += "**License Families:** {}  \n".format(component.get('License families'))
-        desc += "**License Usage:** {}  \n".format(component.get('Usage'))
-        desc += "**License Origin name:** {} \n".format(component.get('Origin name'))
-        desc += "**License Origin id:** {} \n".format(component.get('Origin id'))
-        desc += "**Match type:** {}\n".format(component.get('Match type'))
+        desc = "**License Name:** {}  \n".format(component.get("License names"))
+        desc += "**License Families:** {}  \n".format(component.get("License families"))
+        desc += "**License Usage:** {}  \n".format(component.get("Usage"))
+        desc += "**License Origin name:** {} \n".format(component.get("Origin name"))
+        desc += "**License Origin id:** {} \n".format(component.get("Origin id"))
+        desc += "**Match type:** {}\n".format(component.get("Match type"))
         try:
-            desc += "**Path:** {}\n".format(source.get('Path'))
-            desc += "**Archive context:** {}\n".format(source.get('Archive context'))
-            desc += "**Scan:** {}\n".format(source.get('Scan'))
+            desc += "**Path:** {}\n".format(source.get("Path"))
+            desc += "**Archive context:** {}\n".format(source.get("Archive context"))
+            desc += "**Scan:** {}\n".format(source.get("Scan"))
         except KeyError:
             desc += "**Path:** Unable to find path in source data."
-            desc += "**Archive context:** Unable to find archive context in source data."
+            desc += (
+                "**Archive context:** Unable to find archive context in source data."
+            )
             desc += "**Scan:** Unable to find scan in source data."
         return desc
 
@@ -164,18 +174,18 @@ class BlackduckHubParser(object):
         mit = ""
         if violation:
             mit = "Package has a license that is In Violation and should not be used: {}:{}.  ".format(
-                component.get('Component name'), component.get('Component version name')
+                component.get("Component name"), component.get("Component version name")
             )
             mit += "Please use another component with an acceptable license."
         else:
             mit = "Package has a potential license risk and should be reviewed: {}:{}. ".format(
-                component.get('Component name'), component.get('Component version name')
+                component.get("Component name"), component.get("Component version name")
             )
             mit += "A legal review may indicate that another component should be used with an acceptable license."
         return mit
 
     def license_references(self, component):
-        return "**Project:** {}\n".format(component.get('Project path'))
+        return "**Project:** {}\n".format(component.get("Project path"))
 
     def security_title(self, vulns):
         """
@@ -184,8 +194,9 @@ class BlackduckHubParser(object):
         :param vulns: Dictionary {component_version_identifier: [vulns]}
         :return:
         """
-        title = "Security Risk: {}:{}".format(vulns[0]["Component name"],
-                                              vulns[0]["Component version name"])
+        title = "Security Risk: {}:{}".format(
+            vulns[0]["Component name"], vulns[0]["Component version name"]
+        )
         return title
 
     def security_description(self, vulns):
@@ -195,17 +206,22 @@ class BlackduckHubParser(object):
         :param vulns: Dictionary {component_version_identifier: [vulns]}
         :return:
         """
-        desc = "#Vulnerabilities \nThis component version contains the following " \
-               "vulnerabilities:\n\n"
+        desc = (
+            "#Vulnerabilities \nThis component version contains the following "
+            "vulnerabilities:\n\n"
+        )
         for vuln in vulns:
             desc += "###{}  \n".format(vuln["Vulnerability id"])
-            desc += "**Base Score:** {} \n**Exploitability:** {} \n**Impact:** {}\n".format(
-                vuln["Base score"], vuln["Exploitability"], vuln["Impact"]
+            desc += (
+                "**Base Score:** {} \n**Exploitability:** {} \n**Impact:** {}\n".format(
+                    vuln["Base score"], vuln["Exploitability"], vuln["Impact"]
+                )
             )
             # Not all have a URL
             if vuln["URL"] != "":
-                desc += "**URL:** [{}]({})\n".format(vuln["Vulnerability id"],
-                                                     vuln["URL"])
+                desc += "**URL:** [{}]({})\n".format(
+                    vuln["Vulnerability id"], vuln["URL"]
+                )
             desc += "**Description:** {}\n".format(vuln["Description"])
         return desc
 
@@ -217,11 +233,17 @@ class BlackduckHubParser(object):
         :param vulns: Dictionary {component_version_identifier: [vulns]}
         :return:
         """
-        map = {"HIGH": "High", "MEDIUM": "Medium", "LOW": "Low", "INFO": "Info",
-               "CRITICAL": "Critical", "OK": "None"}
+        map = {
+            "HIGH": "High",
+            "MEDIUM": "Medium",
+            "LOW": "Low",
+            "INFO": "Info",
+            "CRITICAL": "Critical",
+            "OK": "None",
+        }
         sev = "None"
         try:
-            sev = map[component.get('License Risk')]
+            sev = map[component.get("License Risk")]
         except KeyError:
             sev = "None"
         return sev
@@ -234,8 +256,13 @@ class BlackduckHubParser(object):
         :param vulns: Dictionary {component_version_identifier: [vulns]}
         :return:
         """
-        map = {"HIGH": "High", "MEDIUM": "Medium", "LOW": "Low", "INFO": "Info",
-               "CRITICAL": "Critical"}
+        map = {
+            "HIGH": "High",
+            "MEDIUM": "Medium",
+            "LOW": "Low",
+            "INFO": "Info",
+            "CRITICAL": "Critical",
+        }
         max_severity = 0.0
         sev = "Info"
         for vuln in vulns:
@@ -280,8 +307,9 @@ class BlackduckHubParser(object):
         references = "**Project:** {}\n".format(vulns[0]["Project path"])
         for vuln in vulns:
             if vuln["URL"] != "":
-                references += "{}: [{}]({})\n".format(vuln["Vulnerability id"], vuln["URL"],
-                                                      vuln["URL"])
+                references += "{}: [{}]({})\n".format(
+                    vuln["Vulnerability id"], vuln["URL"], vuln["URL"]
+                )
         return references
 
     def security_filepath(self, vulns):
@@ -295,8 +323,9 @@ class BlackduckHubParser(object):
         :return:
         """
         if vulns[0]["Component origin id"] == "":
-            component_key = "{}/{}".format(vulns[0]["Component name"],
-                                           vulns[0]["Component version name"])
+            component_key = "{}/{}".format(
+                vulns[0]["Component name"], vulns[0]["Component version name"]
+            )
         else:
             component_key = vulns[0]["Component origin id"]
         return "{}:{}".format(vulns[0]["Component origin name"], component_key)

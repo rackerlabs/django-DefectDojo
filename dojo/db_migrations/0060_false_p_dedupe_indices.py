@@ -6,21 +6,28 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('dojo', '0059_product_type_authorized_users'),
+        ("dojo", "0059_product_type_authorized_users"),
     ]
 
     operations = [
         migrations.AlterField(
-            model_name='system_settings',
-            name='false_positive_history',
-            field=models.BooleanField(default=False, help_text='DefectDojo will automatically mark the finding as a false positive if the finding has been previously marked as a false positive. Not needed when using deduplication, advised to not combine these two.'),
+            model_name="system_settings",
+            name="false_positive_history",
+            field=models.BooleanField(
+                default=False,
+                help_text="DefectDojo will automatically mark the finding as a false positive if the finding has been previously marked as a false positive. Not needed when using deduplication, advised to not combine these two.",
+            ),
         ),
         migrations.AddIndex(
-            model_name='finding',
-            index=models.Index(fields=['duplicate'], name='dojo_findin_duplica_f60788_idx'),
+            model_name="finding",
+            index=models.Index(
+                fields=["duplicate"], name="dojo_findin_duplica_f60788_idx"
+            ),
         ),
         migrations.AddIndex(
-            model_name='finding',
-            index=models.Index(fields=['is_Mitigated'], name='dojo_findin_is_Miti_aaa533_idx'),
+            model_name="finding",
+            index=models.Index(
+                fields=["is_Mitigated"], name="dojo_findin_is_Miti_aaa533_idx"
+            ),
         ),
     ]

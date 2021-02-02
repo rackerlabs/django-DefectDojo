@@ -6,12 +6,12 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('dojo', '0039_test_version'),
+        ("dojo", "0039_test_version"),
     ]
 
     operations = [
         migrations.AddIndex(
-            model_name='finding',
-            index=models.Index(fields=['cwe'], name='dojo_findin_cwe_a8da22_idx'),
+            model_name="finding",
+            index=models.Index(fields=["cwe"], name="dojo_findin_cwe_a8da22_idx"),
         ),
     ]

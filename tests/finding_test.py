@@ -14,18 +14,17 @@ dir_path = os.path.dirname(os.path.realpath(__file__))
 
 
 class FindingTest(BaseTestCase):
-
     def test_list_findings_all(self):
-        return self.test_list_findings('finding/all')
+        return self.test_list_findings("finding/all")
 
     def test_list_findings_closed(self):
-        return self.test_list_findings('finding/closed')
+        return self.test_list_findings("finding/closed")
 
     def test_list_findings_accepted(self):
-        return self.test_list_findings('finding/accepted')
+        return self.test_list_findings("finding/accepted")
 
     def test_list_findings_open(self):
-        return self.test_list_findings('finding/open')
+        return self.test_list_findings("finding/open")
 
     def test_list_findings(self, suffix):
         # bulk edit dropdown menu
@@ -37,20 +36,42 @@ class FindingTest(BaseTestCase):
         driver.find_element_by_id("dropdownMenu2").click()
 
         bulk_edit_menu = driver.find_element_by_id("bulk_edit_menu")
-        self.assertEqual(bulk_edit_menu.find_element_by_id("id_bulk_active").is_enabled(), False)
-        self.assertEqual(bulk_edit_menu.find_element_by_id("id_bulk_verified").is_enabled(), False)
-        self.assertEqual(bulk_edit_menu.find_element_by_id("id_bulk_false_p").is_enabled(), False)
-        self.assertEqual(bulk_edit_menu.find_element_by_id("id_bulk_out_of_scope").is_enabled(), False)
-        self.assertEqual(bulk_edit_menu.find_element_by_id("id_bulk_is_Mitigated").is_enabled(), False)
+        self.assertEqual(
+            bulk_edit_menu.find_element_by_id("id_bulk_active").is_enabled(), False
+        )
+        self.assertEqual(
+            bulk_edit_menu.find_element_by_id("id_bulk_verified").is_enabled(), False
+        )
+        self.assertEqual(
+            bulk_edit_menu.find_element_by_id("id_bulk_false_p").is_enabled(), False
+        )
+        self.assertEqual(
+            bulk_edit_menu.find_element_by_id("id_bulk_out_of_scope").is_enabled(),
+            False,
+        )
+        self.assertEqual(
+            bulk_edit_menu.find_element_by_id("id_bulk_is_Mitigated").is_enabled(),
+            False,
+        )
 
         driver.find_element_by_id("id_bulk_status").click()
 
         bulk_edit_menu = driver.find_element_by_id("bulk_edit_menu")
-        self.assertEqual(bulk_edit_menu.find_element_by_id("id_bulk_active").is_enabled(), True)
-        self.assertEqual(bulk_edit_menu.find_element_by_id("id_bulk_verified").is_enabled(), True)
-        self.assertEqual(bulk_edit_menu.find_element_by_id("id_bulk_false_p").is_enabled(), True)
-        self.assertEqual(bulk_edit_menu.find_element_by_id("id_bulk_out_of_scope").is_enabled(), True)
-        self.assertEqual(bulk_edit_menu.find_element_by_id("id_bulk_is_Mitigated").is_enabled(), True)
+        self.assertEqual(
+            bulk_edit_menu.find_element_by_id("id_bulk_active").is_enabled(), True
+        )
+        self.assertEqual(
+            bulk_edit_menu.find_element_by_id("id_bulk_verified").is_enabled(), True
+        )
+        self.assertEqual(
+            bulk_edit_menu.find_element_by_id("id_bulk_false_p").is_enabled(), True
+        )
+        self.assertEqual(
+            bulk_edit_menu.find_element_by_id("id_bulk_out_of_scope").is_enabled(), True
+        )
+        self.assertEqual(
+            bulk_edit_menu.find_element_by_id("id_bulk_is_Mitigated").is_enabled(), True
+        )
 
     @on_exception_html_source_logger
     def test_edit_finding(self):
@@ -68,15 +89,21 @@ class FindingTest(BaseTestCase):
         driver.find_element_by_link_text("Edit Finding").click()
         # Change: 'Severity' and 'Mitigation'
         # finding Severity
-        Select(driver.find_element_by_id("id_severity")).select_by_visible_text("Critical")
+        Select(driver.find_element_by_id("id_severity")).select_by_visible_text(
+            "Critical"
+        )
         # finding Description
-        driver.find_element_by_id("id_severity").send_keys(Keys.TAB, "This is a crucial update to finding description.")
+        driver.find_element_by_id("id_severity").send_keys(
+            Keys.TAB, "This is a crucial update to finding description."
+        )
         # "Click" the Done button to Edit the finding
         driver.find_element_by_xpath("//input[@name='_Finished']").click()
         # Query the site to determine if the finding has been added
 
         # Assert ot the query to dtermine status of failure
-        self.assertTrue(self.is_success_message_present(text='Finding saved successfully'))
+        self.assertTrue(
+            self.is_success_message_present(text="Finding saved successfully")
+        )
 
     def test_add_image(self):
         # print("\n\nDebug Print Log: testing 'add image' \n")
@@ -94,7 +121,7 @@ class FindingTest(BaseTestCase):
         driver.find_element_by_link_text("Manage Images").click()
         # select first file input field: form-0-image
         # Set full image path for image file 'strange.png
-        image_path = os.path.join(dir_path, 'finding_image.png')
+        image_path = os.path.join(dir_path, "finding_image.png")
         driver.find_element_by_id("id_form-0-image").send_keys(image_path)
         # Save uploaded image
         with WaitForPageLoad(driver, timeout=50):
@@ -102,7 +129,9 @@ class FindingTest(BaseTestCase):
         # Query the site to determine if the finding has been added
 
         # Assert ot the query to dtermine status of failure
-        self.assertTrue(self.is_success_message_present(text='Images updated successfully'))
+        self.assertTrue(
+            self.is_success_message_present(text="Images updated successfully")
+        )
 
     def test_mark_finding_for_review(self):
         # login to site, password set to fetch from environ
@@ -120,24 +149,34 @@ class FindingTest(BaseTestCase):
         # set select element style from 'none' to 'inline'
 
         try:
-            WebDriverWait(driver, 5).until(EC.presence_of_element_located((By.ID, 'id_reviewers_chosen')))
+            WebDriverWait(driver, 5).until(
+                EC.presence_of_element_located((By.ID, "id_reviewers_chosen"))
+            )
         except TimeoutException:
-            self.fail('Timed out waiting for reviewer dropdown to initialize ')
+            self.fail("Timed out waiting for reviewer dropdown to initialize ")
 
-        driver.execute_script("document.getElementsByName('reviewers')[0].style.display = 'inline'")
+        driver.execute_script(
+            "document.getElementsByName('reviewers')[0].style.display = 'inline'"
+        )
         # select the first option tag
         element = driver.find_element_by_xpath("//select[@name='reviewers']")
-        reviewer_option = element.find_elements_by_tag_name('option')[0]
+        reviewer_option = element.find_elements_by_tag_name("option")[0]
         Select(element).select_by_value(reviewer_option.get_attribute("value"))
         # Add Review notes
         driver.find_element_by_id("id_entry").clear()
-        driver.find_element_by_id("id_entry").send_keys("This is to be reveiwed critically. Make sure it is well handled.")
+        driver.find_element_by_id("id_entry").send_keys(
+            "This is to be reveiwed critically. Make sure it is well handled."
+        )
         # Click 'Mark for reveiw'
         driver.find_element_by_name("submit").click()
         # Query the site to determine if the finding has been added
 
         # Assert ot the query to dtermine status of failure
-        self.assertTrue(self.is_success_message_present(text='Finding marked for review and reviewers notified.'))
+        self.assertTrue(
+            self.is_success_message_present(
+                text="Finding marked for review and reviewers notified."
+            )
+        )
 
     def test_clear_review_from_finding(self):
         # login to site, password set to fetch from environ
@@ -149,17 +188,23 @@ class FindingTest(BaseTestCase):
         # Click on `Clear Review` link text
         driver.find_element_by_link_text("Clear Review").click()
         # Mark Active and Verified checkboxes
-        driver.find_element_by_id('id_active').click()
-        driver.find_element_by_id('id_verified').click()
+        driver.find_element_by_id("id_active").click()
+        driver.find_element_by_id("id_verified").click()
         # Add Review notes
         driver.find_element_by_id("id_entry").clear()
-        driver.find_element_by_id("id_entry").send_keys("This has been reviewed and confirmed. A fix needed here.")
+        driver.find_element_by_id("id_entry").send_keys(
+            "This has been reviewed and confirmed. A fix needed here."
+        )
         # Click 'Clear reveiw' button
         driver.find_element_by_name("submit").click()
         # Query the site to determine if the finding has been added
 
         # Assert ot the query to dtermine status of failure
-        self.assertTrue(self.is_success_message_present(text='Finding review has been updated successfully.'))
+        self.assertTrue(
+            self.is_success_message_present(
+                text="Finding review has been updated successfully."
+            )
+        )
 
     def test_delete_image(self):
         # login to site, password set to fetch from environ
@@ -179,7 +224,9 @@ class FindingTest(BaseTestCase):
         # Query the site to determine if the finding has been added
 
         # Assert ot the query to dtermine status of failure
-        self.assertTrue(self.is_success_message_present(text='Images updated successfully'))
+        self.assertTrue(
+            self.is_success_message_present(text="Images updated successfully")
+        )
 
     def test_close_finding(self):
         driver = self.driver
@@ -188,24 +235,30 @@ class FindingTest(BaseTestCase):
         # Select and click on the particular finding to edit
         driver.find_element_by_link_text("App Vulnerable to XSS").click()
         # Get the status of the current endpoint
-        pre_status = driver.find_element_by_xpath('//*[@id="vuln_endpoints"]/tbody/tr/td[3]').text
+        pre_status = driver.find_element_by_xpath(
+            '//*[@id="vuln_endpoints"]/tbody/tr/td[3]'
+        ).text
         # Click on the 'dropdownMenu1 button'
         driver.find_element_by_id("dropdownMenu1").click()
         # Click on `Close Finding`
         driver.find_element_by_link_text("Close Finding").click()
         # fill notes stating why finding should be closed
-        driver.find_element_by_id("id_entry").send_keys("All issues in this Finding have been resolved successfully")
+        driver.find_element_by_id("id_entry").send_keys(
+            "All issues in this Finding have been resolved successfully"
+        )
         # click 'close Finding' submission button
         driver.find_element_by_css_selector("input.btn.btn-primary").click()
         # Query the site to determine if the finding has been added
         # Assert ot the query to dtermine status of failure
-        self.assertTrue(self.is_success_message_present(text='Finding closed.'))
+        self.assertTrue(self.is_success_message_present(text="Finding closed."))
         # Check to see if the endpoint was mitigated
         # Select and click on the particular finding to edit
         driver.find_element_by_link_text("App Vulnerable to XSS").click()
         # Get the status of the current endpoint
         # This will throw exception if the test fails due to invalid xpath
-        post_status = driver.find_element_by_xpath('//*[@id="remd_endpoints"]/tbody/tr/td[3]').text
+        post_status = driver.find_element_by_xpath(
+            '//*[@id="remd_endpoints"]/tbody/tr/td[3]'
+        ).text
         # Assert ot the query to dtermine status of failure
         self.assertTrue(pre_status != post_status)
 
@@ -216,19 +269,23 @@ class FindingTest(BaseTestCase):
         # Select and click on the particular finding to edit
         driver.find_element_by_link_text("App Vulnerable to XSS").click()
         # Get the status of the current endpoint
-        pre_status = driver.find_element_by_xpath('//*[@id="remd_endpoints"]/tbody/tr/td[3]').text
+        pre_status = driver.find_element_by_xpath(
+            '//*[@id="remd_endpoints"]/tbody/tr/td[3]'
+        ).text
         # Click on the 'dropdownMenu1 button'
         driver.find_element_by_id("dropdownMenu1").click()
         # Click on `Open Finding`
         driver.find_element_by_link_text("Open Finding").click()
         # Assert ot the query to dtermine status of failure
-        self.assertTrue(self.is_success_message_present(text='Finding Reopened.'))
+        self.assertTrue(self.is_success_message_present(text="Finding Reopened."))
         # Check to see if the endpoint was set to active again
         # Select and click on the particular finding to edit
         driver.find_element_by_link_text("App Vulnerable to XSS").click()
         # Get the status of the current endpoint
         # This will throw exception if the test fails due to invalid xpath
-        post_status = driver.find_element_by_xpath('//*[@id="vuln_endpoints"]/tbody/tr/td[3]').text
+        post_status = driver.find_element_by_xpath(
+            '//*[@id="vuln_endpoints"]/tbody/tr/td[3]'
+        ).text
         # Assert ot the query to dtermine status of failure
         self.assertTrue(pre_status != post_status)
 
@@ -245,7 +302,11 @@ class FindingTest(BaseTestCase):
         # Query the site to determine if the finding has been added
 
         # Assert ot the query to dtermine status of failure
-        self.assertTrue(self.is_success_message_present(text='Finding template added successfully. You may edit it here.'))
+        self.assertTrue(
+            self.is_success_message_present(
+                text="Finding template added successfully. You may edit it here."
+            )
+        )
 
     def test_apply_template_to_a_finding(self):
         driver = self.driver
@@ -273,12 +334,12 @@ class FindingTest(BaseTestCase):
         self.assertNoConsoleErrors()
         # Click the 'finished' button to submit
         # print("\nClicking on finished \n")
-        driver.find_element_by_name('_Finished').click()
+        driver.find_element_by_name("_Finished").click()
         self.assertNoConsoleErrors()
         # Query the site to determine if the finding has been added
 
         # Assert ot the query to dtermine status of failure
-        self.assertTrue(self.is_text_present_on_page(text='App Vulnerable to XSS'))
+        self.assertTrue(self.is_text_present_on_page(text="App Vulnerable to XSS"))
 
     @on_exception_html_source_logger
     def test_delete_finding_template(self):
@@ -294,7 +355,11 @@ class FindingTest(BaseTestCase):
         # Query the site to determine if the finding has been added
 
         # Assert ot the query to dtermine status of failure
-        self.assertTrue(self.is_success_message_present(text='Finding Template deleted successfully.'))
+        self.assertTrue(
+            self.is_success_message_present(
+                text="Finding Template deleted successfully."
+            )
+        )
 
     def test_import_scan_result(self):
         driver = self.driver
@@ -307,11 +372,15 @@ class FindingTest(BaseTestCase):
         # Click on `Import Scan Results` link text
         driver.find_element_by_link_text("Import Scan Results").click()
         # Select `ZAP Scan` as Scan Type
-        Select(driver.find_element_by_id("id_scan_type")).select_by_visible_text('ZAP Scan')
+        Select(driver.find_element_by_id("id_scan_type")).select_by_visible_text(
+            "ZAP Scan"
+        )
         # Select `Default` as the Environment
-        Select(driver.find_element_by_id("id_environment")).select_by_visible_text('Development')
+        Select(driver.find_element_by_id("id_environment")).select_by_visible_text(
+            "Development"
+        )
         # upload scan file
-        file_path = os.path.join(dir_path, 'zap_sample.xml')
+        file_path = os.path.join(dir_path, "zap_sample.xml")
         driver.find_element_by_name("file").send_keys(file_path)
         # Click Submit button
         with WaitForPageLoad(driver, timeout=50):
@@ -320,7 +389,11 @@ class FindingTest(BaseTestCase):
         # print("\n\nDebug Print Log: findingTxt fetched: {}\n".format(productTxt))
         # print("Checking for '.*ZAP Scan processed, a total of 4 findings were processed.*'")
         # Assert ot the query to dtermine status of failure
-        self.assertTrue(self.is_success_message_present(text='ZAP Scan processed, a total of 4 findings were processed'))
+        self.assertTrue(
+            self.is_success_message_present(
+                text="ZAP Scan processed, a total of 4 findings were processed"
+            )
+        )
 
     def test_delete_finding(self):
         # The Name of the Finding created by test_add_product_finding => 'App Vulnerable to XSS'
@@ -342,7 +415,9 @@ class FindingTest(BaseTestCase):
         # Query the site to determine if the finding has been added
 
         # Assert ot the query to dtermine status of failure
-        self.assertTrue(self.is_success_message_present(text='Finding deleted successfully'))
+        self.assertTrue(
+            self.is_success_message_present(text="Finding deleted successfully")
+        )
         # check that user was redirect back to url where it came from based on return_url
 
     def test_list_components(self):
@@ -352,37 +427,37 @@ class FindingTest(BaseTestCase):
 
 
 def add_finding_tests_to_suite(suite, jira=False, github=False, block_execution=False):
-    suite.addTest(BaseTestCase('test_login'))
+    suite.addTest(BaseTestCase("test_login"))
     if jira:
-        suite.addTest(FindingTest('enable_jira'))
+        suite.addTest(FindingTest("enable_jira"))
     if github:
-        suite.addTest(FindingTest('enable_github'))
+        suite.addTest(FindingTest("enable_github"))
     if block_execution:
-        suite.addTest(FindingTest('enable_block_execution'))
+        suite.addTest(FindingTest("enable_block_execution"))
 
     # Add each test the the suite to be run
     # success and failure is output by the test
-    suite.addTest(ProductTest('test_create_product'))
-    suite.addTest(ProductTest('test_add_product_finding'))
+    suite.addTest(ProductTest("test_create_product"))
+    suite.addTest(ProductTest("test_add_product_finding"))
     # TODO add some more findings with different statuses
-    suite.addTest(FindingTest('test_list_findings_all'))
-    suite.addTest(FindingTest('test_list_findings_closed'))
-    suite.addTest(FindingTest('test_list_findings_accepted'))
-    suite.addTest(FindingTest('test_list_findings_open'))
-    suite.addTest(FindingTest('test_list_components'))
-    suite.addTest(FindingTest('test_edit_finding'))
-    suite.addTest(FindingTest('test_add_image'))
-    suite.addTest(FindingTest('test_delete_image'))
-    suite.addTest(FindingTest('test_mark_finding_for_review'))
-    suite.addTest(FindingTest('test_clear_review_from_finding'))
-    suite.addTest(FindingTest('test_close_finding'))
-    suite.addTest(FindingTest('test_open_finding'))
-    suite.addTest(FindingTest('test_make_finding_a_template'))
-    suite.addTest(FindingTest('test_apply_template_to_a_finding'))
-    suite.addTest(FindingTest('test_import_scan_result'))
-    suite.addTest(FindingTest('test_delete_finding'))
-    suite.addTest(FindingTest('test_delete_finding_template'))
-    suite.addTest(ProductTest('test_delete_product'))
+    suite.addTest(FindingTest("test_list_findings_all"))
+    suite.addTest(FindingTest("test_list_findings_closed"))
+    suite.addTest(FindingTest("test_list_findings_accepted"))
+    suite.addTest(FindingTest("test_list_findings_open"))
+    suite.addTest(FindingTest("test_list_components"))
+    suite.addTest(FindingTest("test_edit_finding"))
+    suite.addTest(FindingTest("test_add_image"))
+    suite.addTest(FindingTest("test_delete_image"))
+    suite.addTest(FindingTest("test_mark_finding_for_review"))
+    suite.addTest(FindingTest("test_clear_review_from_finding"))
+    suite.addTest(FindingTest("test_close_finding"))
+    suite.addTest(FindingTest("test_open_finding"))
+    suite.addTest(FindingTest("test_make_finding_a_template"))
+    suite.addTest(FindingTest("test_apply_template_to_a_finding"))
+    suite.addTest(FindingTest("test_import_scan_result"))
+    suite.addTest(FindingTest("test_delete_finding"))
+    suite.addTest(FindingTest("test_delete_finding_template"))
+    suite.addTest(ProductTest("test_delete_product"))
     return suite
 
 

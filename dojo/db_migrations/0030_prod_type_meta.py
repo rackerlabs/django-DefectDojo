@@ -6,12 +6,12 @@ from django.db import migrations
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('dojo', '0029_cve_regex'),
+        ("dojo", "0029_cve_regex"),
     ]
 
     operations = [
         migrations.AlterModelOptions(
-            name='product_type',
-            options={'ordering': ('name',)},
+            name="product_type",
+            options={"ordering": ("name",)},
         ),
     ]

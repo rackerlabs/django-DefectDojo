@@ -8,13 +8,19 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('dojo', '0004_cve_field'),
+        ("dojo", "0004_cve_field"),
     ]
 
     operations = [
         migrations.AlterField(
-            model_name='engagement',
-            name='source_code_management_uri',
-            field=models.URLField(blank=True, help_text=b'Resource link to source code', max_length=600, null=True, verbose_name=b'Repo'),
+            model_name="engagement",
+            name="source_code_management_uri",
+            field=models.URLField(
+                blank=True,
+                help_text=b"Resource link to source code",
+                max_length=600,
+                null=True,
+                verbose_name=b"Repo",
+            ),
         ),
     ]

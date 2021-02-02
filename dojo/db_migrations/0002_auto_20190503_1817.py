@@ -8,13 +8,13 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('dojo', '0001_initial'),
+        ("dojo", "0001_initial"),
     ]
 
     operations = [
         migrations.AlterField(
-            model_name='finding',
-            name='hash_code',
+            model_name="finding",
+            name="hash_code",
             field=models.TextField(blank=True, editable=False, null=True),
         ),
     ]

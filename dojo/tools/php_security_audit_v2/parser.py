@@ -8,7 +8,7 @@ class PhpSecurityAuditV2(object):
     def get_findings(self, filename, test):
         tree = filename.read()
         try:
-            data = json.loads(str(tree, 'utf-8'))
+            data = json.loads(str(tree, "utf-8"))
         except:
             data = json.loads(tree)
         dupes = dict()
@@ -28,29 +28,33 @@ class PhpSecurityAuditV2(object):
 
                     sev = PhpSecurityAuditV2.get_severity_word(issue["severity"])
 
-                    dupe_key = title + filepath + str(issue["line"]) + str(issue["column"])
+                    dupe_key = (
+                        title + filepath + str(issue["line"]) + str(issue["column"])
+                    )
 
                     if dupe_key in dupes:
                         find = dupes[dupe_key]
                     else:
                         dupes[dupe_key] = True
 
-                        find = Finding(title=title,
-                                       test=test,
-                                       active=False,
-                                       verified=False,
-                                       description=findingdetail,
-                                       severity=sev.title(),
-                                       numerical_severity=Finding.get_numerical_severity(sev),
-                                       mitigation='',
-                                       impact='',
-                                       references='',
-                                       file_path=filepath,
-                                       url='N/A',
-                                       static_finding=True)
+                        find = Finding(
+                            title=title,
+                            test=test,
+                            active=False,
+                            verified=False,
+                            description=findingdetail,
+                            severity=sev.title(),
+                            numerical_severity=Finding.get_numerical_severity(sev),
+                            mitigation="",
+                            impact="",
+                            references="",
+                            file_path=filepath,
+                            url="N/A",
+                            static_finding=True,
+                        )
 
                         dupes[dupe_key] = find
-                        findingdetail = ''
+                        findingdetail = ""
 
         self.items = list(dupes.values())
 
@@ -59,10 +63,10 @@ class PhpSecurityAuditV2(object):
         sev = math.ceil(severity / 2)
 
         if sev == 5:
-            return 'Critical'
+            return "Critical"
         elif sev == 4:
-            return 'High'
+            return "High"
         elif sev == 3:
-            return 'Medium'
+            return "Medium"
         else:
-            return 'Low'
+            return "Low"

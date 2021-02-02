@@ -23,20 +23,20 @@ class SonarQubeApiImporter(object):
     @staticmethod
     def is_confirmed(state):
         return state.lower() in [
-            'confirmed',
-            'accepted',
-            'detected',
+            "confirmed",
+            "accepted",
+            "detected",
         ]
 
     @staticmethod
     def is_closed(state):
         return state.lower() in [
-            'resolved',
-            'falsepositive',
-            'wontfix',
-            'closed',
-            'dismissed',
-            'rejected'
+            "resolved",
+            "falsepositive",
+            "wontfix",
+            "closed",
+            "dismissed",
+            "rejected",
         ]
 
     def import_issues(self, test):
@@ -56,36 +56,38 @@ class SonarQubeApiImporter(object):
             else:
                 component = client.find_project(product.name)
 
-            issues = client.find_issues(component['key'])
-            logging.info('Found {} issues for component {}'.format(len(issues), component["key"]))
+            issues = client.find_issues(component["key"])
+            logging.info(
+                "Found {} issues for component {}".format(len(issues), component["key"])
+            )
 
             for issue in issues:
-                status = issue['status']
-                from_hotspot = issue.get('fromHotspot', False)
+                status = issue["status"]
+                from_hotspot = issue.get("fromHotspot", False)
 
                 if self.is_closed(status) or from_hotspot:
                     continue
 
-                type = issue['type']
-                if len(issue['message']) > 511:
-                    title = issue['message'][0:507] + "..."
+                type = issue["type"]
+                if len(issue["message"]) > 511:
+                    title = issue["message"][0:507] + "..."
                 else:
-                    title = issue['message']
-                component_key = issue['component']
-                line = issue.get('line')
-                rule_id = issue['rule']
+                    title = issue["message"]
+                component_key = issue["component"]
+                line = issue.get("line")
+                rule_id = issue["rule"]
                 rule = client.get_rule(rule_id)
-                severity = self.convert_sonar_severity(rule['severity'])
-                description = self.clean_rule_description_html(rule['htmlDesc'])
-                cwe = self.clean_cwe(rule['htmlDesc'])
-                references = self.get_references(rule['htmlDesc'])
+                severity = self.convert_sonar_severity(rule["severity"])
+                description = self.clean_rule_description_html(rule["htmlDesc"])
+                cwe = self.clean_cwe(rule["htmlDesc"])
+                references = self.get_references(rule["htmlDesc"])
 
                 sonarqube_issue, _ = Sonarqube_Issue.objects.update_or_create(
-                    key=issue['key'],
+                    key=issue["key"],
                     defaults={
-                        'status': status,
-                        'type': type,
-                    }
+                        "status": status,
+                        "type": type,
+                    },
                 )
 
                 # Only assign the SonarQube_issue to the first finding related to the issue
@@ -107,7 +109,7 @@ class SonarQubeApiImporter(object):
                     duplicate=False,
                     out_of_scope=False,
                     mitigated=None,
-                    mitigation='No mitigation provided',
+                    mitigation="No mitigation provided",
                     impact="No impact provided",
                     numerical_severity=Finding.get_numerical_severity(severity),
                     static_finding=True,
@@ -118,27 +120,29 @@ class SonarQubeApiImporter(object):
         except Exception as e:
             logger.exception(e)
             create_notification(
-                event='other',
-                title='SonarQube API import issue',
+                event="other",
+                title="SonarQube API import issue",
                 description=e,
-                icon='exclamation-triangle',
-                source='SonarQube API'
+                icon="exclamation-triangle",
+                source="SonarQube API",
             )
 
         return items
 
     @staticmethod
     def clean_rule_description_html(raw_html):
-        search = re.search(r"^(.*?)(?:(<h2>See</h2>)|(<b>References</b>))", raw_html, re.DOTALL)
+        search = re.search(
+            r"^(.*?)(?:(<h2>See</h2>)|(<b>References</b>))", raw_html, re.DOTALL
+        )
         if search:
             raw_html = search.group(1)
         h = html2text.HTML2Text()
-        raw_html = raw_html.replace('<h2>', '<b>').replace('</h2>', '</b>')
+        raw_html = raw_html.replace("<h2>", "<b>").replace("</h2>", "</b>")
         return h.handle(raw_html)
 
     @staticmethod
     def clean_cwe(raw_html):
-        search = re.search(r'CWE-(\d+)', raw_html)
+        search = re.search(r"CWE-(\d+)", raw_html)
         if search:
             return int(search.group(1))
 
@@ -162,5 +166,5 @@ class SonarQubeApiImporter(object):
         details = etree.fromstring(vuln_details, parser)
         rule_references = ""
         for a in details.iter("a"):
-            rule_references += "[{}]({})\n".format(a.text, a.get('href'))
+            rule_references += "[{}]({})\n".format(a.text, a.get("href"))
         return rule_references

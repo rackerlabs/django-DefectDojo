@@ -48,21 +48,23 @@ class TruffleHogJSONParser(object):
             else:
                 self.dupes[dupe_key] = True
 
-                finding = Finding(title=titleText,
-                                  test=test,
-                                  cwe=798,
-                                  active=False,
-                                  verified=False,
-                                  description=description,
-                                  severity=severity,
-                                  numerical_severity=Finding.get_numerical_severity(severity),
-                                  mitigation="Secrets and passwords should be stored in a secure vault and/or secure storage.",
-                                  impact="This weakness can lead to the exposure of resources or functionality to unintended actors, possibly providing attackers with sensitive information or even execute arbitrary code.",
-                                  references="N/A",
-                                  file_path=file,
-                                  url='N/A',
-                                  dynamic_finding=False,
-                                  static_finding=True)
+                finding = Finding(
+                    title=titleText,
+                    test=test,
+                    cwe=798,
+                    active=False,
+                    verified=False,
+                    description=description,
+                    severity=severity,
+                    numerical_severity=Finding.get_numerical_severity(severity),
+                    mitigation="Secrets and passwords should be stored in a secure vault and/or secure storage.",
+                    impact="This weakness can lead to the exposure of resources or functionality to unintended actors, possibly providing attackers with sensitive information or even execute arbitrary code.",
+                    references="N/A",
+                    file_path=file,
+                    url="N/A",
+                    dynamic_finding=False,
+                    static_finding=True,
+                )
 
                 self.dupes[dupe_key] = finding
 
@@ -71,7 +73,7 @@ class TruffleHogJSONParser(object):
     def parse_json(self, json_output):
         try:
             try:
-                json_data = json.loads(str(json_output, 'utf-8'))
+                json_data = json.loads(str(json_output, "utf-8"))
             except:
                 json_data = json.loads(json_output)
         except ValueError:

@@ -6,7 +6,7 @@ from dojo.models import Finding
 
 
 class TestDuplicationReopen(TestCase):
-    fixtures = ['dojo_testdata.json']
+    fixtures = ["dojo_testdata.json"]
 
     def setUp(self):
         self.finding_a = Finding.objects.get(id=2)
@@ -58,7 +58,9 @@ class TestDuplicationReopen(TestCase):
 
         fix_loop_duplicates()
 
-        candidates = Finding.objects.filter(duplicate_finding__isnull=False, original_finding__isnull=False).count()
+        candidates = Finding.objects.filter(
+            duplicate_finding__isnull=False, original_finding__isnull=False
+        ).count()
         self.assertEqual(candidates, 0)
 
         # Get latest status
@@ -87,7 +89,9 @@ class TestDuplicationReopen(TestCase):
 
         fix_loop_duplicates()
 
-        candidates = Finding.objects.filter(duplicate_finding__isnull=False, original_finding__isnull=False).count()
+        candidates = Finding.objects.filter(
+            duplicate_finding__isnull=False, original_finding__isnull=False
+        ).count()
         self.assertEqual(candidates, 0)
 
         # Get latest status

@@ -4,7 +4,6 @@ from dojo.models import Test
 
 
 class TestDependencyTrackParser(TestCase):
-
     def test_dependency_track_parser_with_empty_list_for_findings_key_has_no_findings(
         self,
     ):

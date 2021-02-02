@@ -1,0 +1,9 @@
+repos:
+  - repo: https://github.com/psf/black
+    # Black version to use. May be set to any tag/version:
+    # https://github.com/psf/black/tags
+    rev: 20.8b1
+    hooks:
+      - id: black
+        # Should be a command that runs python3.6+
+        language_version: python3

@@ -4,7 +4,6 @@ from dojo.models import Test
 
 
 class TestBrakemanScanParser(TestCase):
-
     def test_parse_file_no_finding(self):
         testfile = open("dojo/unittests/scans/brakeman/no_finding.json")
         parser = BrakemanScanParser()

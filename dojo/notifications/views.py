@@ -14,27 +14,30 @@ logger = logging.getLogger(__name__)
 
 def personal_notifications(request):
     try:
-        notifications_obj = Notifications.objects.get(user=request.user, product__isnull=True)
+        notifications_obj = Notifications.objects.get(
+            user=request.user, product__isnull=True
+        )
     except:
         notifications_obj = Notifications(user=request.user)
 
     form = NotificationsForm(instance=notifications_obj)
-    if request.method == 'POST':
+    if request.method == "POST":
         form = NotificationsForm(request.POST, instance=notifications_obj)
         if form.is_valid():
             new_settings = form.save()
-            messages.add_message(request,
-                                 messages.SUCCESS,
-                                 'Settings saved.',
-                                 extra_tags='alert-success')
+            messages.add_message(
+                request, messages.SUCCESS, "Settings saved.", extra_tags="alert-success"
+            )
 
-    add_breadcrumb(title="Personal notification settings", top_level=False, request=request)
+    add_breadcrumb(
+        title="Personal notification settings", top_level=False, request=request
+    )
 
-    return render(request, 'dojo/notifications.html',
-                  {'form': form,
-                   'scope': 'personal',
-                   'admin': request.user.is_superuser
-                   })
+    return render(
+        request,
+        "dojo/notifications.html",
+        {"form": form, "scope": "personal", "admin": request.user.is_superuser},
+    )
 
 
 @user_passes_test(lambda u: u.is_superuser)
@@ -45,17 +48,19 @@ def system_notifications(request):
         notifications_obj = Notifications(user=None)
 
     form = NotificationsForm(instance=notifications_obj)
-    if request.method == 'POST':
+    if request.method == "POST":
         form = NotificationsForm(request.POST, instance=notifications_obj)
         if form.is_valid():
             new_settings = form.save()
-            messages.add_message(request,
-                                 messages.SUCCESS,
-                                 'Settings saved.',
-                                 extra_tags='alert-success')
+            messages.add_message(
+                request, messages.SUCCESS, "Settings saved.", extra_tags="alert-success"
+            )
 
-    add_breadcrumb(title="System notification settings", top_level=False, request=request)
-    return render(request, 'dojo/notifications.html',
-                  {'form': form,
-                   'scope': 'system',
-                   'admin': request.user.is_superuser})
+    add_breadcrumb(
+        title="System notification settings", top_level=False, request=request
+    )
+    return render(
+        request,
+        "dojo/notifications.html",
+        {"form": form, "scope": "system", "admin": request.user.is_superuser},
+    )

@@ -4,7 +4,6 @@ from dojo.models import Test
 
 
 class TestSemGrepJSONParser(TestCase):
-
     def test_parse_one_finding(self):
         testfile = open("dojo/unittests/scans/semgrep/one_finding.json")
         parser = SemgrepJSONParser()

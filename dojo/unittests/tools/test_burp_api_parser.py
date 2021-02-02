@@ -6,7 +6,6 @@ from dojo.tools.burp_api.parser import convert_severity, convert_confidence
 
 
 class TestParser(TestCase):
-
     def test_example_report(self):
         testfile = "dojo/unittests/scans/burp_suite_pro/example.json"
         test = Test()

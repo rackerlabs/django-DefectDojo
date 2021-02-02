@@ -7,7 +7,7 @@ import sys
 SERIALIZER_DEFS_MODULE = "dojo.api_v2.serializers"
 
 
-class _Prefetcher():
+class _Prefetcher:
     @staticmethod
     def _build_serializers():
         """Returns a map model -> serializer where model is a django model and serializer is the corresponding
@@ -16,13 +16,16 @@ class _Prefetcher():
         Returns:
             dict[model, serializer]: map of model to their serializer
         """
+
         def _is_model_serializer(obj):
             return inspect.isclass(obj) and issubclass(obj, ModelSerializer)
 
         serializers = dict()
         # We process all the serializers found in the module SERIALIZER_DEFS_MODULE. We restrict the scope to avoid
         # processing all the classes in the symbol table
-        available_serializers = inspect.getmembers(sys.modules[SERIALIZER_DEFS_MODULE], _is_model_serializer)
+        available_serializers = inspect.getmembers(
+            sys.modules[SERIALIZER_DEFS_MODULE], _is_model_serializer
+        )
 
         for _, serializer in available_serializers:
             model = serializer.Meta.model

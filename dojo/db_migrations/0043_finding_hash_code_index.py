@@ -6,25 +6,31 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('dojo', '0042_risk_acceptance_improvements'),
+        ("dojo", "0042_risk_acceptance_improvements"),
     ]
 
     operations = [
         migrations.AlterField(
-            model_name='finding',
-            name='hash_code',
-            field=models.CharField(blank=True, editable=False, max_length=64, null=True),
+            model_name="finding",
+            name="hash_code",
+            field=models.CharField(
+                blank=True, editable=False, max_length=64, null=True
+            ),
         ),
         migrations.AddIndex(
-            model_name='finding',
-            index=models.Index(fields=['hash_code'], name='dojo_findin_hash_co_09df6a_idx'),
+            model_name="finding",
+            index=models.Index(
+                fields=["hash_code"], name="dojo_findin_hash_co_09df6a_idx"
+            ),
         ),
         migrations.AddIndex(
-            model_name='finding',
-            index=models.Index(fields=['unique_id_from_tool'], name='dojo_findin_unique__f76d47_idx'),
+            model_name="finding",
+            index=models.Index(
+                fields=["unique_id_from_tool"], name="dojo_findin_unique__f76d47_idx"
+            ),
         ),
         migrations.AddIndex(
-            model_name='finding',
-            index=models.Index(fields=['line'], name='dojo_findin_line_fea329_idx'),
+            model_name="finding",
+            index=models.Index(fields=["line"], name="dojo_findin_line_fea329_idx"),
         ),
     ]

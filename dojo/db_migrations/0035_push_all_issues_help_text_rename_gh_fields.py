@@ -6,28 +6,32 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('dojo', '0034_add_github_support'),
+        ("dojo", "0034_add_github_support"),
     ]
 
     operations = [
         migrations.AlterField(
-            model_name='jira_pkey',
-            name='push_all_issues',
-            field=models.BooleanField(blank=True, default=False, help_text='Automatically maintain parity with JIRA. Always create and update JIRA tickets for findings in this Product.'),
+            model_name="jira_pkey",
+            name="push_all_issues",
+            field=models.BooleanField(
+                blank=True,
+                default=False,
+                help_text="Automatically maintain parity with JIRA. Always create and update JIRA tickets for findings in this Product.",
+            ),
         ),
         migrations.RenameField(
-            model_name='github_pkey',
-            old_name='conf',
-            new_name='git_conf',
+            model_name="github_pkey",
+            old_name="conf",
+            new_name="git_conf",
         ),
         migrations.RenameField(
-            model_name='github_pkey',
-            old_name='project_key',
-            new_name='git_project',
+            model_name="github_pkey",
+            old_name="project_key",
+            new_name="git_project",
         ),
         migrations.RenameField(
-            model_name='github_pkey',
-            old_name='push_notes',
-            new_name='git_push_notes',
+            model_name="github_pkey",
+            old_name="push_notes",
+            new_name="git_push_notes",
         ),
     ]

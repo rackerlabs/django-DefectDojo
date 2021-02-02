@@ -3,11 +3,12 @@ from dojo.utils import set_duplicate
 from dojo.management.commands.fix_loop_duplicates import fix_loop_duplicates
 from dojo.models import Finding
 import logging
+
 deduplicationLogger = logging.getLogger("dojo.specific-loggers.deduplication")
 
 
 class TestDuplication(TestCase):
-    fixtures = ['dojo_testdata.json']
+    fixtures = ["dojo_testdata.json"]
 
     def setUp(self):
         self.finding_a = Finding.objects.get(id=2)
@@ -45,7 +46,9 @@ class TestDuplication(TestCase):
         self.assertEqual(self.finding_b.original_finding.first().id, self.finding_a.id)
         self.assertEqual(self.finding_a.duplicate_finding_set().count(), 1)
         self.assertEqual(self.finding_b.duplicate_finding_set().count(), 1)
-        self.assertEqual(self.finding_b.duplicate_finding_set().first().id, self.finding_a.id)
+        self.assertEqual(
+            self.finding_b.duplicate_finding_set().first().id, self.finding_a.id
+        )
 
     # A duplicate should not be considered to be an original for another finding
     def test_set_duplicate_exception_1(self):
@@ -103,10 +106,14 @@ class TestDuplication(TestCase):
         self.finding_b.duplicate = True
         self.finding_b.duplicate_finding = self.finding_b
         super(Finding, self.finding_b).save()
-        candidates = Finding.objects.filter(duplicate_finding__isnull=False, original_finding__isnull=False).count()
+        candidates = Finding.objects.filter(
+            duplicate_finding__isnull=False, original_finding__isnull=False
+        ).count()
         self.assertEqual(candidates, 1)
         fix_loop_duplicates()
-        candidates = Finding.objects.filter(duplicate_finding__isnull=False, original_finding__isnull=False).count()
+        candidates = Finding.objects.filter(
+            duplicate_finding__isnull=False, original_finding__isnull=False
+        ).count()
         self.assertEqual(candidates, 0)
 
     # if two findings are connected with each other the fix_loop function should detect and remove the loop
@@ -121,7 +128,9 @@ class TestDuplication(TestCase):
 
         fix_loop_duplicates()
 
-        candidates = Finding.objects.filter(duplicate_finding__isnull=False, original_finding__isnull=False).count()
+        candidates = Finding.objects.filter(
+            duplicate_finding__isnull=False, original_finding__isnull=False
+        ).count()
         self.assertEqual(candidates, 0)
 
         # Get latest status

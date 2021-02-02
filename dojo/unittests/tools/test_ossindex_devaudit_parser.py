@@ -4,7 +4,6 @@ from dojo.models import Test
 
 
 class TestOssIndexDevauditParser(TestCase):
-
     def test_ossindex_devaudit_parser_with_no_vulns_has_no_findings(self):
         testfile = open(
             "dojo/unittests/scans/ossindex_devaudit_sample/ossindex_devaudit_no_vuln.json"

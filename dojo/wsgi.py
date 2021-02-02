@@ -38,7 +38,7 @@ application = get_wsgi_application()
 def _check_ptvsd_port_not_in_use(port):
     try:
         sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-        sock.bind(('127.0.0.1', port))
+        sock.bind(("127.0.0.1", port))
     except socket_error as se:
         return False
 
@@ -50,7 +50,8 @@ if os.environ.get("DD_DEBUG") == "True" and _check_ptvsd_port_not_in_use(ptvsd_p
     try:
         # enable remote debugging
         import ptvsd
-        ptvsd.enable_attach(address=('0.0.0.0', ptvsd_port))
+
+        ptvsd.enable_attach(address=("0.0.0.0", ptvsd_port))
         print("ptvsd listening on port " + ptvsd_port)
     except Exception as e:
         print("Generic exception caught with DD_DEBUG on. Passing.")

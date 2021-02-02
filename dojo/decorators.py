@@ -17,7 +17,10 @@ def we_want_async():
     user = get_current_user()
 
     if Dojo_User.wants_block_execution(user):
-        logger.debug('dojo_async_task: running task in the foreground as block_execution is set to True for %s', user)
+        logger.debug(
+            "dojo_async_task: running task in the foreground as block_execution is set to True for %s",
+            user,
+        )
         return False
 
     return True
@@ -53,7 +56,7 @@ def dojo_model_to_id(_func=None, *, parameter=0):
 
             if model_or_id:
                 if isinstance(model_or_id, models.Model) and we_want_async():
-                    logger.debug('converting model_or_id to id: %s', model_or_id)
+                    logger.debug("converting model_or_id to id: %s", model_or_id)
                     id = model_or_id.id
                     args = list(args)
                     args[parameter] = id
@@ -83,25 +86,41 @@ def dojo_model_from_id(_func=None, *, model=Finding, parameter=0):
             if not settings.CELERY_PASS_MODEL_BY_ID:
                 return func(*args, **kwargs)
 
-            logger.debug('args:' + str(args))
-            logger.debug('kwargs:' + str(kwargs))
+            logger.debug("args:" + str(args))
+            logger.debug("kwargs:" + str(kwargs))
 
-            logger.debug('checking if we need to convert id to model: %s for parameter: %s', model.__name__, parameter)
+            logger.debug(
+                "checking if we need to convert id to model: %s for parameter: %s",
+                model.__name__,
+                parameter,
+            )
 
             model_or_id = get_parameter_froms_args_kwargs(args, kwargs, parameter)
 
             if model_or_id:
                 if not isinstance(model_or_id, models.Model) and we_want_async():
-                    logger.debug('instantiating model_or_id: %s for model: %s', model_or_id, model)
+                    logger.debug(
+                        "instantiating model_or_id: %s for model: %s",
+                        model_or_id,
+                        model,
+                    )
                     try:
                         instance = model.objects.get(id=model_or_id)
                     except model.DoesNotExist:
-                        logger.debug('error instantiating model_or_id: %s for model: %s: DoesNotExist', model_or_id, model)
+                        logger.debug(
+                            "error instantiating model_or_id: %s for model: %s: DoesNotExist",
+                            model_or_id,
+                            model,
+                        )
                         instance = None
                     args = list(args)
                     args[parameter] = instance
                 else:
-                    logger.debug('model_or_id already a model instance %s for model: %s', model_or_id, model)
+                    logger.debug(
+                        "model_or_id already a model instance %s for model: %s",
+                        model_or_id,
+                        model,
+                    )
 
             return func(*args, **kwargs)
 
@@ -120,31 +139,33 @@ def get_parameter_froms_args_kwargs(args, kwargs, parameter):
         # Lookup value came as a positional argument
         args = list(args)
         if parameter >= len(args):
-            raise ValueError('parameter index invalid: ' + str(parameter))
+            raise ValueError("parameter index invalid: " + str(parameter))
         model_or_id = args[parameter]
     else:
         # Lookup value was passed as keyword argument
         model_or_id = kwargs.get(parameter, None)
 
-    logger.debug('model_or_id: %s', model_or_id)
+    logger.debug("model_or_id: %s", model_or_id)
 
     if not model_or_id:
-        logger.error('unable to get parameter: ' + parameter)
+        logger.error("unable to get parameter: " + parameter)
 
     return model_or_id
 
 
 def model_to_dict_with_tags(model):
     converted = model_to_dict(model)
-    if 'tags' in converted:
+    if "tags" in converted:
         # further conversion needed from Tag Queryset to strings
-        converted['tags'] = converted['tags'].values_list()
+        converted["tags"] = converted["tags"].values_list()
 
     # dirty hack to now barf on accepted_findings... we may need to rethink all this mess with celery
-    if 'accepted_findings' in converted:
-        converted['accepted_findings'] = list_of_models_to_dict_with_tags(converted['accepted_findings'])
+    if "accepted_findings" in converted:
+        converted["accepted_findings"] = list_of_models_to_dict_with_tags(
+            converted["accepted_findings"]
+        )
 
-    logger.debug('dict: %s', converted)
+    logger.debug("dict: %s", converted)
     return converted
 
 
@@ -184,9 +205,9 @@ def on_exception_log_kwarg(func):
         except Exception as e:
             print("exception occured at url:", self.driver.current_url)
             print("page source:", self.driver.page_source)
-            f = open("selenium_page_source.html", "w", encoding='utf-8')
+            f = open("selenium_page_source.html", "w", encoding="utf-8")
             f.writelines(self.driver.page_source)
             # time.sleep(30)
-            raise(e)
+            raise (e)
 
     return wrapper

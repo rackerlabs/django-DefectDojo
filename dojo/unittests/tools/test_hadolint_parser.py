@@ -4,7 +4,6 @@ from dojo.tools.hadolint.parser import HadolintParser
 
 
 class TesthadolintParser(TestCase):
-
     def test_parse_file_with_one_dockerfile(self):
         testfile = open("dojo/unittests/scans/hadolint/one_dockerfile.json")
         parser = HadolintParser()

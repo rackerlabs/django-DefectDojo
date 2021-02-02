@@ -1,4 +1,4 @@
-__author__ = 'omerlh'
+__author__ = "omerlh"
 
 import json
 
@@ -17,15 +17,15 @@ class ESLintParser(object):
     def get_findings(self, filename, test):
         tree = filename.read()
         try:
-            data = json.loads(str(tree, 'utf-8'))
+            data = json.loads(str(tree, "utf-8"))
         except:
             data = json.loads(tree)
 
         items = list()
         for item in data:
-            findingdetail = ''
+            findingdetail = ""
 
-            if (len(item["messages"]) == 0):
+            if len(item["messages"]) == 0:
                 continue
 
             for message in item["messages"]:
@@ -36,26 +36,30 @@ class ESLintParser(object):
                     title = str(message["message"])
 
                 if message["ruleId"] is not None:
-                    title = title + ' Test ID: ' + str(message["ruleId"])
+                    title = title + " Test ID: " + str(message["ruleId"])
 
                 findingdetail += "Filename: " + item["filePath"] + "\n"
                 findingdetail += "Line number: " + str(message["line"]) + "\n"
 
-                sev = self._convert_eslint_severity_to_dojo_severity(message["severity"])
+                sev = self._convert_eslint_severity_to_dojo_severity(
+                    message["severity"]
+                )
 
-                find = Finding(title=title,
-                            test=test,
-                            active=False,
-                            verified=False,
-                            description=findingdetail,
-                            severity=sev.title(),
-                            numerical_severity=Finding.get_numerical_severity(sev),
-                            file_path=item["filePath"],
-                            line=message["line"],
-                            url='N/A',
-                            static_finding=True,
-                            mitigation='N/A',
-                            impact='N/A')
+                find = Finding(
+                    title=title,
+                    test=test,
+                    active=False,
+                    verified=False,
+                    description=findingdetail,
+                    severity=sev.title(),
+                    numerical_severity=Finding.get_numerical_severity(sev),
+                    file_path=item["filePath"],
+                    line=message["line"],
+                    url="N/A",
+                    static_finding=True,
+                    mitigation="N/A",
+                    impact="N/A",
+                )
 
                 items.append(find)
         return items

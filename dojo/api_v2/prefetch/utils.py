@@ -36,6 +36,7 @@ def _get_prefetchable_fields(serializer):
     Args:
         serializer (Serializer): [description]
     """
+
     def _is_field_prefetchable(field):
         return _is_one_to_one_relation(field) or _is_many_to_many_relation(field)
 

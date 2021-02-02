@@ -62,49 +62,56 @@ def action_history(request, cid, oid):
             else:
                 product_tab.setEngagement(object_value.engagement)
 
-    history = LogEntry.objects.filter(content_type=ct,
-                                      object_pk=obj.id).order_by('-timestamp')
+    history = LogEntry.objects.filter(content_type=ct, object_pk=obj.id).order_by(
+        "-timestamp"
+    )
     history = LogEntryFilter(request.GET, queryset=history)
     paged_history = get_page_items(request, history.qs, 25)
 
-    if not get_system_setting('enable_auditlog'):
+    if not get_system_setting("enable_auditlog"):
         messages.add_message(
             request,
             messages.WARNING,
-            'Audit logging is currently disabled in System Settings.',
-            extra_tags='alert-danger')
+            "Audit logging is currently disabled in System Settings.",
+            extra_tags="alert-danger",
+        )
 
-    return render(request, 'dojo/action_history.html',
-                  {"history": paged_history,
-                   'product_tab': product_tab,
-                   "filtered": history,
-                   "obj": obj,
-                   "test": test,
-                   "object_value": object_value,
-                   "finding": finding
-                   })
+    return render(
+        request,
+        "dojo/action_history.html",
+        {
+            "history": paged_history,
+            "product_tab": product_tab,
+            "filtered": history,
+            "obj": obj,
+            "test": test,
+            "object_value": object_value,
+            "finding": finding,
+        },
+    )
 
 
 @user_passes_test(lambda u: u.is_staff)
 def manage_files(request, oid, obj_type):
-    if obj_type == 'Engagement':
+    if obj_type == "Engagement":
         obj = get_object_or_404(Engagement, pk=oid)
-        obj_vars = ('view_engagement', 'engagement_set')
-    elif obj_type == 'Test':
+        obj_vars = ("view_engagement", "engagement_set")
+    elif obj_type == "Test":
         obj = get_object_or_404(Test, pk=oid)
-        obj_vars = ('view_test', 'test_set')
-    elif obj_type == 'Finding':
+        obj_vars = ("view_test", "test_set")
+    elif obj_type == "Finding":
         obj = get_object_or_404(Finding, pk=oid)
-        obj_vars = ('view_finding', 'finding_set')
+        obj_vars = ("view_finding", "finding_set")
     else:
         raise Http404()
 
     files_formset = ManageFileFormSet(queryset=obj.files.all())
     error = False
 
-    if request.method == 'POST':
+    if request.method == "POST":
         files_formset = ManageFileFormSet(
-            request.POST, request.FILES, queryset=obj.files.all())
+            request.POST, request.FILES, queryset=obj.files.all()
+        )
         if files_formset.is_valid():
             # remove all from database and disk
 
@@ -118,9 +125,9 @@ def manage_files(request, oid, obj_type):
                 logger.debug("adding file: %s", o.file.name)
                 obj.files.add(o)
 
-            orphan_files = FileUpload.objects.filter(engagement__isnull=True,
-                                                     test__isnull=True,
-                                                     finding__isnull=True)
+            orphan_files = FileUpload.objects.filter(
+                engagement__isnull=True, test__isnull=True, finding__isnull=True
+            )
             for o in orphan_files:
                 logger.debug("purging orphan file: %s", o.file.name)
                 os.remove(os.path.join(settings.MEDIA_ROOT, o.file.name))
@@ -129,22 +136,27 @@ def manage_files(request, oid, obj_type):
             messages.add_message(
                 request,
                 messages.SUCCESS,
-                'Files updated successfully.',
-                extra_tags='alert-success')
+                "Files updated successfully.",
+                extra_tags="alert-success",
+            )
 
         else:
             error = True
             messages.add_message(
                 request,
                 messages.ERROR,
-                'Please check form data and try again.',
-                extra_tags='alert-danger')
+                "Please check form data and try again.",
+                extra_tags="alert-danger",
+            )
 
         if not error:
-            return HttpResponseRedirect(reverse(obj_vars[0], args=(oid, )))
+            return HttpResponseRedirect(reverse(obj_vars[0], args=(oid,)))
     return render(
-        request, 'dojo/manage_files.html', {
-            'files_formset': files_formset,
-            'obj': obj,
-            'obj_type': obj_type,
-        })
+        request,
+        "dojo/manage_files.html",
+        {
+            "files_formset": files_formset,
+            "obj": obj,
+            "obj_type": obj_type,
+        },
+    )

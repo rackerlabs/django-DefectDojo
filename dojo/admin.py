@@ -1,8 +1,17 @@
 from auditlog.models import LogEntry
 from django.contrib import admin
 from polymorphic.admin import PolymorphicParentModelAdmin, PolymorphicChildModelAdmin
-from dojo.models import Question, TextQuestion, ChoiceQuestion, Choice, \
-    Answer, TextAnswer, ChoiceAnswer, Engagement_Survey, Answered_Survey
+from dojo.models import (
+    Question,
+    TextQuestion,
+    ChoiceQuestion,
+    Choice,
+    Answer,
+    TextAnswer,
+    ChoiceAnswer,
+    Engagement_Survey,
+    Answered_Survey,
+)
 
 admin.site.unregister(LogEntry)
 
@@ -37,10 +46,7 @@ class QuestionParentAdmin(PolymorphicParentModelAdmin):
     """
 
     base_model = Question
-    child_models = (
-        TextQuestion,
-        ChoiceQuestion
-    )
+    child_models = (TextQuestion, ChoiceQuestion)
 
 
 admin.site.register(TextQuestion, TextQuestionAdmin)
@@ -75,8 +81,8 @@ class AnswerParentAdmin(PolymorphicParentModelAdmin):
     """
 
     list_display = (
-        'answered_survey',
-        'question',
+        "answered_survey",
+        "question",
     )
 
     base_model = Answer

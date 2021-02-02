@@ -4,7 +4,6 @@ from dojo.models import Test, Engagement, Product
 
 
 class TestNiktoParser(TestCase):
-
     def test_parse_file_with_old_format(self):
         test = Test()
         engagement = Engagement()

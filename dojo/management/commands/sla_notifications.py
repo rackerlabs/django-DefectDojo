@@ -7,7 +7,7 @@ This command will iterate over findings and send SLA notifications as appropriat
 
 
 class Command(BaseCommand):
-    help = 'Launch with no argument.'
+    help = "Launch with no argument."
 
     def handle(self, *args, **options):
         sla_compute_and_notify()

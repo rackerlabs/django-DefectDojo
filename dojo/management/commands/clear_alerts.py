@@ -11,24 +11,35 @@ system: Clear system alert
 
 
 class Command(BaseCommand):
-    help = 'Remove alerts from the database'
+    help = "Remove alerts from the database"
 
     def add_arguments(self, parser):
-        parser.add_argument('-a', '--all', action='store_true', help='Remove all alerts from the database')
-        parser.add_argument('-s', '--system', action='store_true', help='Remove alerts wihtout a user')
-        parser.add_argument('-u', '--users', nargs='+', type=str, help='Removes alerts from users')
+        parser.add_argument(
+            "-a",
+            "--all",
+            action="store_true",
+            help="Remove all alerts from the database",
+        )
+        parser.add_argument(
+            "-s", "--system", action="store_true", help="Remove alerts wihtout a user"
+        )
+        parser.add_argument(
+            "-u", "--users", nargs="+", type=str, help="Removes alerts from users"
+        )
 
     def handle(self, *args, **options):
-        alls = options['all']
-        users = options['users']
-        system = options['system']
+        alls = options["all"]
+        users = options["users"]
+        system = options["system"]
 
         if users:
             for user_name in users:
                 try:
                     user = Dojo_User.objects.get(username=user_name)
                     Alerts.objects.filter(user_id_id=user.id).delete()
-                    self.stdout.write('User Alerts for "%s" deleted with success!' % (user_name))
+                    self.stdout.write(
+                        'User Alerts for "%s" deleted with success!' % (user_name)
+                    )
                 except:
                     self.stdout.write('User "%s" does not exist.' % user_name)
         elif alls and not system:

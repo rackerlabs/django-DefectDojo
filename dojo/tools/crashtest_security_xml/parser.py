@@ -43,24 +43,24 @@ class CrashtestSecurityXmlParser(object):
         items = list()
 
         # Get all testcases
-        for node in tree.findall('.//testcase'):
+        for node in tree.findall(".//testcase"):
 
             # Only failed test cases contain a finding
-            failure = node.find('failure')
+            failure = node.find("failure")
             if failure is None:
                 continue
 
-            title = node.get('name')
+            title = node.get("name")
             # Remove enumeration from title
-            title = re.sub(r' \([0-9]*\)$', '', title)
+            title = re.sub(r" \([0-9]*\)$", "", title)
 
             # Attache CVEs
             if "CVE" in title:
-                cve = re.findall(r'CVE-\d{4}-\d{4,10}', title)[0]
+                cve = re.findall(r"CVE-\d{4}-\d{4,10}", title)[0]
             else:
                 cve = None
-            description = failure.get('message')
-            severity = failure.get('type').capitalize()
+            description = failure.get("message")
+            severity = failure.get("type").capitalize()
 
             # This denotes an error of the scanner and not a vulnerability
             if severity == "Error":
@@ -70,20 +70,22 @@ class CrashtestSecurityXmlParser(object):
             if severity == "Skipped":
                 continue
 
-            find = Finding(title=title,
-                           description=description,
-                           test=test,
-                           cve=cve,
-                           severity=severity,
-                           mitigation="No mitigation provided",
-                           active=False,
-                           verified=False,
-                           false_p=False,
-                           duplicate=False,
-                           out_of_scope=False,
-                           mitigated=None,
-                           impact="No impact provided",
-                           numerical_severity=Finding.get_numerical_severity(severity))
+            find = Finding(
+                title=title,
+                description=description,
+                test=test,
+                cve=cve,
+                severity=severity,
+                mitigation="No mitigation provided",
+                active=False,
+                verified=False,
+                false_p=False,
+                duplicate=False,
+                out_of_scope=False,
+                mitigated=None,
+                impact="No impact provided",
+                numerical_severity=Finding.get_numerical_severity(severity),
+            )
             items.append(find)
 
         return items

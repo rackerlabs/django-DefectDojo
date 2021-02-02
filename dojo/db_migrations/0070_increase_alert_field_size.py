@@ -6,13 +6,13 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('dojo', '0069_risk_acceptance'),
+        ("dojo", "0069_risk_acceptance"),
     ]
 
     operations = [
         migrations.AlterField(
-            model_name='alerts',
-            name='title',
-            field=models.CharField(default='', max_length=250),
+            model_name="alerts",
+            name="title",
+            field=models.CharField(default="", max_length=250),
         ),
     ]

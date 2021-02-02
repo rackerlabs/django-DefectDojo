@@ -2,6 +2,7 @@ from django.urls import reverse
 from .dojo_test_case import DojoTestCase
 from dojo.models import JIRA_Issue
 import json
+
 # from unittest import skip
 import logging
 import dojo.jira_link.helper as jira_helper
@@ -10,82 +11,82 @@ logger = logging.getLogger(__name__)
 
 
 class JIRAWebhookTest(DojoTestCase):
-    fixtures = ['dojo_testdata.json']
+    fixtures = ["dojo_testdata.json"]
 
     jira_issue_comment_template_json = {
         "timestamp": 1605117321425,
         "webhookEvent": "comment_created",
         "comment": {
-                    "self": "http://www.testjira.com/rest/api/2/issue/2/comment/456843",
-                    "id": "456843",
-                    "author": {
-                        "self": "http://www.testjira.com/rest/api/2/user?username=valentijn",
-                        "name": "valentijn",
-                        "avatarUrls": {
-                            "48x48": "http://www.testjira.com/secure/useravatar?ownerId=valentijn&avatarId=11101",
-                            "24x24": "http://www.testjira.com/secure/useravatar?size=small&ownerId=valentijn&avatarId=11101",
-                            "16x16": "http://www.testjira.com/secure/useravatar?size=x small&ownerId=valentijn&avatarId=11101",
-                            "32x32": "http://www.testjira.com/secure/useravatar?size=medium&ownerId=valentijn&avatarId=11101"
-                        },
-                        "displayName": "Valentijn Scholten",
-                        "active": "true",
-                        "timeZone": "Europe/Amsterdam"
-                    },
-                    "body": "test2",
-                    "updateAuthor": {
-                        "self": "http://www.testjira.com/rest/api/2/user?username=valentijn",
-                        "name": "valentijn",
-                        "avatarUrls": {
-                            "48x48": "http://www.testjira.com/secure/useravatar?ownerId=valentijn&avatarId=11101",
-                            "24x24": "http://www.testjira.com/secure/useravatar?size=small&ownerId=valentijn&avatarId=11101",
-                            "16x16": "http://www.testjira.com/secure/useravatar?size=xsmall&ownerId=valentijn&avatarId=11101",
-                            "32x32": "http://www.testjira.com/secure/useravatar?size=medium&ownerId=valentijn&avatarId=11101"
-                        },
-                        "displayName": "Valentijn Scholten",
-                        "active": "true",
-                        "timeZone": "Europe/Amsterdam"
-                    },
-                    "created": "2020-11-11T18:55:21.425+0100",
-                    "updated": "2020-11-11T18:55:21.425+0100"
-        }
+            "self": "http://www.testjira.com/rest/api/2/issue/2/comment/456843",
+            "id": "456843",
+            "author": {
+                "self": "http://www.testjira.com/rest/api/2/user?username=valentijn",
+                "name": "valentijn",
+                "avatarUrls": {
+                    "48x48": "http://www.testjira.com/secure/useravatar?ownerId=valentijn&avatarId=11101",
+                    "24x24": "http://www.testjira.com/secure/useravatar?size=small&ownerId=valentijn&avatarId=11101",
+                    "16x16": "http://www.testjira.com/secure/useravatar?size=x small&ownerId=valentijn&avatarId=11101",
+                    "32x32": "http://www.testjira.com/secure/useravatar?size=medium&ownerId=valentijn&avatarId=11101",
+                },
+                "displayName": "Valentijn Scholten",
+                "active": "true",
+                "timeZone": "Europe/Amsterdam",
+            },
+            "body": "test2",
+            "updateAuthor": {
+                "self": "http://www.testjira.com/rest/api/2/user?username=valentijn",
+                "name": "valentijn",
+                "avatarUrls": {
+                    "48x48": "http://www.testjira.com/secure/useravatar?ownerId=valentijn&avatarId=11101",
+                    "24x24": "http://www.testjira.com/secure/useravatar?size=small&ownerId=valentijn&avatarId=11101",
+                    "16x16": "http://www.testjira.com/secure/useravatar?size=xsmall&ownerId=valentijn&avatarId=11101",
+                    "32x32": "http://www.testjira.com/secure/useravatar?size=medium&ownerId=valentijn&avatarId=11101",
+                },
+                "displayName": "Valentijn Scholten",
+                "active": "true",
+                "timeZone": "Europe/Amsterdam",
+            },
+            "created": "2020-11-11T18:55:21.425+0100",
+            "updated": "2020-11-11T18:55:21.425+0100",
+        },
     }
 
     jira_issue_comment_template_json_with_email = {
         "timestamp": 1605117321425,
         "webhookEvent": "comment_created",
         "comment": {
-                    "self": "http://www.testjira.com/rest/api/2/issue/2/comment/456843",
-                    "id": "456843",
-                    "author": {
-                        "self": "http://www.testjira.com/rest/api/2/user?username=valentijn",
-                        "emailAddress": "darthvaalor@testme.nl",
-                        "avatarUrls": {
-                            "48x48": "http://www.testjira.com/secure/useravatar?ownerId=valentijn&avatarId=11101",
-                            "24x24": "http://www.testjira.com/secure/useravatar?size=small&ownerId=valentijn&avatarId=11101",
-                            "16x16": "http://www.testjira.com/secure/useravatar?size=x small&ownerId=valentijn&avatarId=11101",
-                            "32x32": "http://www.testjira.com/secure/useravatar?size=medium&ownerId=valentijn&avatarId=11101"
-                        },
-                        "displayName": "Valentijn Scholten",
-                        "active": "true",
-                        "timeZone": "Europe/Amsterdam"
-                    },
-                    "body": "test2",
-                    "updateAuthor": {
-                        "self": "http://www.testjira.com/rest/api/2/user?username=valentijn",
-                        "emailAddress": "darthvaalor@testme.nl",
-                        "avatarUrls": {
-                            "48x48": "http://www.testjira.com/secure/useravatar?ownerId=valentijn&avatarId=11101",
-                            "24x24": "http://www.testjira.com/secure/useravatar?size=small&ownerId=valentijn&avatarId=11101",
-                            "16x16": "http://www.testjira.com/secure/useravatar?size=xsmall&ownerId=valentijn&avatarId=11101",
-                            "32x32": "http://www.testjira.com/secure/useravatar?size=medium&ownerId=valentijn&avatarId=11101"
-                        },
-                        "displayName": "Valentijn Scholten",
-                        "active": "true",
-                        "timeZone": "Europe/Amsterdam"
-                    },
-                    "created": "2020-11-11T18:55:21.425+0100",
-                    "updated": "2020-11-11T18:55:21.425+0100"
-        }
+            "self": "http://www.testjira.com/rest/api/2/issue/2/comment/456843",
+            "id": "456843",
+            "author": {
+                "self": "http://www.testjira.com/rest/api/2/user?username=valentijn",
+                "emailAddress": "darthvaalor@testme.nl",
+                "avatarUrls": {
+                    "48x48": "http://www.testjira.com/secure/useravatar?ownerId=valentijn&avatarId=11101",
+                    "24x24": "http://www.testjira.com/secure/useravatar?size=small&ownerId=valentijn&avatarId=11101",
+                    "16x16": "http://www.testjira.com/secure/useravatar?size=x small&ownerId=valentijn&avatarId=11101",
+                    "32x32": "http://www.testjira.com/secure/useravatar?size=medium&ownerId=valentijn&avatarId=11101",
+                },
+                "displayName": "Valentijn Scholten",
+                "active": "true",
+                "timeZone": "Europe/Amsterdam",
+            },
+            "body": "test2",
+            "updateAuthor": {
+                "self": "http://www.testjira.com/rest/api/2/user?username=valentijn",
+                "emailAddress": "darthvaalor@testme.nl",
+                "avatarUrls": {
+                    "48x48": "http://www.testjira.com/secure/useravatar?ownerId=valentijn&avatarId=11101",
+                    "24x24": "http://www.testjira.com/secure/useravatar?size=small&ownerId=valentijn&avatarId=11101",
+                    "16x16": "http://www.testjira.com/secure/useravatar?size=xsmall&ownerId=valentijn&avatarId=11101",
+                    "32x32": "http://www.testjira.com/secure/useravatar?size=medium&ownerId=valentijn&avatarId=11101",
+                },
+                "displayName": "Valentijn Scholten",
+                "active": "true",
+                "timeZone": "Europe/Amsterdam",
+            },
+            "created": "2020-11-11T18:55:21.425+0100",
+            "updated": "2020-11-11T18:55:21.425+0100",
+        },
     }
 
     jira_issue_update_template_string = """
@@ -399,59 +400,97 @@ class JIRAWebhookTest(DojoTestCase):
         DojoTestCase.__init__(self, *args, **kwargs)
 
     def setUp(self):
-        self.correct_secret = '12345'
-        self.incorrect_secret = '1234567890'
+        self.correct_secret = "12345"
+        self.incorrect_secret = "1234567890"
 
     def test_webhook_get(self):
-        response = self.client.get(reverse('jira_web_hook'))
+        response = self.client.get(reverse("jira_web_hook"))
         self.assertEqual(405, response.status_code, response.content[:1000])
 
     def test_webhook_jira_disabled(self):
         self.system_settings(enable_jira=False)
-        response = self.client.post(reverse('jira_web_hook'))
+        response = self.client.post(reverse("jira_web_hook"))
         self.assertEqual(404, response.status_code, response.content[:1000])
 
     def test_webhook_disabled(self):
         self.system_settings(enable_jira=False, enable_jira_web_hook=False)
-        response = self.client.post(reverse('jira_web_hook'))
+        response = self.client.post(reverse("jira_web_hook"))
         self.assertEqual(404, response.status_code, response.content[:1000])
 
     def test_webhook_invalid_content_type(self):
-        self.system_settings(enable_jira=True, enable_jira_web_hook=True, disable_jira_webhook_secret=True)
-        response = self.client.post(reverse('jira_web_hook'))
+        self.system_settings(
+            enable_jira=True,
+            enable_jira_web_hook=True,
+            disable_jira_webhook_secret=True,
+        )
+        response = self.client.post(reverse("jira_web_hook"))
         # 400 due to incorrect content_type
         self.assertEqual(400, response.status_code, response.content[:1000])
 
     def test_webhook_secret_disabled_no_secret(self):
-        self.system_settings(enable_jira=True, enable_jira_web_hook=True, disable_jira_webhook_secret=True)
-        response = self.client.post(reverse('jira_web_hook'))
+        self.system_settings(
+            enable_jira=True,
+            enable_jira_web_hook=True,
+            disable_jira_webhook_secret=True,
+        )
+        response = self.client.post(reverse("jira_web_hook"))
         # 400 due to incorrect content_type
         self.assertEqual(400, response.status_code, response.content[:1000])
 
     def test_webhook_secret_disabled_secret(self):
-        self.system_settings(enable_jira=True, enable_jira_web_hook=True, disable_jira_webhook_secret=True)
-        response = self.client.post(reverse('jira_web_hook_secret', args=(self.incorrect_secret, )))
+        self.system_settings(
+            enable_jira=True,
+            enable_jira_web_hook=True,
+            disable_jira_webhook_secret=True,
+        )
+        response = self.client.post(
+            reverse("jira_web_hook_secret", args=(self.incorrect_secret,))
+        )
         # 400 due to incorrect content_type
         self.assertEqual(400, response.status_code, response.content[:1000])
 
     def test_webhook_secret_enabled_no_secret(self):
-        self.system_settings(enable_jira=True, enable_jira_web_hook=True, disable_jira_webhook_secret=False, jira_webhook_secret=self.correct_secret)
-        response = self.client.post(reverse('jira_web_hook'))
+        self.system_settings(
+            enable_jira=True,
+            enable_jira_web_hook=True,
+            disable_jira_webhook_secret=False,
+            jira_webhook_secret=self.correct_secret,
+        )
+        response = self.client.post(reverse("jira_web_hook"))
         self.assertEqual(403, response.status_code, response.content[:1000])
 
     def test_webhook_secret_enabled_incorrect_secret(self):
-        self.system_settings(enable_jira=True, enable_jira_web_hook=True, disable_jira_webhook_secret=False, jira_webhook_secret=self.correct_secret)
-        response = self.client.post(reverse('jira_web_hook_secret', args=(self.incorrect_secret, )))
+        self.system_settings(
+            enable_jira=True,
+            enable_jira_web_hook=True,
+            disable_jira_webhook_secret=False,
+            jira_webhook_secret=self.correct_secret,
+        )
+        response = self.client.post(
+            reverse("jira_web_hook_secret", args=(self.incorrect_secret,))
+        )
         self.assertEqual(403, response.status_code, response.content[:1000])
 
     def test_webhook_secret_enabled_correct_secret(self):
-        self.system_settings(enable_jira=True, enable_jira_web_hook=True, disable_jira_webhook_secret=False, jira_webhook_secret=self.correct_secret)
-        response = self.client.post(reverse('jira_web_hook_secret', args=(self.correct_secret, )))
+        self.system_settings(
+            enable_jira=True,
+            enable_jira_web_hook=True,
+            disable_jira_webhook_secret=False,
+            jira_webhook_secret=self.correct_secret,
+        )
+        response = self.client.post(
+            reverse("jira_web_hook_secret", args=(self.correct_secret,))
+        )
         # 400 due to incorrect content_type
         self.assertEqual(400, response.status_code, response.content[:1000])
 
     def test_webhook_comment_on_finding(self):
-        self.system_settings(enable_jira=True, enable_jira_web_hook=True, disable_jira_webhook_secret=False, jira_webhook_secret=self.correct_secret)
+        self.system_settings(
+            enable_jira=True,
+            enable_jira_web_hook=True,
+            disable_jira_webhook_secret=False,
+            jira_webhook_secret=self.correct_secret,
+        )
 
         # finding 5 has a JIRA issue in the initial fixture for unit tests with id=2
 
@@ -459,9 +498,11 @@ class JIRAWebhookTest(DojoTestCase):
         finding = jira_issue.finding
         notes_count_before = finding.notes.count()
 
-        response = self.client.post(reverse('jira_web_hook_secret', args=(self.correct_secret, )),
-                                    self.jira_issue_comment_template_json,
-                                    content_type="application/json")
+        response = self.client.post(
+            reverse("jira_web_hook_secret", args=(self.correct_secret,)),
+            self.jira_issue_comment_template_json,
+            content_type="application/json",
+        )
 
         jira_issue = JIRA_Issue.objects.get(jira_id=2)
         finding = jira_issue.finding
@@ -473,7 +514,12 @@ class JIRAWebhookTest(DojoTestCase):
     # when a note is placed in defect dojo and sent to jira, it will trigger an incoming webhook request
     # we want to ignore that one because the incoming comment from jira is the comment that was placed in dojo
     def test_webhook_comment_on_finding_from_dojo_note(self):
-        self.system_settings(enable_jira=True, enable_jira_web_hook=True, disable_jira_webhook_secret=False, jira_webhook_secret=self.correct_secret)
+        self.system_settings(
+            enable_jira=True,
+            enable_jira_web_hook=True,
+            disable_jira_webhook_secret=False,
+            jira_webhook_secret=self.correct_secret,
+        )
 
         # finding 5 has a JIRA issue in the initial fixture for unit tests with id=2
 
@@ -482,12 +528,14 @@ class JIRAWebhookTest(DojoTestCase):
         notes_count_before = finding.notes.count()
 
         body = json.loads(json.dumps(self.jira_issue_comment_template_json))
-        body['comment']['updateAuthor']['name'] = "defect.dojo"
-        body['comment']['updateAuthor']['displayName'] = "Defect Dojo"
+        body["comment"]["updateAuthor"]["name"] = "defect.dojo"
+        body["comment"]["updateAuthor"]["displayName"] = "Defect Dojo"
 
-        response = self.client.post(reverse('jira_web_hook_secret', args=(self.correct_secret, )),
-                                  body,
-                                  content_type="application/json")
+        response = self.client.post(
+            reverse("jira_web_hook_secret", args=(self.correct_secret,)),
+            body,
+            content_type="application/json",
+        )
 
         jira_issue = JIRA_Issue.objects.get(jira_id=2)
         finding = jira_issue.finding
@@ -501,7 +549,12 @@ class JIRAWebhookTest(DojoTestCase):
     # we want to ignore that one because the incoming comment from jira is the comment that was placed in dojo
     # this time when name is not there, but with email (jira with sso?)
     def test_webhook_comment_on_finding_from_dojo_note_with_email(self):
-        self.system_settings(enable_jira=True, enable_jira_web_hook=True, disable_jira_webhook_secret=False, jira_webhook_secret=self.correct_secret)
+        self.system_settings(
+            enable_jira=True,
+            enable_jira_web_hook=True,
+            disable_jira_webhook_secret=False,
+            jira_webhook_secret=self.correct_secret,
+        )
 
         jira_issue = JIRA_Issue.objects.get(jira_id=2)
         finding = jira_issue.finding
@@ -513,12 +566,14 @@ class JIRAWebhookTest(DojoTestCase):
         jira_instance.save()
 
         body = json.loads(json.dumps(self.jira_issue_comment_template_json_with_email))
-        body['comment']['updateAuthor']['emailAddress'] = "defect.dojo@testme.com"
-        body['comment']['updateAuthor']['displayName'] = "Defect Dojo"
+        body["comment"]["updateAuthor"]["emailAddress"] = "defect.dojo@testme.com"
+        body["comment"]["updateAuthor"]["displayName"] = "Defect Dojo"
 
-        response = self.client.post(reverse('jira_web_hook_secret', args=(self.correct_secret, )),
-                                  body,
-                                  content_type="application/json")
+        response = self.client.post(
+            reverse("jira_web_hook_secret", args=(self.correct_secret,)),
+            body,
+            content_type="application/json",
+        )
 
         jira_issue = JIRA_Issue.objects.get(jira_id=2)
         finding = jira_issue.finding
@@ -534,20 +589,29 @@ class JIRAWebhookTest(DojoTestCase):
         self.assertEqual(notes_count_after, notes_count_before)
 
     def test_webhook_comment_on_finding_jira_under_path(self):
-        self.system_settings(enable_jira=True, enable_jira_web_hook=True, disable_jira_webhook_secret=False, jira_webhook_secret=self.correct_secret)
+        self.system_settings(
+            enable_jira=True,
+            enable_jira_web_hook=True,
+            disable_jira_webhook_secret=False,
+            jira_webhook_secret=self.correct_secret,
+        )
 
         # finding 5 has a JIRA issue in the initial fixture for unit tests with id=2
 
         body = json.loads(json.dumps(self.jira_issue_comment_template_json))
-        body['comment']['self'] = "http://www.testjira.com/my_little_happy_path_for_jira/rest/api/2/issue/2/comment/456843"
+        body["comment"][
+            "self"
+        ] = "http://www.testjira.com/my_little_happy_path_for_jira/rest/api/2/issue/2/comment/456843"
 
         jira_issue = JIRA_Issue.objects.get(jira_id=2)
         finding = jira_issue.finding
         notes_count_before = finding.notes.count()
 
-        response = self.client.post(reverse('jira_web_hook_secret', args=(self.correct_secret, )),
-                                    self.jira_issue_comment_template_json,
-                                    content_type="application/json")
+        response = self.client.post(
+            reverse("jira_web_hook_secret", args=(self.correct_secret,)),
+            self.jira_issue_comment_template_json,
+            content_type="application/json",
+        )
 
         jira_issue = JIRA_Issue.objects.get(jira_id=2)
         finding = jira_issue.finding
@@ -557,82 +621,130 @@ class JIRAWebhookTest(DojoTestCase):
         self.assertEqual(notes_count_after, notes_count_before + 1)
 
     def test_webhook_comment_on_engagement(self):
-        self.system_settings(enable_jira=True, enable_jira_web_hook=True, disable_jira_webhook_secret=False, jira_webhook_secret=self.correct_secret)
+        self.system_settings(
+            enable_jira=True,
+            enable_jira_web_hook=True,
+            disable_jira_webhook_secret=False,
+            jira_webhook_secret=self.correct_secret,
+        )
 
         # 333 = engagement
         body = json.loads(json.dumps(self.jira_issue_comment_template_json))
-        body['comment']['self'] = "http://www.testjira.com/rest/api/2/issue/333/comment/456843"
+        body["comment"][
+            "self"
+        ] = "http://www.testjira.com/rest/api/2/issue/333/comment/456843"
 
-        response = self.client.post(reverse('jira_web_hook_secret', args=(self.correct_secret, )),
-                                    body,
-                                    content_type="application/json")
+        response = self.client.post(
+            reverse("jira_web_hook_secret", args=(self.correct_secret,)),
+            body,
+            content_type="application/json",
+        )
         print(response.content)
 
         self.assertEqual(200, response.status_code, response.content[:1000])
-        self.assertEqual(b'Comment for engagement ignored', response.content)
+        self.assertEqual(b"Comment for engagement ignored", response.content)
 
     def test_webhook_update_engagement(self):
-        self.system_settings(enable_jira=True, enable_jira_web_hook=True, disable_jira_webhook_secret=False, jira_webhook_secret=self.correct_secret)
+        self.system_settings(
+            enable_jira=True,
+            enable_jira_web_hook=True,
+            disable_jira_webhook_secret=False,
+            jira_webhook_secret=self.correct_secret,
+        )
 
         # 333 = engagement
         body = json.loads(self.jira_issue_update_template_string)
-        body['issue']['id'] = 333
+        body["issue"]["id"] = 333
 
-        response = self.client.post(reverse('jira_web_hook_secret', args=(self.correct_secret, )),
-                                    body,
-                                    content_type="application/json")
+        response = self.client.post(
+            reverse("jira_web_hook_secret", args=(self.correct_secret,)),
+            body,
+            content_type="application/json",
+        )
 
         self.assertEqual(200, response.status_code, response.content[:1000])
-        self.assertEqual(b'Update for engagement ignored', response.content)
+        self.assertEqual(b"Update for engagement ignored", response.content)
 
     def test_webhook_comment_no_finding_no_engagement(self):
-        self.system_settings(enable_jira=True, enable_jira_web_hook=True, disable_jira_webhook_secret=False, jira_webhook_secret=self.correct_secret)
+        self.system_settings(
+            enable_jira=True,
+            enable_jira_web_hook=True,
+            disable_jira_webhook_secret=False,
+            jira_webhook_secret=self.correct_secret,
+        )
 
         # 666 = nothing attached to JIRA_Issue
         body = json.loads(json.dumps(self.jira_issue_comment_template_json))
-        body['comment']['self'] = "http://www.testjira.com/rest/api/2/issue/666/comment/456843"
+        body["comment"][
+            "self"
+        ] = "http://www.testjira.com/rest/api/2/issue/666/comment/456843"
 
-        response = self.client.post(reverse('jira_web_hook_secret', args=(self.correct_secret, )),
-                                    body,
-                                    content_type="application/json")
+        response = self.client.post(
+            reverse("jira_web_hook_secret", args=(self.correct_secret,)),
+            body,
+            content_type="application/json",
+        )
 
         self.assertEqual(404, response.status_code, response.content[:1000])
 
     def test_webhook_update_no_finding_no_engagement(self):
-        self.system_settings(enable_jira=True, enable_jira_web_hook=True, disable_jira_webhook_secret=False, jira_webhook_secret=self.correct_secret)
+        self.system_settings(
+            enable_jira=True,
+            enable_jira_web_hook=True,
+            disable_jira_webhook_secret=False,
+            jira_webhook_secret=self.correct_secret,
+        )
 
         # 666 = nothing attached to JIRA_Issue
         body = json.loads(self.jira_issue_update_template_string)
-        body['issue']['id'] = 999
+        body["issue"]["id"] = 999
 
-        response = self.client.post(reverse('jira_web_hook_secret', args=(self.correct_secret, )),
-                                    body,
-                                    content_type="application/json")
+        response = self.client.post(
+            reverse("jira_web_hook_secret", args=(self.correct_secret,)),
+            body,
+            content_type="application/json",
+        )
 
         self.assertEqual(404, response.status_code, response.content[:1000])
 
     def test_webhook_comment_no_jira_issue_at_all(self):
-        self.system_settings(enable_jira=True, enable_jira_web_hook=True, disable_jira_webhook_secret=False, jira_webhook_secret=self.correct_secret)
+        self.system_settings(
+            enable_jira=True,
+            enable_jira_web_hook=True,
+            disable_jira_webhook_secret=False,
+            jira_webhook_secret=self.correct_secret,
+        )
 
         # 666 = nothing attached to JIRA_Issue
         body = json.loads(json.dumps(self.jira_issue_comment_template_json))
-        body['comment']['self'] = "http://www.testjira.com/rest/api/2/issue/999/comment/456843"
+        body["comment"][
+            "self"
+        ] = "http://www.testjira.com/rest/api/2/issue/999/comment/456843"
 
-        response = self.client.post(reverse('jira_web_hook_secret', args=(self.correct_secret, )),
-                                    body,
-                                    content_type="application/json")
+        response = self.client.post(
+            reverse("jira_web_hook_secret", args=(self.correct_secret,)),
+            body,
+            content_type="application/json",
+        )
 
         self.assertEqual(404, response.status_code, response.content[:1000])
 
     def test_webhook_update_no_jira_issue_at_all(self):
-        self.system_settings(enable_jira=True, enable_jira_web_hook=True, disable_jira_webhook_secret=False, jira_webhook_secret=self.correct_secret)
+        self.system_settings(
+            enable_jira=True,
+            enable_jira_web_hook=True,
+            disable_jira_webhook_secret=False,
+            jira_webhook_secret=self.correct_secret,
+        )
 
         # 666 = nothing attached to JIRA_Issue
         body = json.loads(self.jira_issue_update_template_string)
-        body['issue']['id'] = 666
+        body["issue"]["id"] = 666
 
-        response = self.client.post(reverse('jira_web_hook_secret', args=(self.correct_secret, )),
-                                    body,
-                                    content_type="application/json")
+        response = self.client.post(
+            reverse("jira_web_hook_secret", args=(self.correct_secret,)),
+            body,
+            content_type="application/json",
+        )
 
         self.assertEqual(404, response.status_code, response.content[:1000])

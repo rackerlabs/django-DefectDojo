@@ -23,6 +23,8 @@ ignore =
     E402
     E126
     E128
+    # line break before binary operator
+    W503
     # line break after binary operator
     W504
     # undefined file name excpetion

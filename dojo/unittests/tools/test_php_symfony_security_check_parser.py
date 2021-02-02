@@ -4,7 +4,6 @@ from dojo.models import Test
 
 
 class TestPhpSymfonySecurityCheckerParser(TestCase):
-
     def test_php_symfony_security_check_parser_with_no_vuln_has_no_findings(self):
         testfile = open(
             "dojo/unittests/scans/php_symfony_security_check_sample/php_symfony_no_vuln.json"

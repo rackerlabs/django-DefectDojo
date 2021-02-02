@@ -4,7 +4,6 @@ from dojo.models import Test
 
 
 class TestTestsslCSVParser(TestCase):
-
     def test_parse_file_with_no_vuln_has_no_finding(self):
         testfile = open("dojo/unittests/scans/testssl/defectdojo_no_vuln.csv")
         parser = TestsslCSVParser()

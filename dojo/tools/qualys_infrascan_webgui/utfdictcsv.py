@@ -13,7 +13,6 @@ import io
 
 
 class DictUnicodeWriter(object):
-
     def __init__(self, f, fieldnames, dialect=csv.excel, encoding="utf-8", **kwds):
         # Redirect output to a queue
         self.queue = io.StringIO()

@@ -4,7 +4,6 @@ from dojo.tools.risk_recon.parser import RiskReconParser
 
 
 class TestRiskReconAPIParser(TestCase):
-
     def test_api_with_bad_url(self):
         testfile = open("dojo/unittests/scans/risk_recon/bad_url.json")
         with self.assertRaises(Exception):

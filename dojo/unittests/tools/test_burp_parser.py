@@ -10,7 +10,6 @@ def sample_path(file_name):
 
 
 class TestBurpParser(TestCase):
-
     def test_burp_with_one_vuln_has_one_finding(self):
         with open(sample_path("one_finding.xml")) as test_file:
             parser = BurpXmlParser()

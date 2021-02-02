@@ -12,7 +12,6 @@ class TestFile(object):
 
 
 class TestClairKlarParser(TestCase):
-
     def test_parse_no_content_no_findings(self):
         my_file_handle = open("dojo/unittests/scans/clair-klar/empty.json")
         parser = ClairKlarParser()

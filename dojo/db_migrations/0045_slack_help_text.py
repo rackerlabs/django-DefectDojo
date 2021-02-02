@@ -6,18 +6,28 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('dojo', '0044_required_prod_type'),
+        ("dojo", "0044_required_prod_type"),
     ]
 
     operations = [
         migrations.AlterField(
-            model_name='system_settings',
-            name='slack_channel',
-            field=models.CharField(blank=True, default='', help_text='Optional. Needed if you want to send global notifications.', max_length=100),
+            model_name="system_settings",
+            name="slack_channel",
+            field=models.CharField(
+                blank=True,
+                default="",
+                help_text="Optional. Needed if you want to send global notifications.",
+                max_length=100,
+            ),
         ),
         migrations.AlterField(
-            model_name='system_settings',
-            name='slack_username',
-            field=models.CharField(blank=True, default='', help_text='Optional. Will take your bot name otherwise.', max_length=100),
+            model_name="system_settings",
+            name="slack_username",
+            field=models.CharField(
+                blank=True,
+                default="",
+                help_text="Optional. Will take your bot name otherwise.",
+                max_length=100,
+            ),
         ),
     ]

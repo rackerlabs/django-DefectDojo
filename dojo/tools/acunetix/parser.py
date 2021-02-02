@@ -27,25 +27,34 @@ class AcunetixScannerParser(object):
         defectdojo_findings = dict()
 
         for acunetix_defectdojo_finding in acunetix_defectdojo_findings:
-            dupe_key = hashlib.md5((acunetix_defectdojo_finding.title + acunetix_defectdojo_finding.description).encode("utf-8")).hexdigest()
+            dupe_key = hashlib.md5(
+                (
+                    acunetix_defectdojo_finding.title
+                    + acunetix_defectdojo_finding.description
+                ).encode("utf-8")
+            ).hexdigest()
 
             if dupe_key not in defectdojo_findings:
                 defectdojo_findings[dupe_key] = Finding(
-                            title=acunetix_defectdojo_finding.title,
-                            date=get_defectdojo_date(acunetix_defectdojo_finding.date),
-                            url=acunetix_defectdojo_finding.url,
-                            cwe=get_cwe_number(acunetix_defectdojo_finding.cwe),
-                            test=test,
-                            severity=get_severity(acunetix_defectdojo_finding.severity),
-                            description=acunetix_defectdojo_finding.description,
-                            mitigation=acunetix_defectdojo_finding.mitigation,
-                            references=acunetix_defectdojo_finding.references,
-                            impact=acunetix_defectdojo_finding.impact,
-                            false_p=get_false_positive(acunetix_defectdojo_finding.false_p),
-                            dynamic_finding=acunetix_defectdojo_finding.dynamic_finding
+                    title=acunetix_defectdojo_finding.title,
+                    date=get_defectdojo_date(acunetix_defectdojo_finding.date),
+                    url=acunetix_defectdojo_finding.url,
+                    cwe=get_cwe_number(acunetix_defectdojo_finding.cwe),
+                    test=test,
+                    severity=get_severity(acunetix_defectdojo_finding.severity),
+                    description=acunetix_defectdojo_finding.description,
+                    mitigation=acunetix_defectdojo_finding.mitigation,
+                    references=acunetix_defectdojo_finding.references,
+                    impact=acunetix_defectdojo_finding.impact,
+                    false_p=get_false_positive(acunetix_defectdojo_finding.false_p),
+                    dynamic_finding=acunetix_defectdojo_finding.dynamic_finding,
                 )
             else:
-                logger.debug("Duplicate finding : {defectdojo_title}".format(defectdojo_title=acunetix_defectdojo_finding.title))
+                logger.debug(
+                    "Duplicate finding : {defectdojo_title}".format(
+                        defectdojo_title=acunetix_defectdojo_finding.title
+                    )
+                )
 
         return list(defectdojo_findings.values())
 

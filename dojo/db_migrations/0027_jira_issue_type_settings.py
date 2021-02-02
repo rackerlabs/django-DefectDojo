@@ -6,13 +6,25 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('dojo', '0026_login_banner'),
+        ("dojo", "0026_login_banner"),
     ]
 
     operations = [
         migrations.AlterField(
-            model_name='jira_conf',
-            name='default_issue_type',
-            field=models.CharField(choices=[('Task', 'Task'), ('Story', 'Story'), ('Epic', 'Epic'), ('Spike', 'Spike'), ('Bug', 'Bug'), ('Security', 'Security')], default='Bug', help_text='You can define extra issue types in settings.py', max_length=15),
+            model_name="jira_conf",
+            name="default_issue_type",
+            field=models.CharField(
+                choices=[
+                    ("Task", "Task"),
+                    ("Story", "Story"),
+                    ("Epic", "Epic"),
+                    ("Spike", "Spike"),
+                    ("Bug", "Bug"),
+                    ("Security", "Security"),
+                ],
+                default="Bug",
+                help_text="You can define extra issue types in settings.py",
+                max_length=15,
+            ),
         ),
     ]

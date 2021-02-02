@@ -7,13 +7,17 @@ import django.db.models.deletion
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('dojo', '0043_finding_hash_code_index'),
+        ("dojo", "0043_finding_hash_code_index"),
     ]
 
     operations = [
         migrations.AlterField(
-            model_name='product',
-            name='prod_type',
-            field=models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='prod_type', to='dojo.Product_Type'),
+            model_name="product",
+            name="prod_type",
+            field=models.ForeignKey(
+                on_delete=django.db.models.deletion.CASCADE,
+                related_name="prod_type",
+                to="dojo.Product_Type",
+            ),
         ),
     ]

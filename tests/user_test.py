@@ -9,7 +9,6 @@ from selenium.webdriver import ActionChains
 
 
 class UserTest(BaseTestCase):
-
     def test_create_user(self):
         # Login to the site.
         driver = self.driver
@@ -35,14 +34,22 @@ class UserTest(BaseTestCase):
         driver.find_element_by_id("id_email").clear()
         driver.find_element_by_id("id_email").send_keys("propersam@example.com")
         # Give user super user permissions by ticking the checkbox 'is_superuser'
-        driver.find_element_by_name("is_superuser").click()  # Clicking will mark the checkbox
+        driver.find_element_by_name(
+            "is_superuser"
+        ).click()  # Clicking will mark the checkbox
         # "Click" the submit button to complete the transaction
         driver.find_element_by_css_selector("input.btn.btn-primary").click()
         # Query the site to determine if the user has been created
 
         # Assert ot the query to dtermine status of failure
-        self.assertTrue(self.is_success_message_present(text='User added successfully, you may edit if necessary.') or
-            self.is_success_message_present(text='A user with that username already exists.'))
+        self.assertTrue(
+            self.is_success_message_present(
+                text="User added successfully, you may edit if necessary."
+            )
+            or self.is_success_message_present(
+                text="A user with that username already exists."
+            )
+        )
 
     def test_user_edit_permissions(self):
         # Login to the site. Password will have to be modified
@@ -70,7 +77,9 @@ class UserTest(BaseTestCase):
         # Query the site to determine if the User permission has been changed
 
         # Assert ot the query to dtermine status of failure
-        self.assertTrue(self.is_success_message_present(text='User saved successfully.'))
+        self.assertTrue(
+            self.is_success_message_present(text="User saved successfully.")
+        )
 
     def test_user_delete(self):
         # Login to the site. Password will have to be modified
@@ -96,7 +105,9 @@ class UserTest(BaseTestCase):
         # Query the site to determine if the User has been deleted
 
         # Assert ot the query to dtermine status of failure
-        self.assertTrue(self.is_success_message_present(text='User and relationships removed.'))
+        self.assertTrue(
+            self.is_success_message_present(text="User and relationships removed.")
+        )
 
     def test_user_notifications_change(self):
         # Login to the site. Password will have to be modified
@@ -105,31 +116,45 @@ class UserTest(BaseTestCase):
 
         wait = WebDriverWait(driver, 5)
         actions = ActionChains(driver)
-        configuration_menu = driver.find_element_by_id('menu_configuration')
+        configuration_menu = driver.find_element_by_id("menu_configuration")
         actions.move_to_element(configuration_menu).perform()
-        wait.until(EC.visibility_of_element_located((By.LINK_TEXT, "Notifications"))).click()
+        wait.until(
+            EC.visibility_of_element_located((By.LINK_TEXT, "Notifications"))
+        ).click()
 
-        driver.find_element_by_xpath("//input[@name='product_added' and @value='mail']").click()
-        driver.find_element_by_xpath("//input[@name='scan_added' and @value='mail']").click()
+        driver.find_element_by_xpath(
+            "//input[@name='product_added' and @value='mail']"
+        ).click()
+        driver.find_element_by_xpath(
+            "//input[@name='scan_added' and @value='mail']"
+        ).click()
 
         driver.find_element_by_css_selector("input.btn.btn-primary").click()
 
-        self.assertTrue(self.is_success_message_present(text='Settings saved'))
-        self.assertTrue(driver.find_element_by_xpath("//input[@name='product_added' and @value='mail']").is_selected())
-        self.assertTrue(driver.find_element_by_xpath("//input[@name='scan_added' and @value='mail']").is_selected())
+        self.assertTrue(self.is_success_message_present(text="Settings saved"))
+        self.assertTrue(
+            driver.find_element_by_xpath(
+                "//input[@name='product_added' and @value='mail']"
+            ).is_selected()
+        )
+        self.assertTrue(
+            driver.find_element_by_xpath(
+                "//input[@name='scan_added' and @value='mail']"
+            ).is_selected()
+        )
 
 
 def suite():
     suite = unittest.TestSuite()
     # Add each test the the suite to be run
     # success and failure is output by the test
-    suite.addTest(BaseTestCase('test_login'))
-    suite.addTest(UserTest('test_create_user'))
-    suite.addTest(UserTest('test_user_edit_permissions'))
-    suite.addTest(UserTest('test_user_delete'))
+    suite.addTest(BaseTestCase("test_login"))
+    suite.addTest(UserTest("test_create_user"))
+    suite.addTest(UserTest("test_user_edit_permissions"))
+    suite.addTest(UserTest("test_user_delete"))
 
     # not really for the user we created, but still related to user settings
-    suite.addTest(UserTest('test_user_notifications_change'))
+    suite.addTest(UserTest("test_user_notifications_change"))
 
     return suite
 

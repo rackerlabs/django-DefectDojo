@@ -6,7 +6,9 @@ from dojo.tools.sarif.parser import SarifParser
 
 class TestSarifParser(TestCase):
     def test_example_report(self):
-        testfile = open("dojo/unittests/scans/sarif/DefectDojo_django-DefectDojo__2020-12-11_13 42 10__export.sarif")
+        testfile = open(
+            "dojo/unittests/scans/sarif/DefectDojo_django-DefectDojo__2020-12-11_13 42 10__export.sarif"
+        )
         test = Test()
         parser = SarifParser()
         findings = parser.get_findings(testfile, test)
@@ -77,7 +79,9 @@ class TestSarifParser(TestCase):
         self.assertEqual("New suppressed result.", item.title)
 
     def test_example_report_semgrep(self):
-        testfile = open("dojo/unittests/scans/sarif/semgrepowasp-benchmark-sample.sarif")
+        testfile = open(
+            "dojo/unittests/scans/sarif/semgrepowasp-benchmark-sample.sarif"
+        )
         test = Test()
         parser = SarifParser()
         findings = parser.get_findings(testfile, test)

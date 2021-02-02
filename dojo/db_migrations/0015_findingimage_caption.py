@@ -7,18 +7,20 @@ import dojo.models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('dojo', '0014_jira_conf_resolution_mappings'),
+        ("dojo", "0014_jira_conf_resolution_mappings"),
     ]
 
     operations = [
         migrations.AddField(
-            model_name='findingimage',
-            name='caption',
+            model_name="findingimage",
+            name="caption",
             field=models.CharField(blank=True, max_length=500),
         ),
         migrations.AlterField(
-            model_name='findingimage',
-            name='image',
-            field=models.ImageField(upload_to=dojo.models.UniqueUploadNameProvider('finding_images')),
+            model_name="findingimage",
+            name="image",
+            field=models.ImageField(
+                upload_to=dojo.models.UniqueUploadNameProvider("finding_images")
+            ),
         ),
     ]

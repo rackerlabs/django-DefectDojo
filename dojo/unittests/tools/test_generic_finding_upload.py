@@ -1,5 +1,6 @@
 import sys
-sys.path.append('..')
+
+sys.path.append("..")
 import datetime
 from django.test import TestCase
 from dojo.models import Test, Engagement, Product
@@ -7,7 +8,6 @@ from dojo.tools.generic.parser import GenericFindingUploadCsvParser
 
 
 class TestFile(object):
-
     def read(self):
         return self.content
 
@@ -17,12 +17,9 @@ class TestFile(object):
 
 
 class TestGenericFindingUploadCsvParser(TestCase):
-
     def setUp(self):
-        self.product = Product(name='sample product',
-                               description='what a description')
-        self.engagement = Engagement(name='sample engagement',
-                                     product=self.product)
+        self.product = Product(name="sample product", description="what a description")
+        self.engagement = Engagement(name="sample engagement", product=self.product)
         self.test = Test(engagement=self.engagement)
 
     def test_parse_no_csv_content_no_findings(self):
@@ -39,8 +36,7 @@ class TestGenericFindingUploadCsvParser(TestCase):
         findings = parser.get_findings(file, self.test, True, True)
         self.assertEqual(0, len(findings))
 
-    def test_parse_csv_with_single_vulnerability_results_in_single_finding(
-            self):
+    def test_parse_csv_with_single_vulnerability_results_in_single_finding(self):
         content = """Date,Title,CweId,Url,Severity,Description,Mitigation,Impact,References,Active,Verified
 11/7/16,Potential XSS Vulnerability,79,,High,"FileName: default.aspx.cs
 Description: Potential XSS Vulnerability
@@ -52,8 +48,7 @@ Code Line: Response.Write(output);",None,,,TRUE,FALSE
         findings = parser.get_findings(file, self.test, True, True)
         self.assertEqual(1, len(findings))
 
-    def test_parse_csv_with_multiple_vulnerabilities_results_in_multiple_findings(
-            self):
+    def test_parse_csv_with_multiple_vulnerabilities_results_in_multiple_findings(self):
         content = """Date,Title,CweId,Url,Severity,Description,Mitigation,Impact,References,Active,Verified
 11/7/16,Potential XSS Vulnerability,79,,High,"FileName: default.aspx.cs
 Description: Potential XSS Vulnerability
@@ -107,8 +102,7 @@ Code Line: Response.Write(output);",None,,,TRUE,FALSE
         file = TestFile("findings.csv", content)
         parser = GenericFindingUploadCsvParser()
         findings = parser.get_findings(file, self.test, True, True)
-        self.assertEqual('Potential XSS Vulnerability',
-                         findings[0].title)
+        self.assertEqual("Potential XSS Vulnerability", findings[0].title)
 
     def test_parsed_finding_has_cwe(self):
         content = """Date,Title,CweId,Url,Severity,Description,Mitigation,Impact,References,Active,Verified
@@ -132,8 +126,7 @@ Code Line: Response.Write(output);",None,,,TRUE,FALSE
         file = TestFile("findings.csv", content)
         parser = GenericFindingUploadCsvParser()
         findings = parser.get_findings(file, self.test, True, True)
-        self.assertEqual('http://localhost/default.aspx',
-                         findings[0].url)
+        self.assertEqual("http://localhost/default.aspx", findings[0].url)
 
     def test_parsed_finding_has_severity(self):
         content = """Date,Title,CweId,Url,Severity,Description,Mitigation,Impact,References,Active,Verified
@@ -145,7 +138,7 @@ Code Line: Response.Write(output);",None,,,TRUE,FALSE
         file = TestFile("findings.csv", content)
         parser = GenericFindingUploadCsvParser()
         findings = parser.get_findings(file, self.test, True, True)
-        self.assertEqual('High', findings[0].severity)
+        self.assertEqual("High", findings[0].severity)
 
     def test_parsed_finding_with_invalid_severity_has_info_severity(self):
         content = """Date,Title,CweId,Url,Severity,Description,Mitigation,Impact,References,Active,Verified
@@ -157,7 +150,7 @@ Code Line: Response.Write(output);",None,,,TRUE,FALSE
         file = TestFile("findings.csv", content)
         parser = GenericFindingUploadCsvParser()
         findings = parser.get_findings(file, self.test, True, True)
-        self.assertEqual('Info', findings[0].severity)
+        self.assertEqual("Info", findings[0].severity)
 
     def test_parsed_finding_has_description(self):
         content = """Date,Title,CweId,Url,Severity,Description,Mitigation,Impact,References,Active,Verified
@@ -170,8 +163,9 @@ Code Line: Response.Write(output);",None,,,TRUE,FALSE
         parser = GenericFindingUploadCsvParser()
         findings = parser.get_findings(file, self.test, True, True)
         self.assertEqual(
-            'FileName: default.aspx.cs\nDescription: Potential XSS Vulnerability\nLine:18\nCode Line: Response.Write(output);',
-            findings[0].description)
+            "FileName: default.aspx.cs\nDescription: Potential XSS Vulnerability\nLine:18\nCode Line: Response.Write(output);",
+            findings[0].description,
+        )
 
     def test_parsed_finding_has_mitigation(self):
         content = """Date,Title,CweId,Url,Severity,Description,Mitigation,Impact,References,Active,Verified
@@ -183,8 +177,7 @@ Code Line: Response.Write(output);","None Currently Available",,,TRUE,FALSE
         file = TestFile("findings.csv", content)
         parser = GenericFindingUploadCsvParser()
         findings = parser.get_findings(file, self.test, True, True)
-        self.assertEqual('None Currently Available',
-                         findings[0].mitigation)
+        self.assertEqual("None Currently Available", findings[0].mitigation)
 
     def test_parsed_finding_has_impact(self):
         content = """Date,Title,CweId,Url,Severity,Description,Mitigation,Impact,References,Active,Verified
@@ -196,8 +189,7 @@ Code Line: Response.Write(output);","None Currently Available","Impact is curren
         file = TestFile("findings.csv", content)
         parser = GenericFindingUploadCsvParser()
         findings = parser.get_findings(file, self.test, True, True)
-        self.assertEqual('Impact is currently unknown',
-                         findings[0].impact)
+        self.assertEqual("Impact is currently unknown", findings[0].impact)
 
     def test_parsed_finding_has_references(self):
         content = """Date,Title,CweId,Url,Severity,Description,Mitigation,Impact,References,Active,Verified
@@ -209,8 +201,7 @@ Code Line: Response.Write(output);","None Currently Available","Impact is curren
         file = TestFile("findings.csv", content)
         parser = GenericFindingUploadCsvParser()
         findings = parser.get_findings(file, self.test, True, True)
-        self.assertEqual('Finding has references.',
-                         findings[0].references)
+        self.assertEqual("Finding has references.", findings[0].references)
 
     def test_parsed_finding_has_positive_active_status(self):
         content = """Date,Title,CweId,Url,Severity,Description,Mitigation,Impact,References,Active,Verified
@@ -334,7 +325,7 @@ True,11/7/2015,Title,0,Url,Severity,Description,Mitigation,Impact,References,Tru
         finding1 = findings1[0]
         finding2 = findings2[0]
 
-        fields1 = {k: v for k, v in finding1.__dict__.items() if k != '_state'}
-        fields2 = {k: v for k, v in finding2.__dict__.items() if k != '_state'}
+        fields1 = {k: v for k, v in finding1.__dict__.items() if k != "_state"}
+        fields2 = {k: v for k, v in finding2.__dict__.items() if k != "_state"}
 
         self.assertEqual(fields1, fields2)

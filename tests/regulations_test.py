@@ -5,14 +5,15 @@ from base_test_class import BaseTestCase
 
 
 class RegulationTest(BaseTestCase):
-
     def login_page(self):
         driver = self.driver
         driver.get(self.base_url + "login")
         driver.find_element_by_id("id_username").clear()
-        driver.find_element_by_id("id_username").send_keys(os.environ['DD_ADMIN_USER'])
+        driver.find_element_by_id("id_username").send_keys(os.environ["DD_ADMIN_USER"])
         driver.find_element_by_id("id_password").clear()
-        driver.find_element_by_id("id_password").send_keys(os.environ['DD_ADMIN_PASSWORD'])
+        driver.find_element_by_id("id_password").send_keys(
+            os.environ["DD_ADMIN_PASSWORD"]
+        )
         driver.find_element_by_css_selector("button.btn.btn-success").click()
         return driver
 
@@ -35,7 +36,9 @@ class RegulationTest(BaseTestCase):
         driver.find_element_by_id("id_reference").send_keys("http://www.psa.eu")
         driver.find_element_by_css_selector(".col-sm-offset-2 > .btn").click()
 
-        self.assertTrue(self.is_success_message_present(text='Regulation Successfully Created.'))
+        self.assertTrue(
+            self.is_success_message_present(text="Regulation Successfully Created.")
+        )
 
     def test_edit_regulation(self):
         driver = self.driver
@@ -45,7 +48,9 @@ class RegulationTest(BaseTestCase):
         driver.find_element_by_id("id_name").clear()
         driver.find_element_by_id("id_name").send_keys("Edited PSA test")
         driver.find_element_by_id("submit").click()
-        self.assertTrue(self.is_success_message_present(text='Regulation Successfully Updated.'))
+        self.assertTrue(
+            self.is_success_message_present(text="Regulation Successfully Updated.")
+        )
 
     def test_delete_regulation(self):
         driver = self.driver
@@ -54,15 +59,15 @@ class RegulationTest(BaseTestCase):
         driver.find_element_by_link_text("Edited PSA test").click()
         driver.find_element_by_id("delete").click()
 
-        self.assertTrue(self.is_success_message_present(text='Regulation Deleted.'))
+        self.assertTrue(self.is_success_message_present(text="Regulation Deleted."))
 
 
 def suite():
     suite = unittest.TestSuite()
-    suite.addTest(BaseTestCase('test_login'))
-    suite.addTest(RegulationTest('test_create_regulation'))
-    suite.addTest(RegulationTest('test_edit_regulation'))
-    suite.addTest(RegulationTest('test_delete_regulation'))
+    suite.addTest(BaseTestCase("test_login"))
+    suite.addTest(RegulationTest("test_create_regulation"))
+    suite.addTest(RegulationTest("test_edit_regulation"))
+    suite.addTest(RegulationTest("test_delete_regulation"))
     return suite
 
 

@@ -6,12 +6,12 @@ from django.db import migrations
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('dojo', '0032_system_settings_enable_auditlog'),
+        ("dojo", "0032_system_settings_enable_auditlog"),
     ]
 
     operations = [
         migrations.RemoveField(
-            model_name='finding',
-            name='duplicate_list',
+            model_name="finding",
+            name="duplicate_list",
         ),
     ]

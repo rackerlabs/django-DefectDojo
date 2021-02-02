@@ -10,190 +10,392 @@ class Migration(migrations.Migration):
 
     initial = True
     dependencies = [
-        ('contenttypes', '0002_remove_content_type_name'),
-        ('dojo', '0040_finding_cwe_index'),
+        ("contenttypes", "0002_remove_content_type_name"),
+        ("dojo", "0040_finding_cwe_index"),
         migrations.swappable_dependency(settings.AUTH_USER_MODEL),
     ]
 
     operations = [
         migrations.CreateModel(
-            name='Question',
+            name="Question",
             fields=[
-                ('id', models.AutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('created', django_extensions.db.fields.CreationDateTimeField(auto_now_add=True, verbose_name='created')),
-                ('modified', django_extensions.db.fields.ModificationDateTimeField(auto_now=True, verbose_name='modified')),
-                ('order', models.PositiveIntegerField(default=1, help_text='The render order')),
-                ('optional', models.BooleanField(default=False, help_text="If selected, user doesn't have to answer this question")),
-                ('text', models.TextField(blank=False, help_text='The question text', default='')),
+                (
+                    "id",
+                    models.AutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
+                (
+                    "created",
+                    django_extensions.db.fields.CreationDateTimeField(
+                        auto_now_add=True, verbose_name="created"
+                    ),
+                ),
+                (
+                    "modified",
+                    django_extensions.db.fields.ModificationDateTimeField(
+                        auto_now=True, verbose_name="modified"
+                    ),
+                ),
+                (
+                    "order",
+                    models.PositiveIntegerField(
+                        default=1, help_text="The render order"
+                    ),
+                ),
+                (
+                    "optional",
+                    models.BooleanField(
+                        default=False,
+                        help_text="If selected, user doesn't have to answer this question",
+                    ),
+                ),
+                (
+                    "text",
+                    models.TextField(
+                        blank=False, help_text="The question text", default=""
+                    ),
+                ),
             ],
             options={
-                'ordering': ['order'],
+                "ordering": ["order"],
             },
         ),
         migrations.CreateModel(
-            name='TextQuestion',
+            name="TextQuestion",
             fields=[
-                ('question_ptr', models.OneToOneField(auto_created=True, on_delete=django.db.models.deletion.CASCADE, parent_link=True, primary_key=True, serialize=False, to='dojo.Question')),
+                (
+                    "question_ptr",
+                    models.OneToOneField(
+                        auto_created=True,
+                        on_delete=django.db.models.deletion.CASCADE,
+                        parent_link=True,
+                        primary_key=True,
+                        serialize=False,
+                        to="dojo.Question",
+                    ),
+                ),
             ],
             options={
-                'abstract': False,
-                'base_manager_name': 'objects',
+                "abstract": False,
+                "base_manager_name": "objects",
             },
-            bases=('dojo.question',),
+            bases=("dojo.question",),
         ),
         migrations.CreateModel(
-            name='Choice',
+            name="Choice",
             fields=[
-                ('id', models.AutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('created', django_extensions.db.fields.CreationDateTimeField(auto_now_add=True, verbose_name='created')),
-                ('modified', django_extensions.db.fields.ModificationDateTimeField(auto_now=True, verbose_name='modified')),
-                ('order', models.PositiveIntegerField(default=1)),
-                ('label', models.TextField(default='')),
+                (
+                    "id",
+                    models.AutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
+                (
+                    "created",
+                    django_extensions.db.fields.CreationDateTimeField(
+                        auto_now_add=True, verbose_name="created"
+                    ),
+                ),
+                (
+                    "modified",
+                    django_extensions.db.fields.ModificationDateTimeField(
+                        auto_now=True, verbose_name="modified"
+                    ),
+                ),
+                ("order", models.PositiveIntegerField(default=1)),
+                ("label", models.TextField(default="")),
             ],
             options={
-                'ordering': ['order'],
-            },
-        ),
-        migrations.CreateModel(
-            name='ChoiceQuestion',
-            fields=[
-                ('question_ptr', models.OneToOneField(auto_created=True, on_delete=django.db.models.deletion.CASCADE, parent_link=True, primary_key=True, serialize=False, to='dojo.Question')),
-                ('multichoice', models.BooleanField(default=False, help_text='Select one or more')),
-            ],
-            options={
-                'abstract': False,
-                'base_manager_name': 'objects',
-            },
-            bases=('dojo.question',),
-        ),
-        migrations.CreateModel(
-            name='Engagement_Survey',
-            fields=[
-                ('id', models.AutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('name', models.CharField(max_length=200, null=False, blank=False, editable=True, default='')),
-                ('description', models.TextField(editable=True, default='')),
-                ('active', models.BooleanField(default=True)),
-            ],
-            options={
-                'verbose_name': 'Engagement Survey',
-                'verbose_name_plural': 'Engagement Surveys',
-                'ordering': ('-active', 'name'),
-            },
-        ),
-        migrations.CreateModel(
-            name='Answered_Survey',
-            fields=[
-                ('id', models.AutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('completed', models.BooleanField(default=False)),
-                ('answered_on', models.DateField(null=True)),
-            ],
-            options={
-                'verbose_name': 'Answered Engagement Survey',
-                'verbose_name_plural': 'Answered Engagement Surveys',
+                "ordering": ["order"],
             },
         ),
         migrations.CreateModel(
-            name='General_Survey',
+            name="ChoiceQuestion",
             fields=[
-                ('id', models.AutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('num_responses', models.IntegerField(default=0)),
-                ('generated', models.DateTimeField(auto_now_add=True, null=True)),
-                ('expiration', models.DateTimeField(null=False, blank=False)),
+                (
+                    "question_ptr",
+                    models.OneToOneField(
+                        auto_created=True,
+                        on_delete=django.db.models.deletion.CASCADE,
+                        parent_link=True,
+                        primary_key=True,
+                        serialize=False,
+                        to="dojo.Question",
+                    ),
+                ),
+                (
+                    "multichoice",
+                    models.BooleanField(default=False, help_text="Select one or more"),
+                ),
             ],
             options={
-                'verbose_name': 'General Engagement Survey',
-                'verbose_name_plural': 'General Engagement Surveys',
+                "abstract": False,
+                "base_manager_name": "objects",
+            },
+            bases=("dojo.question",),
+        ),
+        migrations.CreateModel(
+            name="Engagement_Survey",
+            fields=[
+                (
+                    "id",
+                    models.AutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
+                (
+                    "name",
+                    models.CharField(
+                        max_length=200,
+                        null=False,
+                        blank=False,
+                        editable=True,
+                        default="",
+                    ),
+                ),
+                ("description", models.TextField(editable=True, default="")),
+                ("active", models.BooleanField(default=True)),
+            ],
+            options={
+                "verbose_name": "Engagement Survey",
+                "verbose_name_plural": "Engagement Surveys",
+                "ordering": ("-active", "name"),
             },
         ),
         migrations.CreateModel(
-            name='Answer',
+            name="Answered_Survey",
             fields=[
-                ('id', models.AutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('created', django_extensions.db.fields.CreationDateTimeField(auto_now_add=True, verbose_name='created')),
-                ('modified', django_extensions.db.fields.ModificationDateTimeField(auto_now=True, verbose_name='modified')),
+                (
+                    "id",
+                    models.AutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
+                ("completed", models.BooleanField(default=False)),
+                ("answered_on", models.DateField(null=True)),
             ],
             options={
-                'abstract': False,
-                'base_manager_name': 'objects',
+                "verbose_name": "Answered Engagement Survey",
+                "verbose_name_plural": "Answered Engagement Surveys",
             },
         ),
         migrations.CreateModel(
-            name='TextAnswer',
+            name="General_Survey",
             fields=[
-                ('answer_ptr', models.OneToOneField(auto_created=True, on_delete=django.db.models.deletion.CASCADE, parent_link=True, primary_key=True, serialize=False, to='dojo.Answer')),
-                ('answer', models.TextField(blank=False, help_text='The answer text', default='')),
+                (
+                    "id",
+                    models.AutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
+                ("num_responses", models.IntegerField(default=0)),
+                ("generated", models.DateTimeField(auto_now_add=True, null=True)),
+                ("expiration", models.DateTimeField(null=False, blank=False)),
             ],
             options={
-                'abstract': False,
-                'base_manager_name': 'objects',
+                "verbose_name": "General Engagement Survey",
+                "verbose_name_plural": "General Engagement Surveys",
             },
-            bases=('dojo.answer',),
         ),
         migrations.CreateModel(
-            name='ChoiceAnswer',
+            name="Answer",
             fields=[
-                ('answer_ptr', models.OneToOneField(auto_created=True, on_delete=django.db.models.deletion.CASCADE, parent_link=True, primary_key=True, serialize=False, to='dojo.Answer')),
-                ('answer', models.ManyToManyField(help_text='The selected choices as the answer', to='dojo.Choice')),
+                (
+                    "id",
+                    models.AutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
+                (
+                    "created",
+                    django_extensions.db.fields.CreationDateTimeField(
+                        auto_now_add=True, verbose_name="created"
+                    ),
+                ),
+                (
+                    "modified",
+                    django_extensions.db.fields.ModificationDateTimeField(
+                        auto_now=True, verbose_name="modified"
+                    ),
+                ),
             ],
             options={
-                'abstract': False,
-                'base_manager_name': 'objects',
+                "abstract": False,
+                "base_manager_name": "objects",
             },
-            bases=('dojo.answer',),
+        ),
+        migrations.CreateModel(
+            name="TextAnswer",
+            fields=[
+                (
+                    "answer_ptr",
+                    models.OneToOneField(
+                        auto_created=True,
+                        on_delete=django.db.models.deletion.CASCADE,
+                        parent_link=True,
+                        primary_key=True,
+                        serialize=False,
+                        to="dojo.Answer",
+                    ),
+                ),
+                (
+                    "answer",
+                    models.TextField(
+                        blank=False, help_text="The answer text", default=""
+                    ),
+                ),
+            ],
+            options={
+                "abstract": False,
+                "base_manager_name": "objects",
+            },
+            bases=("dojo.answer",),
+        ),
+        migrations.CreateModel(
+            name="ChoiceAnswer",
+            fields=[
+                (
+                    "answer_ptr",
+                    models.OneToOneField(
+                        auto_created=True,
+                        on_delete=django.db.models.deletion.CASCADE,
+                        parent_link=True,
+                        primary_key=True,
+                        serialize=False,
+                        to="dojo.Answer",
+                    ),
+                ),
+                (
+                    "answer",
+                    models.ManyToManyField(
+                        help_text="The selected choices as the answer", to="dojo.Choice"
+                    ),
+                ),
+            ],
+            options={
+                "abstract": False,
+                "base_manager_name": "objects",
+            },
+            bases=("dojo.answer",),
         ),
         migrations.AddField(
-            model_name='question',
-            name='polymorphic_ctype',
-            field=models.ForeignKey(editable=False, null=True, on_delete=django.db.models.deletion.CASCADE, related_name='polymorphic_dojo.question_set+', to='contenttypes.ContentType'),
+            model_name="question",
+            name="polymorphic_ctype",
+            field=models.ForeignKey(
+                editable=False,
+                null=True,
+                on_delete=django.db.models.deletion.CASCADE,
+                related_name="polymorphic_dojo.question_set+",
+                to="contenttypes.ContentType",
+            ),
         ),
         migrations.AddField(
-            model_name='choicequestion',
-            name='choices',
-            field=models.ManyToManyField(to='dojo.Choice'),
+            model_name="choicequestion",
+            name="choices",
+            field=models.ManyToManyField(to="dojo.Choice"),
         ),
         migrations.AddField(
-            model_name='engagement_survey',
-            name='questions',
-            field=models.ManyToManyField(to='dojo.Question'),
+            model_name="engagement_survey",
+            name="questions",
+            field=models.ManyToManyField(to="dojo.Question"),
         ),
         migrations.AddField(
-            model_name='answered_survey',
-            name='engagement',
-            field=models.ForeignKey(null=True, blank=False, editable=True, on_delete=django.db.models.deletion.CASCADE, related_name='engagement+', to='dojo.Engagement'),
+            model_name="answered_survey",
+            name="engagement",
+            field=models.ForeignKey(
+                null=True,
+                blank=False,
+                editable=True,
+                on_delete=django.db.models.deletion.CASCADE,
+                related_name="engagement+",
+                to="dojo.Engagement",
+            ),
         ),
         migrations.AddField(
-            model_name='answered_survey',
-            name='responder',
-            field=models.ForeignKey(blank=True, default=None, null=True, editable=True, on_delete=django.db.models.deletion.CASCADE, related_name='responder', to=settings.AUTH_USER_MODEL),
+            model_name="answered_survey",
+            name="responder",
+            field=models.ForeignKey(
+                blank=True,
+                default=None,
+                null=True,
+                editable=True,
+                on_delete=django.db.models.deletion.CASCADE,
+                related_name="responder",
+                to=settings.AUTH_USER_MODEL,
+            ),
         ),
         migrations.AddField(
-            model_name='answered_survey',
-            name='assignee',
-            field=models.ForeignKey(blank=True, default=None, null=True, editable=True, on_delete=django.db.models.deletion.CASCADE, related_name='assignee', to=settings.AUTH_USER_MODEL),
+            model_name="answered_survey",
+            name="assignee",
+            field=models.ForeignKey(
+                blank=True,
+                default=None,
+                null=True,
+                editable=True,
+                on_delete=django.db.models.deletion.CASCADE,
+                related_name="assignee",
+                to=settings.AUTH_USER_MODEL,
+            ),
         ),
         migrations.AddField(
-            model_name='answered_survey',
-            name='survey',
-            field=models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='dojo.Engagement_Survey'),
+            model_name="answered_survey",
+            name="survey",
+            field=models.ForeignKey(
+                on_delete=django.db.models.deletion.CASCADE, to="dojo.Engagement_Survey"
+            ),
         ),
         migrations.AddField(
-            model_name='general_survey',
-            name='survey',
-            field=models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='dojo.Engagement_Survey'),
+            model_name="general_survey",
+            name="survey",
+            field=models.ForeignKey(
+                on_delete=django.db.models.deletion.CASCADE, to="dojo.Engagement_Survey"
+            ),
         ),
         migrations.AddField(
-            model_name='answer',
-            name='answered_survey',
-            field=models.ForeignKey(null=False, blank=False, on_delete=django.db.models.deletion.CASCADE, to='dojo.Answered_Survey'),
+            model_name="answer",
+            name="answered_survey",
+            field=models.ForeignKey(
+                null=False,
+                blank=False,
+                on_delete=django.db.models.deletion.CASCADE,
+                to="dojo.Answered_Survey",
+            ),
         ),
         migrations.AddField(
-            model_name='answer',
-            name='polymorphic_ctype',
-            field=models.ForeignKey(editable=False, null=True, on_delete=django.db.models.deletion.CASCADE, related_name='polymorphic_dojo.answer_set+', to='contenttypes.ContentType'),
+            model_name="answer",
+            name="polymorphic_ctype",
+            field=models.ForeignKey(
+                editable=False,
+                null=True,
+                on_delete=django.db.models.deletion.CASCADE,
+                related_name="polymorphic_dojo.answer_set+",
+                to="contenttypes.ContentType",
+            ),
         ),
         migrations.AddField(
-            model_name='answer',
-            name='question',
-            field=models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='dojo.Question'),
+            model_name="answer",
+            name="question",
+            field=models.ForeignKey(
+                on_delete=django.db.models.deletion.CASCADE, to="dojo.Question"
+            ),
         ),
     ]

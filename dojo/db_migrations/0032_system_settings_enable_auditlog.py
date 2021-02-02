@@ -6,13 +6,17 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('dojo', '0031_finding_component'),
+        ("dojo", "0031_finding_component"),
     ]
 
     operations = [
         migrations.AddField(
-            model_name='system_settings',
-            name='enable_auditlog',
-            field=models.BooleanField(default=True, help_text="With this setting turned on, Dojo maintains an audit log of changes made to entities (Findings, Tests, Engagements, Procuts, ...)If you run big import you may want to disable this because the way django-auditlog currently works, there's a big performance hit. Especially during (re-)imports.", verbose_name='Enable audit logging'),
+            model_name="system_settings",
+            name="enable_auditlog",
+            field=models.BooleanField(
+                default=True,
+                help_text="With this setting turned on, Dojo maintains an audit log of changes made to entities (Findings, Tests, Engagements, Procuts, ...)If you run big import you may want to disable this because the way django-auditlog currently works, there's a big performance hit. Especially during (re-)imports.",
+                verbose_name="Enable audit logging",
+            ),
         ),
     ]

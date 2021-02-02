@@ -6,8 +6,14 @@ from django.urls import reverse
 from django.utils import timezone
 
 from dojo.notifications.helper import create_notification
-from dojo.models import Test, Test_Type, Development_Environment, Objects_Engagement, \
-                        Objects_Product, Objects_Review
+from dojo.models import (
+    Test,
+    Test_Type,
+    Development_Environment,
+    Objects_Engagement,
+    Objects_Product,
+    Objects_Review,
+)
 
 
 logger = logging.getLogger(__name__)
@@ -45,10 +51,12 @@ def import_object_eng(request, engagement, json_data):
     product = engagement.product
 
     # Retrieve the files currently set for this product
-    object_queryset = Objects_Product.objects.filter(product=engagement.product.id).order_by('-path')
+    object_queryset = Objects_Product.objects.filter(
+        product=engagement.product.id
+    ).order_by("-path")
     tree = json_data.read()
     try:
-        data = json.loads(str(tree, 'utf-8'))
+        data = json.loads(str(tree, "utf-8"))
     except:
         data = json.loads(tree)
 
@@ -71,7 +79,9 @@ def import_object_eng(request, engagement, json_data):
             review_status = Objects_Review.objects.get(pk=review_status_id)
 
             # if found_object is None:
-            object = Objects_Product(product=product, path=file["path"], review_status=review_status)
+            object = Objects_Product(
+                product=product, path=file["path"], review_status=review_status
+            )
             object.save()
             found_object = object
             if file_type == "path":
@@ -99,19 +109,48 @@ def import_object_eng(request, engagement, json_data):
             create_alert = True
 
         # Save the changed files to the engagement view
-        object_eng = Objects_Engagement(engagement=engagement, object_id=found_object, full_url=full_url, type=file_type, percentUnchanged=percentUnchanged, build_id=build_id)
+        object_eng = Objects_Engagement(
+            engagement=engagement,
+            object_id=found_object,
+            full_url=full_url,
+            type=file_type,
+            percentUnchanged=percentUnchanged,
+            build_id=build_id,
+        )
         object_eng.save()
 
     # Create the notification
     if create_alert:
-        create_notification(event='code_review', title='Manual Code Review Requested', description="Manual code review requested as tracked file changes were found in the latest build.", engagement=engagement, url=reverse('view_object_eng', args=(engagement.id,)))
+        create_notification(
+            event="code_review",
+            title="Manual Code Review Requested",
+            description="Manual code review requested as tracked file changes were found in the latest build.",
+            engagement=engagement,
+            url=reverse("view_object_eng", args=(engagement.id,)),
+        )
 
     # Create the test within the engagement
     if create_test_code_review:
-        environment, env_created = Development_Environment.objects.get_or_create(name="Development")
+        environment, env_created = Development_Environment.objects.get_or_create(
+            name="Development"
+        )
         tt = Test_Type.objects.get(pk=27)  # Manual code review
         if tt:
-            test = Test(engagement=engagement, test_type=tt, target_start=timezone.now(),
-                     target_end=timezone.now() + timezone.timedelta(days=1), environment=environment, percent_complete=0)
+            test = Test(
+                engagement=engagement,
+                test_type=tt,
+                target_start=timezone.now(),
+                target_end=timezone.now() + timezone.timedelta(days=1),
+                environment=environment,
+                percent_complete=0,
+            )
             test.save()
-            create_notification(event='test_added', title='Test added for Manual Code Review', test=test, engagement=engagement, url=request.build_absolute_uri(reverse('view_engagement', args=(engagement.id,))))
+            create_notification(
+                event="test_added",
+                title="Test added for Manual Code Review",
+                test=test,
+                engagement=engagement,
+                url=request.build_absolute_uri(
+                    reverse("view_engagement", args=(engagement.id,))
+                ),
+            )

@@ -7,58 +7,154 @@ import django.db.models.deletion
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('dojo', '0033_remove_finding_duplicate_list'),
+        ("dojo", "0033_remove_finding_duplicate_list"),
     ]
 
     operations = [
         migrations.CreateModel(
-            name='GITHUB_Clone',
+            name="GITHUB_Clone",
             fields=[
-                ('id', models.AutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('github_id', models.CharField(max_length=200)),
-                ('github_clone_id', models.CharField(max_length=200)),
+                (
+                    "id",
+                    models.AutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
+                ("github_id", models.CharField(max_length=200)),
+                ("github_clone_id", models.CharField(max_length=200)),
             ],
         ),
         migrations.CreateModel(
-            name='GITHUB_Conf',
+            name="GITHUB_Conf",
             fields=[
-                ('id', models.AutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('configuration_name', models.CharField(default='', help_text='Enter a name to give to this configuration', max_length=2000)),
-                ('api_key', models.CharField(default='', help_text='Enter your Github API Key', max_length=2000)),
+                (
+                    "id",
+                    models.AutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
+                (
+                    "configuration_name",
+                    models.CharField(
+                        default="",
+                        help_text="Enter a name to give to this configuration",
+                        max_length=2000,
+                    ),
+                ),
+                (
+                    "api_key",
+                    models.CharField(
+                        default="",
+                        help_text="Enter your Github API Key",
+                        max_length=2000,
+                    ),
+                ),
             ],
         ),
         migrations.CreateModel(
-            name='GITHUB_Details_Cache',
+            name="GITHUB_Details_Cache",
             fields=[
-                ('id', models.AutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('github_id', models.CharField(max_length=200)),
-                ('github_key', models.CharField(max_length=200)),
-                ('github_status', models.CharField(max_length=200)),
-                ('github_resolution', models.CharField(max_length=200)),
+                (
+                    "id",
+                    models.AutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
+                ("github_id", models.CharField(max_length=200)),
+                ("github_key", models.CharField(max_length=200)),
+                ("github_status", models.CharField(max_length=200)),
+                ("github_resolution", models.CharField(max_length=200)),
             ],
         ),
         migrations.AddField(
-            model_name='system_settings',
-            name='enable_github',
-            field=models.BooleanField(default=False, verbose_name='Enable GITHUB integration'),
+            model_name="system_settings",
+            name="enable_github",
+            field=models.BooleanField(
+                default=False, verbose_name="Enable GITHUB integration"
+            ),
         ),
         migrations.CreateModel(
-            name='GITHUB_PKey',
+            name="GITHUB_PKey",
             fields=[
-                ('id', models.AutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('project_key', models.CharField(blank=True, help_text='Specify your project location. (:user/:repo)', max_length=200, verbose_name='Github project')),
-                ('push_notes', models.BooleanField(blank=True, default=False, help_text='Notes added to findings will be automatically added to the corresponding github issue')),
-                ('conf', models.ForeignKey(blank=True, null=True, on_delete=django.db.models.deletion.CASCADE, to='dojo.GITHUB_Conf', verbose_name='Github Configuration')),
-                ('product', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='dojo.Product')),
+                (
+                    "id",
+                    models.AutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
+                (
+                    "project_key",
+                    models.CharField(
+                        blank=True,
+                        help_text="Specify your project location. (:user/:repo)",
+                        max_length=200,
+                        verbose_name="Github project",
+                    ),
+                ),
+                (
+                    "push_notes",
+                    models.BooleanField(
+                        blank=True,
+                        default=False,
+                        help_text="Notes added to findings will be automatically added to the corresponding github issue",
+                    ),
+                ),
+                (
+                    "conf",
+                    models.ForeignKey(
+                        blank=True,
+                        null=True,
+                        on_delete=django.db.models.deletion.CASCADE,
+                        to="dojo.GITHUB_Conf",
+                        verbose_name="Github Configuration",
+                    ),
+                ),
+                (
+                    "product",
+                    models.ForeignKey(
+                        on_delete=django.db.models.deletion.CASCADE, to="dojo.Product"
+                    ),
+                ),
             ],
         ),
         migrations.CreateModel(
-            name='GITHUB_Issue',
+            name="GITHUB_Issue",
             fields=[
-                ('id', models.AutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('issue_id', models.CharField(max_length=200)),
-                ('issue_url', models.URLField(max_length=2000, verbose_name='GitHub issue URL')),
-                ('finding', models.OneToOneField(blank=True, null=True, on_delete=django.db.models.deletion.CASCADE, to='dojo.Finding')),
+                (
+                    "id",
+                    models.AutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
+                ("issue_id", models.CharField(max_length=200)),
+                (
+                    "issue_url",
+                    models.URLField(max_length=2000, verbose_name="GitHub issue URL"),
+                ),
+                (
+                    "finding",
+                    models.OneToOneField(
+                        blank=True,
+                        null=True,
+                        on_delete=django.db.models.deletion.CASCADE,
+                        to="dojo.Finding",
+                    ),
+                ),
             ],
         ),
     ]

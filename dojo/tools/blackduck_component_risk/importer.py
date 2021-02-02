@@ -3,7 +3,7 @@ import io
 import zipfile
 from pathlib import Path
 
-__author__ = 'Apipia'
+__author__ = "Apipia"
 
 
 class BlackduckCRImporter(object):
@@ -15,6 +15,7 @@ class BlackduckCRImporter(object):
     Security Risks and License Risks.
     Security Risks have the severity and impact of it's highest vulnerability the component has.
     """
+
     def parse_findings(self, report: Path) -> (dict, dict, dict):
         """
         Given a path to a zip file, this function will find the relevant CSV files and
@@ -52,15 +53,15 @@ class BlackduckCRImporter(object):
                     # zip file, best to ignore it.
                     file_name = full_file_name.split("/")[-1]
                     # Look for the component and security CSVs.
-                    if 'component' in file_name:
+                    if "component" in file_name:
                         with io.TextIOWrapper(zip.open(full_file_name)) as f:
                             components = self.__get_components(f)
                             c_file = True
-                    elif 'security' in file_name:
+                    elif "security" in file_name:
                         with io.TextIOWrapper(zip.open(full_file_name)) as f:
                             security_issues = self.__get_security_risks(f)
                             s_file = True
-                    elif 'source' in file_name:
+                    elif "source" in file_name:
                         with io.TextIOWrapper(zip.open(full_file_name)) as f:
                             source = self.__get_source(f)
                             src_file = True
@@ -90,8 +91,9 @@ class BlackduckCRImporter(object):
         records = csv.DictReader(src_file)
         for record in records:
             # Using component_id:version_id for unique identifier of each component
-            source[record.get("Component id") + ":" + record.get("Version id") + ":License"]\
-                = {x[0]: x[1] for x in record.items()}
+            source[
+                record.get("Component id") + ":" + record.get("Version id") + ":License"
+            ] = {x[0]: x[1] for x in record.items()}
         return source
 
     def __get_components(self, csv_file) -> dict:
@@ -111,8 +113,9 @@ class BlackduckCRImporter(object):
         records = csv.DictReader(csv_file)
         for record in records:
             # Using component_id:version_id for unique identifier of each component
-            components[record.get("Component id") + ":" + record.get("Version id") + ":License"]\
-                = {x[0]: x[1] for x in record.items()}
+            components[
+                record.get("Component id") + ":" + record.get("Version id") + ":License"
+            ] = {x[0]: x[1] for x in record.items()}
         return components
 
     def __get_security_risks(self, csv_file) -> dict:
@@ -131,7 +134,12 @@ class BlackduckCRImporter(object):
         securities = {}
         records = csv.DictReader(csv_file)
         for record in records:
-            key = record.get("Component id") + ":" + record.get("Version id") + ":security"
+            key = (
+                record.get("Component id")
+                + ":"
+                + record.get("Version id")
+                + ":security"
+            )
             vulns = securities.get(key) or []
             vulns.append({x[0]: x[1] for x in record.items()})
             securities[key] = vulns

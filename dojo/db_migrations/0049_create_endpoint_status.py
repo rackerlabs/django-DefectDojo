@@ -1,4 +1,3 @@
-
 from django.db import migrations, models
 
 
@@ -8,12 +7,15 @@ class Migration(migrations.Migration):
     This script will create endpoint status objects for findings and endpoints for
     databases that already contain those objects.
     """
+
     def create_status_objects(apps, schema_editor):
         # Retreive the correct models
-        Finding = apps.get_model('dojo', 'Finding')
-        Endpoint_Status = apps.get_model('dojo', 'Endpoint_Status')
+        Finding = apps.get_model("dojo", "Finding")
+        Endpoint_Status = apps.get_model("dojo", "Endpoint_Status")
         # Get a list of findings that have endpoints
-        findings = Finding.objects.annotate(count=models.Count('endpoints')).filter(count__gt=0)
+        findings = Finding.objects.annotate(count=models.Count("endpoints")).filter(
+            count__gt=0
+        )
         for finding in findings:
             # Get the list of endpoints on the current finding
             endpoints = finding.endpoints.all()
@@ -44,7 +46,7 @@ class Migration(migrations.Migration):
                     pass
 
     dependencies = [
-        ('dojo', '0048_sla_notifications'),
+        ("dojo", "0048_sla_notifications"),
     ]
 
     operations = [migrations.RunPython(create_status_objects)]

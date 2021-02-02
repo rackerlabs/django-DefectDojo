@@ -6,12 +6,14 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('dojo', '0055_notifications_jira_update_verbose_name'),
+        ("dojo", "0055_notifications_jira_update_verbose_name"),
     ]
 
     operations = [
         migrations.AddIndex(
-            model_name='finding',
-            index=models.Index(fields=['component_name'], name='dojo_findin_compone_920323_idx'),
+            model_name="finding",
+            index=models.Index(
+                fields=["component_name"], name="dojo_findin_compone_920323_idx"
+            ),
         ),
     ]

@@ -4,7 +4,6 @@ from dojo.models import Test
 
 
 class TestNmapParser(TestCase):
-
     def test_parse_file_with_no_open_ports_has_no_findings(self):
         testfile = open("dojo/unittests/scans/nmap_sample/nmap_0port.xml")
         parser = NmapXMLParser()

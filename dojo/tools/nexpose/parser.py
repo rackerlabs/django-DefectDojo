@@ -1,4 +1,3 @@
-
 import html2text
 from defusedxml import ElementTree
 
@@ -30,7 +29,7 @@ class NexposeFullXmlParser(object):
         ret = ""
         tag = node.tag.lower()
 
-        if tag == 'containerblockelement':
+        if tag == "containerblockelement":
 
             if len(list(node)) > 0:
                 for child in list(node):
@@ -42,19 +41,19 @@ class NexposeFullXmlParser(object):
                     ret += str(node.tail).strip() + "</div>"
                 else:
                     ret += "</div>"
-        if tag == 'listitem':
+        if tag == "listitem":
             if len(list(node)) > 0:
                 for child in list(node):
                     ret += self.parse_html_type(child)
             else:
                 if node.text:
                     ret += "<li>" + str(node.text).strip() + "</li>"
-        if tag == 'orderedlist':
+        if tag == "orderedlist":
             i = 1
             for item in list(node):
                 ret += "<ol>" + str(i) + " " + self.parse_html_type(item) + "</ol>"
                 i += 1
-        if tag == 'paragraph':
+        if tag == "paragraph":
             if len(list(node)) > 0:
                 for child in list(node):
                     ret += self.parse_html_type(child)
@@ -65,12 +64,12 @@ class NexposeFullXmlParser(object):
                     ret += str(node.tail).strip() + "</p>"
                 else:
                     ret += "</p>"
-        if tag == 'unorderedlist':
+        if tag == "unorderedlist":
             for item in list(node):
                 unorderedlist = self.parse_html_type(item)
                 if unorderedlist not in ret:
                     ret += "* " + unorderedlist
-        if tag == 'urllink':
+        if tag == "urllink":
             if node.text:
                 ret += str(node.text).strip() + " "
             last = ""
@@ -91,17 +90,19 @@ class NexposeFullXmlParser(object):
         """
         vulns = list()
 
-        for tests in node.iter('tests'):
-            for test in tests.iter('test'):
+        for tests in node.iter("tests"):
+            for test in tests.iter("test"):
                 vuln = dict()
-                if test.get('id') in vulnsDefinitions and test.get('status') == 'vulnerable-exploited':
-                    vuln = vulnsDefinitions[test.get('id').lower()]
+                if (
+                    test.get("id") in vulnsDefinitions
+                    and test.get("status") == "vulnerable-exploited"
+                ):
+                    vuln = vulnsDefinitions[test.get("id").lower()]
                     for desc in list(test):
-                        if 'pluginOutput' in vuln:
-                            vuln['pluginOutput'] += "\n\n" + \
-                                self.parse_html_type(desc)
+                        if "pluginOutput" in vuln:
+                            vuln["pluginOutput"] += "\n\n" + self.parse_html_type(desc)
                         else:
-                            vuln['pluginOutput'] = self.parse_html_type(desc)
+                            vuln["pluginOutput"] = self.parse_html_type(desc)
                     vulns.append(vuln)
 
         return vulns
@@ -112,43 +113,47 @@ class NexposeFullXmlParser(object):
         """
         vulns = dict()
 
-        for vulnsDef in tree.iter('VulnerabilityDefinitions'):
-            for vulnDef in vulnsDef.iter('vulnerability'):
-                vid = vulnDef.get('id').lower()
-                severity_chk = int(vulnDef.get('severity'))
+        for vulnsDef in tree.iter("VulnerabilityDefinitions"):
+            for vulnDef in vulnsDef.iter("vulnerability"):
+                vid = vulnDef.get("id").lower()
+                severity_chk = int(vulnDef.get("severity"))
                 if severity_chk >= 9:
-                    sev = 'Critical'
+                    sev = "Critical"
                 elif severity_chk >= 7:
-                    sev = 'High'
+                    sev = "High"
                 elif severity_chk >= 4:
-                    sev = 'Medium'
+                    sev = "Medium"
                 elif severity_chk < 4 and severity_chk > 0:
-                    sev = 'Low'
+                    sev = "Low"
                 else:
-                    sev = 'Info'
+                    sev = "Info"
                 vuln = {
-                    'desc': "",
-                    'name': vulnDef.get('title'),
-                    'vector': vulnDef.get('cvssVector'),  # this is CVSS v2
-                    'refs': dict(),
-                    'resolution': "",
-                    'severity': sev,
-                    'tags': list()
+                    "desc": "",
+                    "name": vulnDef.get("title"),
+                    "vector": vulnDef.get("cvssVector"),  # this is CVSS v2
+                    "refs": dict(),
+                    "resolution": "",
+                    "severity": sev,
+                    "tags": list(),
                 }
                 for item in list(vulnDef):
-                    if item.tag == 'description':
+                    if item.tag == "description":
                         for htmlType in list(item):
-                            vuln['desc'] += self.parse_html_type(htmlType)
+                            vuln["desc"] += self.parse_html_type(htmlType)
 
-                    if item.tag == 'exploits':
+                    if item.tag == "exploits":
                         for exploit in list(item):
-                            vuln['refs'][exploit.get('title')] = str(exploit.get('title')).strip() + ' ' + str(exploit.get('link')).strip()
-                    if item.tag == 'references':
+                            vuln["refs"][exploit.get("title")] = (
+                                str(exploit.get("title")).strip()
+                                + " "
+                                + str(exploit.get("link")).strip()
+                            )
+                    if item.tag == "references":
                         for ref in list(item):
-                            vuln['refs'][ref.get('source')] = str(ref.text).strip()
-                    if item.tag == 'solution':
+                            vuln["refs"][ref.get("source")] = str(ref.text).strip()
+                    if item.tag == "solution":
                         for htmlType in list(item):
-                            vuln['resolution'] += self.parse_html_type(htmlType)
+                            vuln["resolution"] += self.parse_html_type(htmlType)
                     """
                     # there is currently no method to register tags in vulns
                     if item.tag == 'tags':
@@ -160,60 +165,64 @@ class NexposeFullXmlParser(object):
 
     def get_items(self, tree, vulns, test):
         x = list()
-        for nodes in tree.iter('nodes'):
-            for node in nodes.iter('node'):
+        for nodes in tree.iter("nodes"):
+            for node in nodes.iter("node"):
                 host = dict()
-                host['name'] = node.get('address')
-                host['hostnames'] = set()
-                host['os'] = ""
-                host['services'] = list()
+                host["name"] = node.get("address")
+                host["hostnames"] = set()
+                host["os"] = ""
+                host["services"] = list()
                 # host['vulns'] = self.parse_tests_type(node, vulns)
 
-                for names in node.iter('names'):
+                for names in node.iter("names"):
                     for name in list(names):
-                        host['hostnames'].add(name.text)
+                        host["hostnames"].add(name.text)
 
-                for endpoints in node.iter('endpoints'):
+                for endpoints in node.iter("endpoints"):
                     for endpoint in list(endpoints):
                         svc = {
-                            'protocol': endpoint.get('protocol'),
-                            'port': endpoint.get('port'),
-                            'status': endpoint.get('status'),
+                            "protocol": endpoint.get("protocol"),
+                            "port": endpoint.get("port"),
+                            "status": endpoint.get("status"),
                         }
-                        for services in endpoint.iter('services'):
+                        for services in endpoint.iter("services"):
                             for service in list(services):
-                                svc['name'] = service.get('name')
-                                svc['vulns'] = self.parse_tests_type(service, vulns)
+                                svc["name"] = service.get("name")
+                                svc["vulns"] = self.parse_tests_type(service, vulns)
 
-                                for configs in service.iter('configurations'):
+                                for configs in service.iter("configurations"):
                                     for config in list(configs):
-                                        if "banner" in config.get('name'):
-                                            svc['version'] = config.get('name')
+                                        if "banner" in config.get("name"):
+                                            svc["version"] = config.get("name")
 
-                        host['services'].append(svc)
+                        host["services"].append(svc)
 
                 x.append(host)
 
         dupes = {}
 
         for item in x:
-            for service in item['services']:
-                for vuln in service['vulns']:
-                    dupe_key = vuln['severity'] + vuln['name']
+            for service in item["services"]:
+                for vuln in service["vulns"]:
+                    dupe_key = vuln["severity"] + vuln["name"]
 
                     if dupe_key in dupes:
                         find = dupes[dupe_key]
-                        dupe_text = html2text.html2text(vuln['pluginOutput'])
+                        dupe_text = html2text.html2text(vuln["pluginOutput"])
                         if dupe_text not in find.description:
                             find.description += "\n\n" + dupe_text
                     else:
-                        find = Finding(title=vuln['name'],
-                                       description=html2text.html2text(
-                            vuln['desc'].strip()) + "\n\n" + html2text.html2text(vuln['pluginOutput'].strip()),
-                            severity=vuln['severity'],
-                            numerical_severity=Finding.get_numerical_severity(vuln['severity']),
-                            mitigation=html2text.html2text(vuln['resolution']),
-                            impact=vuln['vector'],
+                        find = Finding(
+                            title=vuln["name"],
+                            description=html2text.html2text(vuln["desc"].strip())
+                            + "\n\n"
+                            + html2text.html2text(vuln["pluginOutput"].strip()),
+                            severity=vuln["severity"],
+                            numerical_severity=Finding.get_numerical_severity(
+                                vuln["severity"]
+                            ),
+                            mitigation=html2text.html2text(vuln["resolution"]),
+                            impact=vuln["vector"],
                             test=test,
                             active=False,
                             verified=False,
@@ -221,27 +230,28 @@ class NexposeFullXmlParser(object):
                             duplicate=False,
                             out_of_scope=False,
                             mitigated=None,
-                            dynamic_finding=True)
+                            dynamic_finding=True,
+                        )
                         # build references
-                        refs = ''
-                        for ref in vuln['refs']:
-                            if ref.startswith('CA'):
+                        refs = ""
+                        for ref in vuln["refs"]:
+                            if ref.startswith("CA"):
                                 ref = f" * [{vuln['refs'][ref]}](https://www.cert.org/advisories/{vuln['refs'][ref]}.html)"
-                            elif ref.startswith('CVE'):
+                            elif ref.startswith("CVE"):
                                 ref = f" * [{vuln['refs'][ref]}](https://cve.mitre.org/cgi-bin/cvename.cgi?name={vuln['refs'][ref]})"
                             else:
                                 refs += f" * {ref}: {vuln['refs'][ref]}"
                             refs += "\n"
                         find.references = refs
                         # update CVE
-                        if "CVE" in vuln['refs']:
-                            find.cve = vuln['refs']['CVE']
+                        if "CVE" in vuln["refs"]:
+                            find.cve = vuln["refs"]["CVE"]
                         find.unsaved_endpoints = list()
                         dupes[dupe_key] = find
 
-                    endpoint = Endpoint(host=item['name'])
-                    if 'port' in service:
-                        endpoint.port = int(service['port'])
+                    endpoint = Endpoint(host=item["name"])
+                    if "port" in service:
+                        endpoint.port = int(service["port"])
                     find.unsaved_endpoints.append(endpoint)
 
         return list(dupes.values())

@@ -27,19 +27,17 @@ class ColumnMappingStrategy(object):
 
 
 class DateColumnMappingStrategy(ColumnMappingStrategy):
-
     def __init__(self):
-        self.mapped_column = 'date'
+        self.mapped_column = "date"
         super(DateColumnMappingStrategy, self).__init__()
 
     def map_column_value(self, finding, column_value):
-        finding.date = datetime.strptime(column_value, '%Y-%m-%d %H:%M:%S').date()
+        finding.date = datetime.strptime(column_value, "%Y-%m-%d %H:%M:%S").date()
 
 
 class TitleColumnMappingStrategy(ColumnMappingStrategy):
-
     def __init__(self):
-        self.mapped_column = 'title'
+        self.mapped_column = "title"
         super(TitleColumnMappingStrategy, self).__init__()
 
     def map_column_value(self, finding, column_value):
@@ -47,9 +45,8 @@ class TitleColumnMappingStrategy(ColumnMappingStrategy):
 
 
 class DescriptionColumnMappingStrategy(ColumnMappingStrategy):
-
     def __init__(self):
-        self.mapped_column = 'description'
+        self.mapped_column = "description"
         super(DescriptionColumnMappingStrategy, self).__init__()
 
     def map_column_value(self, finding, column_value):
@@ -57,9 +54,8 @@ class DescriptionColumnMappingStrategy(ColumnMappingStrategy):
 
 
 class MitigationColumnMappingStrategy(ColumnMappingStrategy):
-
     def __init__(self):
-        self.mapped_column = 'mitigation'
+        self.mapped_column = "mitigation"
         super(MitigationColumnMappingStrategy, self).__init__()
 
     def map_column_value(self, finding, column_value):
@@ -67,13 +63,12 @@ class MitigationColumnMappingStrategy(ColumnMappingStrategy):
 
 
 class NotesColumnMappingStrategy(ColumnMappingStrategy):
-
     def __init__(self):
-        self.mapped_column = 'notes'
+        self.mapped_column = "notes"
         super(NotesColumnMappingStrategy, self).__init__()
 
     def map_column_value(self, finding, column_value):
-        if (column_value != ""):
+        if column_value != "":
             user = User.objects.all().first()
             note = Notes(entry=column_value, author=user)
             note.save()
@@ -83,7 +78,6 @@ class NotesColumnMappingStrategy(ColumnMappingStrategy):
 
 
 class SKFCsvParser(object):
-
     def create_chain(self):
         date_column_strategy = DateColumnMappingStrategy()
         title_column_strategy = TitleColumnMappingStrategy()
@@ -115,13 +109,15 @@ class SKFCsvParser(object):
             self.items = ()
             return
 
-        content = filename.read().decode('utf-8')
+        content = filename.read().decode("utf-8")
 
         row_number = 0
-        reader = csv.reader(io.StringIO(content), delimiter=',', quotechar='"', escapechar='\\')
+        reader = csv.reader(
+            io.StringIO(content), delimiter=",", quotechar='"', escapechar="\\"
+        )
         for row in reader:
             finding = Finding(test=test)
-            finding.severity = 'Info'
+            finding.severity = "Info"
 
             if row_number == 0:
                 self.read_column_names(row)
@@ -130,11 +126,21 @@ class SKFCsvParser(object):
 
             column_number = 0
             for column in row:
-                self.chain.process_column(self.column_names[column_number], column, finding)
+                self.chain.process_column(
+                    self.column_names[column_number], column, finding
+                )
                 column_number += 1
 
             if finding is not None:
-                key = hashlib.md5(str(finding.severity + '|' + finding.title + '|' + finding.description).encode('utf-8')).hexdigest()
+                key = hashlib.md5(
+                    str(
+                        finding.severity
+                        + "|"
+                        + finding.title
+                        + "|"
+                        + finding.description
+                    ).encode("utf-8")
+                ).hexdigest()
 
                 if key not in self.dupes:
                     self.dupes[key] = finding

@@ -18,7 +18,7 @@ class ChoctawhogParser(object):
         try:
             data = json_output.read()
             try:
-                tree = json.loads(str(data, 'utf-8'))
+                tree = json.loads(str(data, "utf-8"))
             except:
                 tree = json.loads(data)
         except:
@@ -38,34 +38,37 @@ class ChoctawhogParser(object):
 
 def get_item(vulnerability, test):
     cwe = 200
-    description = "This string was found: {}".format(vulnerability.get('stringsFound'))
-    description += "\nCommit message: {}".format(vulnerability.get('commit'))
-    description += "\nCommit hash: {}".format(vulnerability.get('commitHash'))
-    description += "\nParent commit hash: {}".format(vulnerability.get('parent_commit_hash'))
-    description += "\nDate: {}".format(vulnerability.get('date'))
+    description = "This string was found: {}".format(vulnerability.get("stringsFound"))
+    description += "\nCommit message: {}".format(vulnerability.get("commit"))
+    description += "\nCommit hash: {}".format(vulnerability.get("commitHash"))
+    description += "\nParent commit hash: {}".format(
+        vulnerability.get("parent_commit_hash")
+    )
+    description += "\nDate: {}".format(vulnerability.get("date"))
     description += "\nOld and new file IDs: {} - {}".format(
-                    vulnerability.get('old_file_id'),
-                    vulnerability.get('new_file_id'))
+        vulnerability.get("old_file_id"), vulnerability.get("new_file_id")
+    )
     description += "\nOld and new line numbers: {} - {}".format(
-                    vulnerability.get('old_line_num'),
-                    vulnerability.get('new_line_num'))
-    file_path = vulnerability.get('path')
+        vulnerability.get("old_line_num"), vulnerability.get("new_line_num")
+    )
+    file_path = vulnerability.get("path")
     title = "{} found in {} ({})".format(
-            vulnerability.get('reason'),
-            vulnerability.get('path'),
-            vulnerability.get('commitHash'))
+        vulnerability.get("reason"),
+        vulnerability.get("path"),
+        vulnerability.get("commitHash"),
+    )
 
     # create the finding object
     finding = Finding(
         title=title,
         test=test,
-        severity='High',
+        severity="High",
         cwe=cwe,
         description=description,
         mitigation="Please ensure no secret material nor confidential information is kept in clear within git repositories.",
         file_path=file_path,
         static_finding=True,
-        dynamic_finding=False
+        dynamic_finding=False,
     )
 
     finding.description = finding.description.strip()

@@ -22,7 +22,7 @@ class OrtParser(object):
         try:
             data = json_output.read()
             try:
-                tree = json.loads(str(data, 'utf-8'))
+                tree = json.loads(str(data, "utf-8"))
             except:
                 tree = json.loads(data)
         except:
@@ -32,17 +32,20 @@ class OrtParser(object):
 
     def get_items(self, evaluatedModel, test):
         items = {}
-        packages = evaluatedModel['packages']
-        dependency_trees = evaluatedModel['dependency_trees']
-        rule_violations = evaluatedModel['rule_violations']
-        licenses = evaluatedModel['licenses']
+        packages = evaluatedModel["packages"]
+        dependency_trees = evaluatedModel["dependency_trees"]
+        rule_violations = evaluatedModel["rule_violations"]
+        licenses = evaluatedModel["licenses"]
         rule_violations_unresolved = get_unresolved_rule_violations(rule_violations)
-        rule_violations_models = get_rule_violation_models(rule_violations_unresolved, packages, licenses,
-                                                           dependency_trees)
+        rule_violations_models = get_rule_violation_models(
+            rule_violations_unresolved, packages, licenses, dependency_trees
+        )
 
         for model in rule_violations_models:
             item = get_item(model, test)
-            unique_key = hashlib.md5((item.title + item.references).encode()).hexdigest()
+            unique_key = hashlib.md5(
+                (item.title + item.references).encode()
+            ).hexdigest()
             items[unique_key] = item
 
         return list(items.values())
@@ -57,16 +60,16 @@ def get_unresolved_rule_violations(rule_violations):
 
 
 def is_rule_violation_unresolved(rule_violation):
-    return 'resolutions' not in rule_violation
+    return "resolutions" not in rule_violation
 
 
 def find_in_dependency_tree(tree, package_id):
-    if 'pkg' in tree and tree['pkg'] == package_id:
+    if "pkg" in tree and tree["pkg"] == package_id:
         return True
     else:
-        if 'children' in tree:
+        if "children" in tree:
             found_in_child = False
-            for child in tree['children']:
+            for child in tree["children"]:
                 if found_in_child:
                     break
                 else:
@@ -80,51 +83,61 @@ def get_project_ids_for_package(dependency_trees, package_id):
     project_ids = []
     for project in dependency_trees:
         if find_in_dependency_tree(project, package_id):
-            project_ids.append(project['pkg'])
+            project_ids.append(project["pkg"])
     return project_ids
 
 
 def get_name_id_for_package(packages, package__id):
     name = ""
     for package in packages:
-        if package['_id'] == package__id:
-            name = package['id']
+        if package["_id"] == package__id:
+            name = package["id"]
             break
     return name
 
 
-def get_rule_violation_models(rule_violations_unresolved, packages, licenses, dependency_trees):
+def get_rule_violation_models(
+    rule_violations_unresolved, packages, licenses, dependency_trees
+):
     models = []
     for violation in rule_violations_unresolved:
-        models.append(get_rule_violation_model(violation, packages, licenses, dependency_trees))
+        models.append(
+            get_rule_violation_model(violation, packages, licenses, dependency_trees)
+        )
     return models
 
 
-def get_rule_violation_model(rule_violation_unresolved, packages, licenses, dependency_trees):
-    project_ids = get_project_ids_for_package(dependency_trees, rule_violation_unresolved['pkg'])
+def get_rule_violation_model(
+    rule_violation_unresolved, packages, licenses, dependency_trees
+):
+    project_ids = get_project_ids_for_package(
+        dependency_trees, rule_violation_unresolved["pkg"]
+    )
     project_names = []
     for id in project_ids:
         project_names.append(get_name_id_for_package(packages, id))
-    package = find_package_by_id(packages, rule_violation_unresolved['pkg'])
-    license_id = find_license_id(licenses, rule_violation_unresolved['license'])
+    package = find_package_by_id(packages, rule_violation_unresolved["pkg"])
+    license_id = find_license_id(licenses, rule_violation_unresolved["license"])
 
-    return RuleViolationModel(package, license_id, project_names, rule_violation_unresolved)
+    return RuleViolationModel(
+        package, license_id, project_names, rule_violation_unresolved
+    )
 
 
 def find_package_by_id(packages, pkg_id):
     package = None
     for pkg in packages:
-        if pkg['_id'] == pkg_id:
+        if pkg["_id"] == pkg_id:
             package = pkg
             break
     return package
 
 
 def find_license_id(licenses, license_id):
-    id = ''
+    id = ""
     for lic in licenses:
-        if lic['_id'] == license_id:
-            id = lic['id']
+        if lic["_id"] == license_id:
+            id = lic["id"]
             break
     return id
 
@@ -139,15 +152,17 @@ how to fix : {model.rule_violation['how_to_fix']}"""
 
     severity = get_severity(model.rule_violation)
 
-    finding = Finding(title=model.rule_violation['rule'],
-                      test=test,
-                      active=True,
-                      verified=True,
-                      references=model.rule_violation['message'],
-                      description=desc,
-                      severity=severity,
-                      numerical_severity=Finding.get_number_severity(severity),
-                      static_finding=True)
+    finding = Finding(
+        title=model.rule_violation["rule"],
+        test=test,
+        active=True,
+        verified=True,
+        references=model.rule_violation["message"],
+        description=desc,
+        severity=severity,
+        numerical_severity=Finding.get_number_severity(severity),
+        static_finding=True,
+    )
 
     return finding
 
@@ -160,20 +175,17 @@ how to fix : {model.rule_violation['how_to_fix']}"""
 #     projects: []
 #     rule_violation: dict
 
-RuleViolationModel = namedtuple('RuleViolationModel', [
-    'pkg',
-    'license_id',
-    'projects',
-    'rule_violation'
-])
+RuleViolationModel = namedtuple(
+    "RuleViolationModel", ["pkg", "license_id", "projects", "rule_violation"]
+)
 
 
 def get_severity(rule_violation):
-    if rule_violation['severity'] == 'ERROR':
-        return 'High'
-    elif rule_violation['severity'] == 'WARNING':
-        return 'Medium'
-    elif rule_violation['severity'] == 'HINT':
-        return 'Info'
+    if rule_violation["severity"] == "ERROR":
+        return "High"
+    elif rule_violation["severity"] == "WARNING":
+        return "Medium"
+    elif rule_violation["severity"] == "HINT":
+        return "Info"
     else:
-        return 'Critical'
+        return "Critical"

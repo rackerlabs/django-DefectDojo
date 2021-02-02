@@ -5,7 +5,6 @@ from dojo.tools.contrast.parser import ContrastCSVParser
 
 
 class TestContrastCSVParser(TestCase):
-
     def test_example_report(self):
         test = Test()
         test.engagement = Engagement()
@@ -17,15 +16,17 @@ class TestContrastCSVParser(TestCase):
         with self.subTest(i=0):
             finding = findings[0]
             self.assertEqual("Info", finding.severity)
-            self.assertEqual("Forms Without Autocomplete Prevention on 2 pages", finding.title)
+            self.assertEqual(
+                "Forms Without Autocomplete Prevention on 2 pages", finding.title
+            )
             self.assertEqual("OMEC-Y0TI-FRLE-FJQQ", finding.vuln_id_from_tool)
             self.assertEqual(522, finding.cwe)
             # endpoints
             self.assertIsNotNone(finding.unsaved_endpoints)
             self.assertEqual(1, len(finding.unsaved_endpoints))
             endpoint = finding.unsaved_endpoints[0]
-            self.assertEqual('http', endpoint.protocol)
-            self.assertEqual('/WebGoat/login.mvc', endpoint.path)
+            self.assertEqual("http", endpoint.protocol)
+            self.assertEqual("/WebGoat/login.mvc", endpoint.path)
 
     def test_example2_report(self):
         test = Test()

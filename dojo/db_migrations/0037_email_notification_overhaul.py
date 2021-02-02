@@ -8,32 +8,57 @@ import multiselectfield.db.fields
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('dojo', '0036_system_settings_email_address'),
+        ("dojo", "0036_system_settings_email_address"),
     ]
 
     operations = [
         migrations.RenameField(
-            model_name='notifications',
-            old_name='results_added',
-            new_name='scan_added',
+            model_name="notifications",
+            old_name="results_added",
+            new_name="scan_added",
         ),
         migrations.AlterField(
-            model_name='notifications',
-            name='user',
-            field=models.ForeignKey(default=None, editable=False, null=True, on_delete=django.db.models.deletion.CASCADE, to='dojo.Dojo_User'),
+            model_name="notifications",
+            name="user",
+            field=models.ForeignKey(
+                default=None,
+                editable=False,
+                null=True,
+                on_delete=django.db.models.deletion.CASCADE,
+                to="dojo.Dojo_User",
+            ),
         ),
         migrations.AddField(
-            model_name='notifications',
-            name='product',
-            field=models.ForeignKey(default=None, editable=False, null=True, on_delete=django.db.models.deletion.CASCADE, to='dojo.Product'),
+            model_name="notifications",
+            name="product",
+            field=models.ForeignKey(
+                default=None,
+                editable=False,
+                null=True,
+                on_delete=django.db.models.deletion.CASCADE,
+                to="dojo.Product",
+            ),
         ),
         migrations.AddConstraint(
-            model_name='notifications',
-            constraint=models.UniqueConstraint(fields=('user', 'product'), name='notifications_user_product'),
+            model_name="notifications",
+            constraint=models.UniqueConstraint(
+                fields=("user", "product"), name="notifications_user_product"
+            ),
         ),
         migrations.AlterField(
-            model_name='notifications',
-            name='scan_added',
-            field=multiselectfield.db.fields.MultiSelectField(blank=True, choices=[('slack', 'slack'), ('hipchat', 'hipchat'), ('mail', 'mail'), ('alert', 'alert')], default='alert', help_text='Triggered whenever an (re-)import has been done that created/updated/closed findings.', max_length=24),
+            model_name="notifications",
+            name="scan_added",
+            field=multiselectfield.db.fields.MultiSelectField(
+                blank=True,
+                choices=[
+                    ("slack", "slack"),
+                    ("hipchat", "hipchat"),
+                    ("mail", "mail"),
+                    ("alert", "alert"),
+                ],
+                default="alert",
+                help_text="Triggered whenever an (re-)import has been done that created/updated/closed findings.",
+                max_length=24,
+            ),
         ),
     ]

@@ -1,4 +1,3 @@
-
 """
 Faraday Penetration Test IDE
 Copyright (C) 2013  Infobyte LLC (http://www.infobytesec.com/)
@@ -60,40 +59,48 @@ class ZapXmlParser(object):
         """
 
         items = list()
-        for node in tree.findall('site'):
+        for node in tree.findall("site"):
             site = Site(node)
-            main_host = Endpoint(host=site.name + (":" + site.port) if site.port is not None else "")
+            main_host = Endpoint(
+                host=site.name + (":" + site.port) if site.port is not None else ""
+            )
             for item in site.items:
-                severity = item.riskdesc.split(' ', 1)[0]
-                references = ''
+                severity = item.riskdesc.split(" ", 1)[0]
+                references = ""
                 for ref in item.ref:
                     references += ref + "\n"
 
-                find = Finding(title=item.name,
-                               cwe=item.cwe,
-                               description=strip_tags(item.desc),
-                               test=test,
-                               severity=severity,
-                               mitigation=strip_tags(item.resolution),
-                               references=references,
-                               active=False,
-                               verified=False,
-                               false_p=False,
-                               duplicate=False,
-                               out_of_scope=False,
-                               mitigated=None,
-                               impact="No impact provided",
-                               numerical_severity=Finding.get_numerical_severity(severity))
+                find = Finding(
+                    title=item.name,
+                    cwe=item.cwe,
+                    description=strip_tags(item.desc),
+                    test=test,
+                    severity=severity,
+                    mitigation=strip_tags(item.resolution),
+                    references=references,
+                    active=False,
+                    verified=False,
+                    false_p=False,
+                    duplicate=False,
+                    out_of_scope=False,
+                    mitigated=None,
+                    impact="No impact provided",
+                    numerical_severity=Finding.get_numerical_severity(severity),
+                )
 
                 find.unsaved_endpoints = [main_host]
                 for i in item.items:
-                    parts = urlparse(i['uri'])
-                    find.unsaved_endpoints.append(Endpoint(protocol=parts.scheme,
-                                                           host=parts.netloc[:500],
-                                                           path=parts.path[:500],
-                                                           query=parts.query[:1000],
-                                                           fragment=parts.fragment[:500],
-                                                           product=test.engagement.product))
+                    parts = urlparse(i["uri"])
+                    find.unsaved_endpoints.append(
+                        Endpoint(
+                            protocol=parts.scheme,
+                            host=parts.netloc[:500],
+                            path=parts.path[:500],
+                            query=parts.query[:1000],
+                            fragment=parts.fragment[:500],
+                            product=test.engagement.product,
+                        )
+                    )
                 items.append(find)
         return items
 
@@ -109,7 +116,9 @@ def get_attrib_from_subnode(xml_node, subnode_xpath_expr, attrib_name):
 
     if ETREE_VERSION[0] <= 1 and ETREE_VERSION[1] < 3:
 
-        match_obj = re.search(r"([^\@]+?)\[\@([^=]*?)=\'([^\']*?)\'", subnode_xpath_expr)
+        match_obj = re.search(
+            r"([^\@]+?)\[\@([^=]*?)=\'([^\']*?)\'", subnode_xpath_expr
+        )
         if match_obj is not None:
             node_to_find = match_obj.group(1)
             xpath_attrib = match_obj.group(2)
@@ -133,12 +142,12 @@ def get_attrib_from_subnode(xml_node, subnode_xpath_expr, attrib_name):
 class Site(object):
     def __init__(self, item_node):
         self.node = item_node
-        self.name = self.node.get('name')
-        self.host = self.node.get('host')
-        self.name = self.node.get('name')
-        self.port = self.node.get('port')
+        self.name = self.node.get("name")
+        self.host = self.node.get("host")
+        self.name = self.node.get("name")
+        self.port = self.node.get("port")
         self.items = []
-        for alert in self.node.findall('alerts/alertitem'):
+        for alert in self.node.findall("alerts/alertitem"):
             self.items.append(Item(alert))
 
     def get_text_from_subnode(self, subnode_xpath_expr):
@@ -172,24 +181,31 @@ class Item(object):
     def __init__(self, item_node):
         self.node = item_node
 
-        self.id = self.get_text_from_subnode('pluginid')
-        self.name = self.get_text_from_subnode('alert')
+        self.id = self.get_text_from_subnode("pluginid")
+        self.name = self.get_text_from_subnode("alert")
 
-        self.severity = self.get_text_from_subnode('riskcode')
-        self.riskdesc = self.get_text_from_subnode('riskdesc')
-        self.desc = self.get_text_from_subnode('desc')
-        self.resolution = self.get_text_from_subnode('solution') if self.get_text_from_subnode('solution') else ""
-        self.desc += "\n\nReference: " + self.get_text_from_subnode('reference') if self.get_text_from_subnode(
-            'reference') else ""
+        self.severity = self.get_text_from_subnode("riskcode")
+        self.riskdesc = self.get_text_from_subnode("riskdesc")
+        self.desc = self.get_text_from_subnode("desc")
+        self.resolution = (
+            self.get_text_from_subnode("solution")
+            if self.get_text_from_subnode("solution")
+            else ""
+        )
+        self.desc += (
+            "\n\nReference: " + self.get_text_from_subnode("reference")
+            if self.get_text_from_subnode("reference")
+            else ""
+        )
         self.ref = []
-        if self.get_text_from_subnode('cweid'):
-            self.ref.append("CWE-" + self.get_text_from_subnode('cweid'))
-            self.cwe = self.get_text_from_subnode('cweid')
+        if self.get_text_from_subnode("cweid"):
+            self.ref.append("CWE-" + self.get_text_from_subnode("cweid"))
+            self.cwe = self.get_text_from_subnode("cweid")
         else:
             self.cwe = 0
 
         description_detail = "\n"
-        for instance in item_node.findall('instances/instance'):
+        for instance in item_node.findall("instances/instance"):
             for node in instance.getiterator():
                 # print('tag: ' + node.tag)
                 # print('text:' + escape(node.text))
@@ -209,16 +225,16 @@ class Item(object):
 
         self.desc += description_detail
 
-        if self.get_text_from_subnode('wascid'):
-            self.ref.append("WASC-" + self.get_text_from_subnode('wascid'))
+        if self.get_text_from_subnode("wascid"):
+            self.ref.append("WASC-" + self.get_text_from_subnode("wascid"))
 
         self.items = []
         i = 0
 
-        for n in item_node.findall('instances/instance/uri'):
+        for n in item_node.findall("instances/instance/uri"):
             n2 = None
-            if item_node.findall('instances/instance/param'):
-                n2 = item_node.findall('instances/instance/param')[i]
+            if item_node.findall("instances/instance/param"):
+                n2 = item_node.findall("instances/instance/param")[i]
 
             # mregex = re.search(
             #     "(http|https|ftp)\://([a-zA-Z0-9\.\-]+(\:[a-zA-Z0-9\.&amp;%\$\-]+)*@)*((25[0-5]|2[0-4][0-9]|[0-1]{1}[0-9]{2}|[1-9]{1}[0-9]{1}|[1-9])\.(25[0-5]|2[0-4][0-9]|[0-1]{1}[0-9]{2}|[1-9]{1}[0-9]{1}|[1-9]|0)\.(25[0-5]|2[0-4][0-9]|[0-1]{1}[0-9]{2}|[1-9]{1}[0-9]{1}|[1-9]|0)\.(25[0-5]|2[0-4][0-9]|[0-1]{1}[0-9]{2}|[1-9]{1}[0-9]{1}|[0-9])|localhost|([a-zA-Z0-9\-]+\.)*[a-zA-Z0-9\-]+\.(com|edu|gov|int|mil|net|org|biz|arpa|info|name|pro|aero|coop|museum|[a-zA-Z]{2}))[\:]*([0-9]+)*([/]*($|[a-zA-Z0-9\.\,\?\'\\\+&amp;%\$#\=~_\-]+)).*?$",
@@ -231,17 +247,23 @@ class Item(object):
             host = urlparse(n.text).netloc
 
             port = 80
-            if protocol == 'https':
+            if protocol == "https":
                 port = 443
             # if mregex.group(11) is not None:
             #     port = mregex.group(11)
             if urlparse(n.text).port is not None:
                 port = urlparse(n.text).port
 
-            item = {'uri': n.text, 'param': n2.text if n2 else "", 'host': host, 'protocol': protocol, 'port': port}
+            item = {
+                "uri": n.text,
+                "param": n2.text if n2 else "",
+                "host": host,
+                "protocol": protocol,
+                "port": port,
+            }
             self.items.append(item)
             i = i + 1
-        self.requests = "\n".join([i['uri'] for i in self.items])
+        self.requests = "\n".join([i["uri"] for i in self.items])
 
     def get_text_from_subnode(self, subnode_xpath_expr):
         """

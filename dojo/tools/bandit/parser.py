@@ -1,4 +1,4 @@
-__author__ = 'aaronweaver'
+__author__ = "aaronweaver"
 
 import json
 import logging
@@ -15,24 +15,24 @@ class BanditParser(object):
 
         tree = filename.read()
         try:
-            data = json.loads(str(tree, 'utf-8'))
+            data = json.loads(str(tree, "utf-8"))
         except:
             data = json.loads(tree)
 
         dupes = dict()
         if "generated_at" in data:
-            find_date = datetime.strptime(data["generated_at"], '%Y-%m-%dT%H:%M:%SZ')
+            find_date = datetime.strptime(data["generated_at"], "%Y-%m-%dT%H:%M:%SZ")
 
         for item in data["results"]:
-            categories = ''
-            language = ''
-            mitigation = ''
-            impact = ''
-            references = ''
-            findingdetail = ''
-            title = ''
-            group = ''
-            status = ''
+            categories = ""
+            language = ""
+            mitigation = ""
+            impact = ""
+            references = ""
+            findingdetail = ""
+            title = ""
+            group = ""
+            status = ""
 
             title = "Test Name: " + item["test_name"] + " Test ID: " + item["test_id"]
 
@@ -54,23 +54,25 @@ class BanditParser(object):
             else:
                 dupes[dupe_key] = True
 
-                find = Finding(title=title,
-                               test=test,
-                               active=False,
-                               verified=False,
-                               description=findingdetail,
-                               severity=sev.title(),
-                               numerical_severity=Finding.get_numerical_severity(sev),
-                               mitigation=mitigation,
-                               impact=impact,
-                               references=references,
-                               file_path=item["filename"],
-                               line=item["line_number"],
-                               url='N/A',
-                               date=find_date,
-                               static_finding=True)
+                find = Finding(
+                    title=title,
+                    test=test,
+                    active=False,
+                    verified=False,
+                    description=findingdetail,
+                    severity=sev.title(),
+                    numerical_severity=Finding.get_numerical_severity(sev),
+                    mitigation=mitigation,
+                    impact=impact,
+                    references=references,
+                    file_path=item["filename"],
+                    line=item["line_number"],
+                    url="N/A",
+                    date=find_date,
+                    static_finding=True,
+                )
                 logging.debug(f"Bandit parser {find}")
                 dupes[dupe_key] = find
-                findingdetail = ''
+                findingdetail = ""
 
         return list(dupes.values())

@@ -4,7 +4,6 @@ from dojo.tools.qualys_infrascan_webgui.parser import QualysInfraScanParser
 
 
 class TestQualysInfraScanParser(TestCase):
-
     def test_parse_file_with_no_vuln_has_no_findings(self):
         testfile = open(
             "dojo/unittests/scans/qualys_infrascan_webgui/qualys_infrascan_webgui_0.xml"

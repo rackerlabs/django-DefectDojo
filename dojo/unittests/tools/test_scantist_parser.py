@@ -4,7 +4,6 @@ from dojo.models import Test
 
 
 class TestScantistJSONParser(TestCase):
-
     def test_parse_file_with_no_vuln_has_no_findings(self):
         testfile = open("dojo/unittests/scans/scantist/scantist-no-vuln.json")
         parser = ScantistJSONParser()

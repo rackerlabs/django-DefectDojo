@@ -1,4 +1,3 @@
-
 import csv
 import io
 import re
@@ -38,7 +37,7 @@ class BlackduckImporter(Importer):
         """
         security_issues = dict()
         try:
-            with open(str(report), 'r') as f:
+            with open(str(report), "r") as f:
                 security_issues = self.__partition_by_key(f)
 
         except Exception as e:
@@ -60,10 +59,10 @@ class BlackduckImporter(Importer):
                     file_name = full_file_name.split("/")[-1]
                     # Backwards compatibility, newer versions of Blackduck have a source file rather
                     # than a "files" file.
-                    if 'source' in file_name or 'files' in file_name:
+                    if "source" in file_name or "files" in file_name:
                         with io.TextIOWrapper(zip.open(full_file_name)) as f:
                             files = self.__partition_by_key(f)
-                    elif 'security' in file_name:
+                    elif "security" in file_name:
                         with io.TextIOWrapper(zip.open(full_file_name)) as f:
                             security_issues = self.__partition_by_key(f)
 
@@ -82,8 +81,8 @@ class BlackduckImporter(Importer):
             if files is not None:
                 for file_entry in files[project_id]:
                     file_entry_dict = dict(file_entry)
-                    path = file_entry_dict.get('Path')
-                    archive_context = file_entry_dict.get('Archive context')
+                    path = file_entry_dict.get("Path")
+                    archive_context = file_entry_dict.get("Archive context")
                     if archive_context:
                         full_path = "{}{}".format(archive_context, path[1:])
                     else:
@@ -93,7 +92,7 @@ class BlackduckImporter(Importer):
                     total_len = len(full_path)
                     for location in list(locations):
                         # + 2 for the ", " that will be added.
-                        total_len += (len(location) + 2)
+                        total_len += len(location) + 2
                     if total_len < 4000:
                         locations.add(full_path)
                     else:
@@ -106,24 +105,24 @@ class BlackduckImporter(Importer):
 
                 yield BlackduckFinding(
                     cve,
-                    security_issue_dict.get('Description'),
-                    security_issue_dict.get('Security Risk'),
-                    security_issue_dict.get('Impact'),
-                    security_issue_dict.get('Project name'),
-                    security_issue_dict.get('Version'),
-                    security_issue_dict.get('Vulnerability source'),
-                    security_issue_dict.get('URL'),
-                    security_issue_dict.get('Channel version origin id'),
-                    security_issue_dict.get('Component origin id'),
-                    security_issue_dict.get('Published on'),
-                    security_issue_dict.get('Updated on'),
-                    security_issue_dict.get('Base score'),
-                    security_issue_dict.get('Exploitability'),
-                    security_issue_dict.get('Remediation status'),
-                    security_issue_dict.get('Remediation target date'),
-                    security_issue_dict.get('Remediation actual date'),
-                    security_issue_dict.get('Remediation comment'),
-                    location
+                    security_issue_dict.get("Description"),
+                    security_issue_dict.get("Security Risk"),
+                    security_issue_dict.get("Impact"),
+                    security_issue_dict.get("Project name"),
+                    security_issue_dict.get("Version"),
+                    security_issue_dict.get("Vulnerability source"),
+                    security_issue_dict.get("URL"),
+                    security_issue_dict.get("Channel version origin id"),
+                    security_issue_dict.get("Component origin id"),
+                    security_issue_dict.get("Published on"),
+                    security_issue_dict.get("Updated on"),
+                    security_issue_dict.get("Base score"),
+                    security_issue_dict.get("Exploitability"),
+                    security_issue_dict.get("Remediation status"),
+                    security_issue_dict.get("Remediation target date"),
+                    security_issue_dict.get("Remediation actual date"),
+                    security_issue_dict.get("Remediation comment"),
+                    location,
                 )
 
     def __partition_by_key(self, csv_file):

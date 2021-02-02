@@ -19,7 +19,4 @@ from split_settings.tools import optional, include
 # in docker-compose release mode, files in docker/extra_settings will be copied into dojo/settings/ on startup
 
 
-include(
-    'settings.dist.py',
-    optional('local_settings.py')
-)
+include("settings.dist.py", optional("local_settings.py"))

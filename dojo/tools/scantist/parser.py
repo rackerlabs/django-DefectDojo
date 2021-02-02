@@ -3,7 +3,7 @@ import json
 
 from dojo.models import Finding
 
-__author__ = 'mohcer'
+__author__ = "mohcer"
 
 
 class ScantistJSONParser(object):
@@ -19,6 +19,7 @@ class ScantistJSONParser(object):
 
     Website: https://scantist.com/
     """
+
     def get_findings(self, file, test):
         tree = json.load(file)
         return self.get_items(tree, test)
@@ -29,6 +30,7 @@ class ScantistJSONParser(object):
         test:
         : purpose: parses input rawto extract dojo
         """
+
         def get_findings(vuln, test):
             """
             vuln : input vulnerable node
@@ -41,7 +43,7 @@ class ScantistJSONParser(object):
             component_name = vuln.get("Library")
             component_version = vuln.get("Library Version")
 
-            title = cve + '|' + component_name
+            title = cve + "|" + component_name
             description = vuln.get("Description")
 
             file_path = vuln.get("File Path", "")
@@ -59,12 +61,12 @@ class ScantistJSONParser(object):
                 cwe=cwe,
                 mitigation=mitigation,
                 numerical_severity=Finding.get_numerical_severity(severity),
-                references=vuln.get('references'),
+                references=vuln.get("references"),
                 file_path=file_path,
                 component_name=component_name,
                 component_version=component_version,
-                severity_justification=vuln.get('severity_justification'),
-                dynamic_finding=True
+                severity_justification=vuln.get("severity_justification"),
+                dynamic_finding=True,
             )
 
             return finding
@@ -75,7 +77,9 @@ class ScantistJSONParser(object):
 
             if item:
                 hash_key = hashlib.md5(
-                    node.get('Public ID').encode('utf-8') + node.get('Library').encode('utf-8')).hexdigest()
+                    node.get("Public ID").encode("utf-8")
+                    + node.get("Library").encode("utf-8")
+                ).hexdigest()
 
                 items[hash_key] = get_findings(node, test)
 

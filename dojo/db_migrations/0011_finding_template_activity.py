@@ -6,13 +6,13 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('dojo', '0010_jira_conf_configuration_name'),
+        ("dojo", "0010_jira_conf_configuration_name"),
     ]
 
     operations = [
         migrations.AddField(
-            model_name='finding_template',
-            name='last_used',
+            model_name="finding_template",
+            name="last_used",
             field=models.DateTimeField(editable=False, null=True),
         ),
     ]

@@ -4,7 +4,6 @@ from dojo.models import Test
 
 
 class TestOpenscapXMLParser(TestCase):
-
     def test_openscap_parser_with_no_vuln_has_no_findings(self):
         testfile = open("dojo/unittests/scans/openscap/no_vuln_rhsa.xml")
         parser = OpenscapXMLParser()

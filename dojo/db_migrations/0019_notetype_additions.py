@@ -7,29 +7,48 @@ import django.db.models.deletion
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('dojo', '0018_sonarqube_api_integration'),
+        ("dojo", "0018_sonarqube_api_integration"),
     ]
 
     operations = [
         migrations.CreateModel(
-            name='Note_Type',
+            name="Note_Type",
             fields=[
-                ('id', models.AutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('name', models.CharField(max_length=100, unique=True)),
-                ('description', models.CharField(max_length=200)),
-                ('is_single', models.BooleanField(default=False)),
-                ('is_active', models.BooleanField(default=True)),
-                ('is_mandatory', models.BooleanField(default=True)),
+                (
+                    "id",
+                    models.AutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
+                ("name", models.CharField(max_length=100, unique=True)),
+                ("description", models.CharField(max_length=200)),
+                ("is_single", models.BooleanField(default=False)),
+                ("is_active", models.BooleanField(default=True)),
+                ("is_mandatory", models.BooleanField(default=True)),
             ],
         ),
         migrations.AddField(
-            model_name='notehistory',
-            name='note_type',
-            field=models.ForeignKey(blank=True, null=True, on_delete=django.db.models.deletion.CASCADE, to='dojo.Note_Type'),
+            model_name="notehistory",
+            name="note_type",
+            field=models.ForeignKey(
+                blank=True,
+                null=True,
+                on_delete=django.db.models.deletion.CASCADE,
+                to="dojo.Note_Type",
+            ),
         ),
         migrations.AddField(
-            model_name='notes',
-            name='note_type',
-            field=models.ForeignKey(blank=True, null=True, on_delete=django.db.models.deletion.CASCADE, related_name='note_type', to='dojo.Note_Type'),
+            model_name="notes",
+            name="note_type",
+            field=models.ForeignKey(
+                blank=True,
+                null=True,
+                on_delete=django.db.models.deletion.CASCADE,
+                related_name="note_type",
+                to="dojo.Note_Type",
+            ),
         ),
     ]

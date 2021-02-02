@@ -4,7 +4,6 @@ from dojo.models import Test
 
 
 class TestGitlabSastReportParser(TestCase):
-
     def test_parse_file_with_no_vuln_has_no_findings(self):
         testfile = open("dojo/unittests/scans/gitlab_sast/gl-sast-report-0-vuln.json")
         parser = GitlabSastReportParser()

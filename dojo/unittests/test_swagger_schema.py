@@ -2,41 +2,120 @@ from django.test import tag
 from rest_framework.test import APIRequestFactory
 from rest_framework.views import APIView
 from rest_framework.test import APITestCase, force_authenticate, APIClient
-from rest_framework.mixins import \
-    RetrieveModelMixin, ListModelMixin, CreateModelMixin, UpdateModelMixin
+from rest_framework.mixins import (
+    RetrieveModelMixin,
+    ListModelMixin,
+    CreateModelMixin,
+    UpdateModelMixin,
+)
 from rest_framework import status
 from drf_yasg2.generators import OpenAPISchemaGenerator
 from drf_yasg2.openapi import Info, SchemaRef
-from drf_yasg2.openapi import \
-    TYPE_ARRAY, TYPE_BOOLEAN, TYPE_INTEGER, TYPE_NUMBER, TYPE_OBJECT, TYPE_STRING
+from drf_yasg2.openapi import (
+    TYPE_ARRAY,
+    TYPE_BOOLEAN,
+    TYPE_INTEGER,
+    TYPE_NUMBER,
+    TYPE_OBJECT,
+    TYPE_STRING,
+)
 from collections import OrderedDict
 
-from dojo.api_v2.views import \
-    DevelopmentEnvironmentViewSet, EndpointStatusViewSet, EndPointViewSet, \
-    EngagementViewSet, FindingTemplatesViewSet, FindingViewSet, \
-    JiraInstanceViewSet, DojoMetaViewSet, NoteTypeViewSet, NotesViewSet, \
-    ProductTypeViewSet, ProductViewSet, RegulationsViewSet, \
-    ScanSettingsViewSet, ScansViewSet, SonarqubeIssueViewSet, SonarqubeProductViewSet, \
-    SonarqubeIssueTransitionViewSet, StubFindingsViewSet, SystemSettingsViewSet, \
-    TestTypesViewSet, TestsViewSet, ToolConfigurationsViewSet, ToolProductSettingsViewSet, \
-    ToolTypesViewSet, UsersViewSet, JiraIssuesViewSet, JiraProjectViewSet, AppAnalysisViewSet
+from dojo.api_v2.views import (
+    DevelopmentEnvironmentViewSet,
+    EndpointStatusViewSet,
+    EndPointViewSet,
+    EngagementViewSet,
+    FindingTemplatesViewSet,
+    FindingViewSet,
+    JiraInstanceViewSet,
+    DojoMetaViewSet,
+    NoteTypeViewSet,
+    NotesViewSet,
+    ProductTypeViewSet,
+    ProductViewSet,
+    RegulationsViewSet,
+    ScanSettingsViewSet,
+    ScansViewSet,
+    SonarqubeIssueViewSet,
+    SonarqubeProductViewSet,
+    SonarqubeIssueTransitionViewSet,
+    StubFindingsViewSet,
+    SystemSettingsViewSet,
+    TestTypesViewSet,
+    TestsViewSet,
+    ToolConfigurationsViewSet,
+    ToolProductSettingsViewSet,
+    ToolTypesViewSet,
+    UsersViewSet,
+    JiraIssuesViewSet,
+    JiraProjectViewSet,
+    AppAnalysisViewSet,
+)
 
-from dojo.models import \
-    Development_Environment, Endpoint_Status, Endpoint, Engagement, Finding_Template, \
-    Finding, JIRA_Instance, JIRA_Issue, DojoMeta, Note_Type, Notes, Product_Type, Product, Regulation, \
-    ScanSettings, Scan, Sonarqube_Issue, Sonarqube_Product, Sonarqube_Issue_Transition, \
-    Stub_Finding, System_Settings, Test_Type, Test, Tool_Configuration, Tool_Product_Settings, \
-    Tool_Type, Dojo_User, JIRA_Project, App_Analysis
+from dojo.models import (
+    Development_Environment,
+    Endpoint_Status,
+    Endpoint,
+    Engagement,
+    Finding_Template,
+    Finding,
+    JIRA_Instance,
+    JIRA_Issue,
+    DojoMeta,
+    Note_Type,
+    Notes,
+    Product_Type,
+    Product,
+    Regulation,
+    ScanSettings,
+    Scan,
+    Sonarqube_Issue,
+    Sonarqube_Product,
+    Sonarqube_Issue_Transition,
+    Stub_Finding,
+    System_Settings,
+    Test_Type,
+    Test,
+    Tool_Configuration,
+    Tool_Product_Settings,
+    Tool_Type,
+    Dojo_User,
+    JIRA_Project,
+    App_Analysis,
+)
 
-from dojo.api_v2.serializers import \
-    DevelopmentEnvironmentSerializer, EndpointStatusSerializer, EndpointSerializer, \
-    EngagementSerializer, FindingTemplateSerializer, FindingSerializer, \
-    JIRAInstanceSerializer, JIRAIssueSerializer, JIRAProjectSerializer, MetaSerializer, NoteTypeSerializer, \
-    ProductSerializer, RegulationSerializer, ScanSettingsSerializer,  \
-    ScanSerializer, SonarqubeIssueSerializer, SonarqubeProductSerializer, SonarqubeIssueTransitionSerializer, \
-    StubFindingSerializer, SystemSettingsSerializer, TestTypeSerializer, TestSerializer, ToolConfigurationSerializer, \
-    ToolProductSettingsSerializer, ToolTypeSerializer, UserSerializer, NoteSerializer, ProductTypeSerializer, \
-    AppAnalysisSerializer
+from dojo.api_v2.serializers import (
+    DevelopmentEnvironmentSerializer,
+    EndpointStatusSerializer,
+    EndpointSerializer,
+    EngagementSerializer,
+    FindingTemplateSerializer,
+    FindingSerializer,
+    JIRAInstanceSerializer,
+    JIRAIssueSerializer,
+    JIRAProjectSerializer,
+    MetaSerializer,
+    NoteTypeSerializer,
+    ProductSerializer,
+    RegulationSerializer,
+    ScanSettingsSerializer,
+    ScanSerializer,
+    SonarqubeIssueSerializer,
+    SonarqubeProductSerializer,
+    SonarqubeIssueTransitionSerializer,
+    StubFindingSerializer,
+    SystemSettingsSerializer,
+    TestTypeSerializer,
+    TestSerializer,
+    ToolConfigurationSerializer,
+    ToolProductSettingsSerializer,
+    ToolTypeSerializer,
+    UserSerializer,
+    NoteSerializer,
+    ProductTypeSerializer,
+    AppAnalysisSerializer,
+)
 
 SWAGGER_SCHEMA_GENERATOR = OpenAPISchemaGenerator(Info("defectdojo", "v2"))
 BASE_API_URL = "/api/v2"
@@ -50,10 +129,12 @@ def skipIfNotSubclass(baseclass):
     def decorate(f):
         def wrapper(self, *args, **kwargs):
             if not issubclass(self.viewset, baseclass):
-                self.skipTest('This view is not %s' % baseclass)
+                self.skipTest("This view is not %s" % baseclass)
             else:
                 f(self, *args, **kwargs)
+
         return wrapper
+
     return decorate
 
 
@@ -63,15 +144,16 @@ def check_response_valid(expected_code, response):
             return response.data
         return None
 
-    assert response.status_code == expected_code, \
-        f"Response invalid, returned with code {response.status_code}\nResponse Data:\n{_data_to_str(response)}"
+    assert (
+        response.status_code == expected_code
+    ), f"Response invalid, returned with code {response.status_code}\nResponse Data:\n{_data_to_str(response)}"
 
 
 def format_url(path):
     return f"{BASE_API_URL}{path}"
 
 
-class SchemaChecker():
+class SchemaChecker:
     def __init__(self, definitions):
         self._prefix = []
         self._has_failed = False
@@ -87,7 +169,7 @@ class SchemaChecker():
             self._register_error(message)
 
     def _get_prefix(self):
-        return '#'.join(self._prefix)
+        return "#".join(self._prefix)
 
     def _push_prefix(self, prefix):
         self._prefix += [prefix]
@@ -100,23 +182,32 @@ class SchemaChecker():
             return schema
 
         ref_name = schema["$ref"]
-        ref_name = ref_name[ref_name.rfind("/") + 1:]
+        ref_name = ref_name[ref_name.rfind("/") + 1 :]
         return self._definitions[ref_name]
 
     def _check_has_required_fields(self, required_fields, obj):
         for required_field in required_fields:
             field = f"{self._get_prefix()}#{required_field}"
-            self._check_or_fail(obj is not None and required_field in obj, f"{field} is required but was not returned")
+            self._check_or_fail(
+                obj is not None and required_field in obj,
+                f"{field} is required but was not returned",
+            )
 
     def _check_type(self, schema, obj):
         schema_type = schema["type"]
         is_nullable = schema.get("x-nullable", False) or schema.get("readOnly", False)
 
         def _check_helper(check):
-            self._check_or_fail(check, f"{self._get_prefix()} should be of type {schema_type} but value was of type {type(obj)}")
+            self._check_or_fail(
+                check,
+                f"{self._get_prefix()} should be of type {schema_type} but value was of type {type(obj)}",
+            )
 
         if obj is None:
-            self._check_or_fail(is_nullable, f"{self._get_prefix()} is not nullable yet the value returned was null")
+            self._check_or_fail(
+                is_nullable,
+                f"{self._get_prefix()} is not nullable yet the value returned was null",
+            )
         elif schema_type is TYPE_BOOLEAN:
             _check_helper(isinstance(obj, bool))
         elif schema_type is TYPE_INTEGER:
@@ -159,7 +250,12 @@ class SchemaChecker():
             additional_properties = schema.get("additionalProperties", None)
             if additional_properties is not None:
                 for name, obj_child in obj.items():
-                    self._with_prefix(f"additionalProp<{name}>", _check, additional_properties, obj_child)
+                    self._with_prefix(
+                        f"additionalProp<{name}>",
+                        _check,
+                        additional_properties,
+                        obj_child,
+                    )
 
             if schema["type"] is TYPE_ARRAY:
                 items_schema = schema["items"]
@@ -170,12 +266,18 @@ class SchemaChecker():
         self._errors = []
         self._prefix = []
         _check(schema, obj)
-        assert not self._has_failed, "\n" + '\n'.join(self._errors) + "\nFailed with " + str(len(self._errors)) + " errors"
+        assert not self._has_failed, (
+            "\n"
+            + "\n".join(self._errors)
+            + "\nFailed with "
+            + str(len(self._errors))
+            + " errors"
+        )
 
 
-class BaseClass():
+class BaseClass:
     class SchemaTest(APITestCase):
-        fixtures = ['dojo_testdata.json']
+        fixtures = ["dojo_testdata.json"]
 
         def __init__(self, *args, **kwargs):
             super().__init__(*args, **kwargs)
@@ -187,10 +289,10 @@ class BaseClass():
 
         def setUp(self):
             super().setUp()
-            testuser = Dojo_User.objects.get(username='admin')
+            testuser = Dojo_User.objects.get(username="admin")
 
             factory = APIRequestFactory()
-            request = factory.get('/')
+            request = factory.get("/")
             force_authenticate(request, user=testuser)
             request = APIView().initialize_request(request)
 
@@ -208,22 +310,28 @@ class BaseClass():
             if len(response.data["results"]) == 0:
                 return None
 
-            return response.data["results"][0].get('id', None)
+            return response.data["results"][0].get("id", None)
 
         def get_endpoint_schema(self, path, method):
             paths = self.schema["paths"]
             methods = paths.get(path, None)
-            assert methods is not None, f"{path} not found in {[path for path in paths.keys()]}"
+            assert (
+                methods is not None
+            ), f"{path} not found in {[path for path in paths.keys()]}"
 
             endpoint = methods.get(method, None)
-            assert endpoint is not None, f"Method {method} not found in {[method for method in methods.keys()]}"
+            assert (
+                endpoint is not None
+            ), f"Method {method} not found in {[method for method in methods.keys()]}"
 
             return endpoint
 
         def construct_response_data(self, obj_id):
             obj = self.model.objects.get(id=obj_id)
             request = APIView().initialize_request(APIRequestFactory().request())
-            serialized_obj = self.serializer(context={"request": request}).to_representation(obj)
+            serialized_obj = self.serializer(
+                context={"request": request}
+            ).to_representation(obj)
 
             for name, transformer in self.field_transformers.items():
                 serialized_obj[name] = transformer(serialized_obj[name])
@@ -236,7 +344,7 @@ class BaseClass():
             response = self.client.get(format_url(f"/{self.viewname}/"), extra_args)
             check_response_valid(status.HTTP_200_OK, response)
 
-            schema = endpoints['get']['responses']['200']['schema']
+            schema = endpoints["get"]["responses"]["200"]["schema"]
             obj = response.data
 
             self.check_schema(schema, obj)
@@ -246,11 +354,13 @@ class BaseClass():
             endpoints = self.schema["paths"][f"/{self.viewname}/{{id}}/"]
             response = self.client.get(format_url(f"/{self.viewname}/"))
             check_response_valid(status.HTTP_200_OK, response)
-            ids = [obj['id'] for obj in response.data["results"]]
+            ids = [obj["id"] for obj in response.data["results"]]
 
-            schema = endpoints['get']['responses']['200']['schema']
+            schema = endpoints["get"]["responses"]["200"]["schema"]
             for id in ids:
-                response = self.client.get(format_url(f"/{self.viewname}/{id}/"), extra_args)
+                response = self.client.get(
+                    format_url(f"/{self.viewname}/{id}/"), extra_args
+                )
                 check_response_valid(status.HTTP_200_OK, response)
                 obj = response.data
                 self.check_schema(schema, obj)
@@ -265,8 +375,10 @@ class BaseClass():
 
             data = self.construct_response_data(id)
 
-            schema = operation['responses']['200']['schema']
-            response = self.client.patch(format_url(f"/{self.viewname}/{id}/"), data, format='json')
+            schema = operation["responses"]["200"]["schema"]
+            response = self.client.patch(
+                format_url(f"/{self.viewname}/{id}/"), data, format="json"
+            )
             check_response_valid(status.HTTP_200_OK, response)
 
             obj = response.data
@@ -274,7 +386,7 @@ class BaseClass():
 
         @skipIfNotSubclass(UpdateModelMixin)
         def test_put_endpoint(self, extra_args=None):
-            operation = self.schema["paths"][f"/{self.viewname}/{{id}}/"]['put']
+            operation = self.schema["paths"][f"/{self.viewname}/{{id}}/"]["put"]
 
             id = self.get_valid_object_id()
             if id is None:
@@ -282,8 +394,10 @@ class BaseClass():
 
             data = self.construct_response_data(id)
 
-            schema = operation['responses']['200']['schema']
-            response = self.client.put(format_url(f"/{self.viewname}/{id}/"), data, format='json')
+            schema = operation["responses"]["200"]["schema"]
+            response = self.client.put(
+                format_url(f"/{self.viewname}/{id}/"), data, format="json"
+            )
             check_response_valid(status.HTTP_200_OK, response)
 
             obj = response.data
@@ -299,8 +413,10 @@ class BaseClass():
 
             data = self.construct_response_data(id)
 
-            schema = operation['responses']['201']['schema']
-            response = self.client.post(format_url(f"/{self.viewname}/"), data, format='json')
+            schema = operation["responses"]["201"]["schema"]
+            response = self.client.post(
+                format_url(f"/{self.viewname}/"), data, format="json"
+            )
             check_response_valid(status.HTTP_201_CREATED, response)
 
             obj = response.data
@@ -332,9 +448,7 @@ class EndpointTest(BaseClass.SchemaTest):
         self.viewset = EndPointViewSet
         self.model = Endpoint
         self.serializer = EndpointSerializer
-        self.field_transformers = {
-            "path": lambda v: v + "transformed/"
-        }
+        self.field_transformers = {"path": lambda v: v + "transformed/"}
 
 
 class EngagementTest(BaseClass.SchemaTest):
@@ -348,20 +462,16 @@ class EngagementTest(BaseClass.SchemaTest):
     @testIsBroken
     def test_accept_risks(self):
         operation = self.get_endpoint_schema("/engagements/{id}/accept_risks/", "post")
-        schema = operation['responses']['201']['schema']
+        schema = operation["responses"]["201"]["schema"]
         id = self.get_valid_object_id()
         if id is None:
             self.skipTest("No data exists to test endpoint")
 
-        data = [
-            {
-                "cve": 1,
-                "justification": "test",
-                "accepted_by": "2"
-            }
-        ]
+        data = [{"cve": 1, "justification": "test", "accepted_by": "2"}]
 
-        response = self.client.post(format_url(f"/engagements/{id}/accept_risks/"), data, format='json')
+        response = self.client.post(
+            format_url(f"/engagements/{id}/accept_risks/"), data, format="json"
+        )
         check_response_valid(201, response)
         obj = response.data
         self.check_schema(schema, obj)
@@ -369,7 +479,7 @@ class EngagementTest(BaseClass.SchemaTest):
     @testIsBroken
     def test_notes_read(self):
         operation = self.get_endpoint_schema("/engagements/{id}/notes/", "get")
-        schema = operation['responses']['200']['schema']
+        schema = operation["responses"]["200"]["schema"]
         id = self.get_valid_object_id()
         if id is None:
             self.skipTest("No data exists to test endpoint")
@@ -382,7 +492,7 @@ class EngagementTest(BaseClass.SchemaTest):
     @testIsBroken
     def test_notes_create(self):
         operation = self.get_endpoint_schema("/engagements/{id}/notes/", "post")
-        schema = operation['responses']['201']['schema']
+        schema = operation["responses"]["201"]["schema"]
         id = self.get_valid_object_id()
         if id is None:
             self.skipTest("No data exists to test endpoint")
@@ -392,7 +502,9 @@ class EngagementTest(BaseClass.SchemaTest):
             "author": 2,
         }
 
-        response = self.client.post(format_url(f"/engagements/{id}/notes/"), data, format='json')
+        response = self.client.post(
+            format_url(f"/engagements/{id}/notes/"), data, format="json"
+        )
         check_response_valid(201, response)
         obj = response.data
         self.check_schema(schema, obj)
@@ -429,9 +541,7 @@ class FindingTest(BaseClass.SchemaTest):
 
     @testIsBroken
     def test_list_endpoint(self):
-        super().test_list_endpoint({
-            "related_fields": True
-        })
+        super().test_list_endpoint({"related_fields": True})
 
     @testIsBroken
     def test_patch_endpoint(self):
@@ -443,9 +553,7 @@ class FindingTest(BaseClass.SchemaTest):
 
     @testIsBroken
     def test_retrieve_endpoint(self):
-        super().test_retrieve_endpoint({
-            "related_fields": True
-        })
+        super().test_retrieve_endpoint({"related_fields": True})
 
 
 class JiraInstanceTest(BaseClass.SchemaTest):
@@ -484,10 +592,7 @@ class JiraFindingMappingsTest(BaseClass.SchemaTest):
         self.viewset = JiraIssuesViewSet
         self.model = JIRA_Issue
         self.serializer = JIRAIssueSerializer
-        self.field_transformers = {
-            "finding": lambda v: 2,
-            "engagement": lambda v: 2
-        }
+        self.field_transformers = {"finding": lambda v: 2, "engagement": lambda v: 2}
 
 
 class JiraProjectTest(BaseClass.SchemaTest):
@@ -515,9 +620,7 @@ class NoteTypeTest(BaseClass.SchemaTest):
         self.viewset = NoteTypeViewSet
         self.model = Note_Type
         self.serializer = NoteTypeSerializer
-        self.field_transformers = {
-            "name": lambda v: v + "_new"
-        }
+        self.field_transformers = {"name": lambda v: v + "_new"}
 
 
 class NoteTest(BaseClass.SchemaTest):
@@ -536,9 +639,7 @@ class ProductTypeTest(BaseClass.SchemaTest):
         self.viewset = ProductTypeViewSet
         self.model = Product_Type
         self.serializer = ProductTypeSerializer
-        self.field_transformers = {
-            "name": lambda v: v + "_new"
-        }
+        self.field_transformers = {"name": lambda v: v + "_new"}
 
 
 class ProductTest(BaseClass.SchemaTest):
@@ -548,9 +649,7 @@ class ProductTest(BaseClass.SchemaTest):
         self.viewset = ProductViewSet
         self.model = Product
         self.serializer = ProductSerializer
-        self.field_transformers = {
-            "name": lambda v: v + "_new"
-        }
+        self.field_transformers = {"name": lambda v: v + "_new"}
 
     @testIsBroken
     def test_list_endpoint(self):
@@ -607,9 +706,7 @@ class SonarqubeIssuesTest(BaseClass.SchemaTest):
         self.viewset = SonarqubeIssueViewSet
         self.model = Sonarqube_Issue
         self.serializer = SonarqubeIssueSerializer
-        self.field_transformers = {
-            "key": lambda v: v + "_new"
-        }
+        self.field_transformers = {"key": lambda v: v + "_new"}
 
 
 class SonarqubeProductConfTest(BaseClass.SchemaTest):
@@ -676,9 +773,7 @@ class TestTypeTest(BaseClass.SchemaTest):
         self.viewset = TestTypesViewSet
         self.model = Test_Type
         self.serializer = TestTypeSerializer
-        self.field_transformers = {
-            "name": lambda v: v + "_new"
-        }
+        self.field_transformers = {"name": lambda v: v + "_new"}
 
 
 class TestsTest(BaseClass.SchemaTest):
@@ -724,6 +819,4 @@ class UserTest(BaseClass.SchemaTest):
         self.viewset = UsersViewSet
         self.model = Dojo_User
         self.serializer = UserSerializer
-        self.field_transformers = {
-            "username": lambda v: v + "_transformed"
-        }
+        self.field_transformers = {"username": lambda v: v + "_transformed"}

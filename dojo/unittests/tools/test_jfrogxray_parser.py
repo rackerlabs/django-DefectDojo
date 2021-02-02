@@ -4,7 +4,6 @@ from dojo.tools.jfrogxray.parser import XrayJSONParser, decode_cwe_number
 
 
 class TestJfrogXrayJSONParser(TestCase):
-
     def test_parse_file_with_one_vuln(self):
         testfile = open("dojo/unittests/scans/jfrogxray/one_vuln.json")
         parser = XrayJSONParser()

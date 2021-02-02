@@ -1,4 +1,3 @@
-
 from django import template
 from dojo.models import BannerConf
 

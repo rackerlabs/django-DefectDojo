@@ -6,13 +6,13 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('dojo', '0016_increase_filepath_length'),
+        ("dojo", "0016_increase_filepath_length"),
     ]
 
     operations = [
         migrations.AlterField(
-            model_name='jira_issue',
-            name='jira_id',
+            model_name="jira_issue",
+            name="jira_id",
             field=models.CharField(max_length=200),
         ),
     ]

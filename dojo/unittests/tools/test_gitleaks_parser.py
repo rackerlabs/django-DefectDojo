@@ -4,7 +4,6 @@ from dojo.models import Test
 
 
 class TestGitleaksParser(TestCase):
-
     def test_parse_file_with_one_finding(self):
         testfile = open("dojo/unittests/scans/gitleaks/data_one.json")
         parser = GitleaksJSONParser()

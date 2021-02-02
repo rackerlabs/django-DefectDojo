@@ -10,13 +10,16 @@ import string
 from urllib.parse import urlparse
 
 import html2text
+
 # from defusedxml import ElementTree as etree
 from lxml import etree
 
 from dojo.models import Endpoint, Finding
 
 __author__ = "Francisco Amato & @JamesCullum"
-__copyright__ = "Copyright (c) 2013, Infobyte LLC & Panasonic Information Systems Company Europe"
+__copyright__ = (
+    "Copyright (c) 2013, Infobyte LLC & Panasonic Information Systems Company Europe"
+)
 __credits__ = ["Francisco Amato", "@JamesCullum"]
 __license__ = ""
 __version__ = "1.0.0"
@@ -70,7 +73,15 @@ class BurpXmlParser(object):
             data = xml_file.read()
             printable = set(string.printable)
             data = [x for x in data if x in printable]
-            tree = etree.fromstring(data, etree.XMLParser(encoding='ISO-8859-1', ns_clean=True, recover=True, resolve_entities=False))
+            tree = etree.fromstring(
+                data,
+                etree.XMLParser(
+                    encoding="ISO-8859-1",
+                    ns_clean=True,
+                    recover=True,
+                    resolve_entities=False,
+                ),
+            )
 
         return tree
 
@@ -81,12 +92,16 @@ class BurpXmlParser(object):
         bugtype = ""
         items = {}
 
-        for node in tree.findall('issue'):
+        for node in tree.findall("issue"):
             item = get_item(node, test)
             dupe_key = str(item.url) + item.severity + item.title
             if dupe_key in items:
-                items[dupe_key].unsaved_endpoints = items[dupe_key].unsaved_endpoints + item.unsaved_endpoints
-                items[dupe_key].unsaved_req_resp = items[dupe_key].unsaved_req_resp + item.unsaved_req_resp
+                items[dupe_key].unsaved_endpoints = (
+                    items[dupe_key].unsaved_endpoints + item.unsaved_endpoints
+                )
+                items[dupe_key].unsaved_req_resp = (
+                    items[dupe_key].unsaved_req_resp + item.unsaved_req_resp
+                )
                 # make sure only unique endpoints are retained
                 unique_objs = []
                 new_list = []
@@ -99,7 +114,9 @@ class BurpXmlParser(object):
                 items[dupe_key].unsaved_endpoints = new_list
 
                 # Description details of the finding are added
-                items[dupe_key].description = item.description + items[dupe_key].description
+                items[dupe_key].description = (
+                    item.description + items[dupe_key].description
+                )
 
                 # Parameters of the finding are added
                 if items[dupe_key].param and items[dupe_key].param:
@@ -121,8 +138,9 @@ def get_attrib_from_subnode(xml_node, subnode_xpath_expr, attrib_name):
 
     if ETREE_VERSION[0] <= 1 and ETREE_VERSION[1] < 3:
 
-        match_obj = re.search(r"([^\@]+?)\[\@([^=]*?)=\'([^\']*?)\'",
-                              subnode_xpath_expr)
+        match_obj = re.search(
+            r"([^\@]+?)\[\@([^=]*?)=\'([^\']*?)\'", subnode_xpath_expr
+        )
         if match_obj is not None:
             node_to_find = match_obj.group(1)
             xpath_attrib = match_obj.group(2)
@@ -155,7 +173,7 @@ def do_clean(value):
 
 def get_item(item_node, test):
     endpoints = []
-    host_node = item_node.findall('host')[0]
+    host_node = item_node.findall("host")[0]
 
     url_host = host_node.text
 
@@ -168,7 +186,7 @@ def get_item(item_node, test):
     host = urlparse(url_host).netloc
 
     port = 80
-    if protocol == 'https':
+    if protocol == "https":
         port = 443
 
     # if rhost.group(11) is not None:
@@ -176,56 +194,71 @@ def get_item(item_node, test):
     if urlparse(url_host).port is not None:
         port = urlparse(url_host).port
 
-    ip = host_node.get('ip')
-    url = item_node.get('url')
-    path = item_node.findall('path')[0].text
-    location = item_node.findall('location')[0].text
+    ip = host_node.get("ip")
+    url = item_node.get("url")
+    path = item_node.findall("path")[0].text
+    location = item_node.findall("location")[0].text
     rparameter = re.search(r"(?<=\[)(.*)(\])", location)
     parameter = None
     if rparameter:
         parameter = rparameter.group(1)
 
     unsaved_req_resp = list()
-    for request_response in item_node.findall('./requestresponse'):
+    for request_response in item_node.findall("./requestresponse"):
         try:
-            request = request_response.findall('request')[0].text
+            request = request_response.findall("request")[0].text
         except:
             request = ""
         try:
-            response = request_response.findall('response')[0].text
+            response = request_response.findall("response")[0].text
         except:
             response = ""
         unsaved_req_resp.append({"req": request, "resp": response})
 
     collab_text = ""
-    for event in item_node.findall('./collaboratorEvent'):
+    for event in item_node.findall("./collaboratorEvent"):
         collab_details = list()
-        collab_details.append(event.findall('interactionType')[0].text)
-        collab_details.append(event.findall('originIp')[0].text)
-        collab_details.append(event.findall('time')[0].text)
+        collab_details.append(event.findall("interactionType")[0].text)
+        collab_details.append(event.findall("originIp")[0].text)
+        collab_details.append(event.findall("time")[0].text)
 
-        if collab_details[0] == 'DNS':
-            collab_details.append(event.findall('lookupType')[0].text)
-            collab_details.append(event.findall('lookupHost')[0].text)
-            collab_text += "The Collaborator server received a " + collab_details[0] + " lookup of type " + collab_details[3] + \
-                " for the domain name " + \
-                collab_details[4] + " at " + collab_details[2] + \
-                " originating from " + collab_details[1] + ". "
+        if collab_details[0] == "DNS":
+            collab_details.append(event.findall("lookupType")[0].text)
+            collab_details.append(event.findall("lookupHost")[0].text)
+            collab_text += (
+                "The Collaborator server received a "
+                + collab_details[0]
+                + " lookup of type "
+                + collab_details[3]
+                + " for the domain name "
+                + collab_details[4]
+                + " at "
+                + collab_details[2]
+                + " originating from "
+                + collab_details[1]
+                + ". "
+            )
 
-        for request_response in event.findall('./requestresponse'):
+        for request_response in event.findall("./requestresponse"):
             try:
-                request = request_response.findall('request')[0].text
+                request = request_response.findall("request")[0].text
             except:
                 request = ""
             try:
-                response = request_response.findall('response')[0].text
+                response = request_response.findall("response")[0].text
             except:
                 response = ""
             unsaved_req_resp.append({"req": request, "resp": response})
-        if collab_details[0] == 'HTTP':
-            collab_text += "The Collaborator server received an " + \
-                collab_details[0] + " request at " + collab_details[2] + \
-                " originating from " + collab_details[1] + ". "
+        if collab_details[0] == "HTTP":
+            collab_text += (
+                "The Collaborator server received an "
+                + collab_details[0]
+                + " request at "
+                + collab_details[2]
+                + " originating from "
+                + collab_details[1]
+                + ". "
+            )
 
     test_product = None
     try:
@@ -240,7 +273,8 @@ def get_item(item_node, test):
             path=path,
             query=None,
             fragment=None,
-            product=test_product)
+            product=test_product,
+        )
     except:
         dupe_endpoint = None
 
@@ -251,7 +285,8 @@ def get_item(item_node, test):
             path=path,
             query=None,
             fragment=None,
-            product=test_product)
+            product=test_product,
+        )
     else:
         endpoint = dupe_endpoint
 
@@ -263,15 +298,13 @@ def get_item(item_node, test):
                 path=None,
                 query=None,
                 fragment=None,
-                product=test_product)
+                product=test_product,
+            )
         except:
             dupe_endpoint = None
 
         if not dupe_endpoint:
-            endpoints = [
-                endpoint,
-                Endpoint(host=ip, product=test_product)
-            ]
+            endpoints = [endpoint, Endpoint(host=ip, product=test_product)]
         else:
             endpoints = [endpoint, dupe_endpoint]
 
@@ -281,31 +314,31 @@ def get_item(item_node, test):
     text_maker = html2text.HTML2Text()
     text_maker.body_width = 0
 
-    background = do_clean(item_node.findall('issueBackground'))
+    background = do_clean(item_node.findall("issueBackground"))
     if background:
         background = text_maker.handle(background)
 
-    detail = do_clean(item_node.findall('issueDetail'))
+    detail = do_clean(item_node.findall("issueDetail"))
     if detail:
         detail = text_maker.handle(detail)
         if collab_text:
-            detail = text_maker.handle(detail + '<p>' + collab_text + '</p>')
+            detail = text_maker.handle(detail + "<p>" + collab_text + "</p>")
 
-    remediation = do_clean(item_node.findall('remediationBackground'))
+    remediation = do_clean(item_node.findall("remediationBackground"))
     if remediation:
         remediation = text_maker.handle(remediation)
 
-    remediation_detail = do_clean(item_node.findall('remediationDetail'))
+    remediation_detail = do_clean(item_node.findall("remediationDetail"))
     if remediation_detail:
         remediation = text_maker.handle(remediation_detail + "\n") + remediation
 
-    references = do_clean(item_node.findall('references'))
+    references = do_clean(item_node.findall("references"))
     if references:
         references = text_maker.handle(references)
 
-    severity = item_node.findall('severity')[0].text
+    severity = item_node.findall("severity")[0].text
 
-    scanner_confidence = item_node.findall('confidence')[0].text
+    scanner_confidence = item_node.findall("confidence")[0].text
     if scanner_confidence:
         if scanner_confidence == "Certain":
             scanner_confidence = 1
@@ -316,7 +349,7 @@ def get_item(item_node, test):
 
     # Finding and Endpoint objects returned have not been saved to the database
     finding = Finding(
-        title=item_node.findall('name')[0].text,
+        title=item_node.findall("name")[0].text,
         url=url,
         test=test,
         severity=severity,
@@ -333,7 +366,8 @@ def get_item(item_node, test):
         mitigated=None,
         dynamic_finding=True,
         impact=background,
-        numerical_severity=Finding.get_numerical_severity(severity))
+        numerical_severity=Finding.get_numerical_severity(severity),
+    )
     finding.unsaved_endpoints = endpoints
     finding.unsaved_req_resp = unsaved_req_resp
 

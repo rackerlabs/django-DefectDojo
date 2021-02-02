@@ -7,23 +7,41 @@ import multiselectfield.db.fields
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('dojo', '0047_jira_minimum_severity_default'),
+        ("dojo", "0047_jira_minimum_severity_default"),
     ]
 
     operations = [
         migrations.AddField(
-            model_name='jira_conf',
-            name='global_jira_sla_notification',
-            field=models.BooleanField(default=True, verbose_name='Globally send SLA notifications as comment?', help_text="This setting can be overidden at the Product level"),
+            model_name="jira_conf",
+            name="global_jira_sla_notification",
+            field=models.BooleanField(
+                default=True,
+                verbose_name="Globally send SLA notifications as comment?",
+                help_text="This setting can be overidden at the Product level",
+            ),
         ),
         migrations.AddField(
-            model_name='notifications',
-            name='sla_breach',
-            field=multiselectfield.db.fields.MultiSelectField(blank=True, choices=[('slack', 'slack'), ('hipchat', 'hipchat'), ('mail', 'mail'), ('alert', 'alert')], default='alert', help_text='Get notified of upcoming SLA breaches', max_length=24, verbose_name='SLA breach'),
+            model_name="notifications",
+            name="sla_breach",
+            field=multiselectfield.db.fields.MultiSelectField(
+                blank=True,
+                choices=[
+                    ("slack", "slack"),
+                    ("hipchat", "hipchat"),
+                    ("mail", "mail"),
+                    ("alert", "alert"),
+                ],
+                default="alert",
+                help_text="Get notified of upcoming SLA breaches",
+                max_length=24,
+                verbose_name="SLA breach",
+            ),
         ),
         migrations.AddField(
-            model_name='jira_pkey',
-            name='product_jira_sla_notification',
-            field=models.BooleanField(default=True, verbose_name='Send SLA notifications as comment?'),
+            model_name="jira_pkey",
+            name="product_jira_sla_notification",
+            field=models.BooleanField(
+                default=True, verbose_name="Send SLA notifications as comment?"
+            ),
         ),
     ]

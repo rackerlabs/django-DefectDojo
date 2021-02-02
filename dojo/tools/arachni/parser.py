@@ -24,7 +24,7 @@ class ArachniJSONParser(object):
         try:
             data = json_output.read()
             try:
-                tree = json.loads(str(data, 'utf-8'))
+                tree = json.loads(str(data, "utf-8"))
             except:
                 tree = json.loads(data)
         except:
@@ -36,14 +36,18 @@ class ArachniJSONParser(object):
         bugtype = ""
         items = {}
 
-        issues = tree['issues']
+        issues = tree["issues"]
 
         for node in issues:
             item = get_item(node, test)
             dupe_key = str(item.url) + item.severity + item.title
             if dupe_key in items:
-                items[dupe_key].unsaved_endpoints = items[dupe_key].unsaved_endpoints + item.unsaved_endpoints
-                items[dupe_key].unsaved_req_resp = items[dupe_key].unsaved_req_resp + item.unsaved_req_resp
+                items[dupe_key].unsaved_endpoints = (
+                    items[dupe_key].unsaved_endpoints + item.unsaved_endpoints
+                )
+                items[dupe_key].unsaved_req_resp = (
+                    items[dupe_key].unsaved_req_resp + item.unsaved_req_resp
+                )
 
                 # make sure only unique endpoints are retained
                 unique_objs = []
@@ -71,10 +75,10 @@ def do_clean(value):
 
 
 def get_item(item_node, test):
-    if 'vector' in item_node and 'action' in item_node['vector']:
-        url = item_node['vector']['action']
+    if "vector" in item_node and "action" in item_node["vector"]:
+        url = item_node["vector"]["action"]
     else:
-        url = item_node['response']['url']
+        url = item_node["response"]["url"]
 
     o = urlparse(url)
 
@@ -94,7 +98,7 @@ def get_item(item_node, test):
     fragment = o.fragment
 
     port = 80
-    if protocol == 'https':
+    if protocol == "https":
         port = 443
 
     # if rhost.group(11) is not None:
@@ -102,44 +106,53 @@ def get_item(item_node, test):
     if o.port is not None:
         port = o.port
 
-    request = item_node['request']
+    request = item_node["request"]
     #
-    req = ''
+    req = ""
     #
     for key, value in request.items():
         req += str(key) + ": " + str(value) + "\n\n"
     #
-    respz = item_node['response']
+    respz = item_node["response"]
 
-    resp = ''
+    resp = ""
 
     for key, value in respz.items():
-        if key != 'body':
+        if key != "body":
             resp += str(key) + ": " + str(value) + "\n\n"
 
-    resp += "\n\n\n" + force_str(respz['body'])
+    resp += "\n\n\n" + force_str(respz["body"])
     unsaved_req_resp = list()
 
     if request is not None and respz is not None:
-        unsaved_req_resp.append({"req": b64encode(req.encode("utf-8")), "resp": b64encode(resp.encode("utf-8"))})
+        unsaved_req_resp.append(
+            {
+                "req": b64encode(req.encode("utf-8")),
+                "resp": b64encode(resp.encode("utf-8")),
+            }
+        )
 
     try:
-        dupe_endpoint = Endpoint.objects.get(protocol=protocol,
-                                             host=host + (":" + port) if port is not None else "",
-                                             query=query,
-                                             fragment=fragment,
-                                             path=path,
-                                             product=test.engagement.product)
+        dupe_endpoint = Endpoint.objects.get(
+            protocol=protocol,
+            host=host + (":" + port) if port is not None else "",
+            query=query,
+            fragment=fragment,
+            path=path,
+            product=test.engagement.product,
+        )
     except:
         dupe_endpoint = None
 
     if not dupe_endpoint:
-        endpoint = Endpoint(protocol=protocol,
-                            host=host + (":" + str(port)) if port is not None else "",
-                            query=query,
-                            fragment=fragment,
-                            path=path,
-                            product=test.engagement.product)
+        endpoint = Endpoint(
+            protocol=protocol,
+            host=host + (":" + str(port)) if port is not None else "",
+            query=query,
+            fragment=fragment,
+            path=path,
+            product=test.engagement.product,
+        )
     else:
         endpoint = dupe_endpoint
 
@@ -148,50 +161,56 @@ def get_item(item_node, test):
     else:
         endpoints = [endpoint, dupe_endpoint]
 
-    background = item_node['description'] if 'description' in item_node else None
+    background = item_node["description"] if "description" in item_node else None
     if background:
         background = html2text.html2text(background)
 
-    remediation = item_node['remedy_guidance'] if 'remedy_guidance' in item_node else 'n/a'
+    remediation = (
+        item_node["remedy_guidance"] if "remedy_guidance" in item_node else "n/a"
+    )
     if remediation:
         remediation = html2text.html2text(remediation)
 
-    references = list(item_node['references'].values()) if 'references' in item_node else None
-    references = '<br/><br/>'.join(reference for reference in references)
+    references = (
+        list(item_node["references"].values()) if "references" in item_node else None
+    )
+    references = "<br/><br/>".join(reference for reference in references)
 
     if references:
         references = html2text.html2text(references)
 
-    severity = item_node['severity'].capitalize() if 'severity' in item_node else 'Info'
+    severity = item_node["severity"].capitalize() if "severity" in item_node else "Info"
 
-    if severity == 'Informational':
-        severity == 'Info'
+    if severity == "Informational":
+        severity == "Info"
 
-    cwe = item_node['cwe'] if 'cwe' in item_node else None
+    cwe = item_node["cwe"] if "cwe" in item_node else None
 
-    tags = item_node['tags'] if 'tags' in item_node else None
+    tags = item_node["tags"] if "tags" in item_node else None
 
     if tags:
-        tags = ', '.join(tag for tag in tags)
+        tags = ", ".join(tag for tag in tags)
 
-    digest = item_node['digest']
+    digest = item_node["digest"]
     # Finding and Endpoint objects returned have not been saved to the database
-    finding = Finding(title=item_node['name'] + " (" + str(digest) + ")",
-                      url=url,
-                      test=test,
-                      severity=severity,
-                      description=background + "\n\n",
-                      mitigation=remediation,
-                      references=references,
-                      active=False,
-                      verified=False,
-                      false_p=False,
-                      duplicate=False,
-                      out_of_scope=False,
-                      mitigated=None,
-                      impact="No impact provided",
-                      numerical_severity=Finding.get_numerical_severity(severity),
-                      cwe=cwe)
+    finding = Finding(
+        title=item_node["name"] + " (" + str(digest) + ")",
+        url=url,
+        test=test,
+        severity=severity,
+        description=background + "\n\n",
+        mitigation=remediation,
+        references=references,
+        active=False,
+        verified=False,
+        false_p=False,
+        duplicate=False,
+        out_of_scope=False,
+        mitigated=None,
+        impact="No impact provided",
+        numerical_severity=Finding.get_numerical_severity(severity),
+        cwe=cwe,
+    )
     finding.unsaved_endpoints = endpoints
     finding.unsaved_req_resp = unsaved_req_resp
     finding.unsaved_tags = tags

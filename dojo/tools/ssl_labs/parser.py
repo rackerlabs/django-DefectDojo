@@ -1,4 +1,4 @@
-__author__ = 'Aaron Weaver'
+__author__ = "Aaron Weaver"
 
 import json
 from datetime import datetime
@@ -10,7 +10,7 @@ class SSLlabsParser(object):
     def get_findings(self, filename, test):
         tree = filename.read()
         try:
-            data = json.loads(str(tree, 'utf-8'))
+            data = json.loads(str(tree, "utf-8"))
         except:
             data = json.loads(tree)
 
@@ -26,18 +26,18 @@ class SSLlabsParser(object):
             if "endpoints" in host:
                 ssl_endpoints = host["endpoints"]
             for endpoints in ssl_endpoints:
-                categories = ''
-                language = ''
-                mitigation = 'N/A'
-                impact = 'N/A'
-                references = ''
-                findingdetail = ''
-                title = ''
-                group = ''
-                status = ''
-                port = ''
-                ipAddress = ''
-                protocol = ''
+                categories = ""
+                language = ""
+                mitigation = "N/A"
+                impact = "N/A"
+                references = ""
+                findingdetail = ""
+                title = ""
+                group = ""
+                status = ""
+                port = ""
+                ipAddress = ""
+                protocol = ""
 
                 grade = ""
                 if "grade" in endpoints:
@@ -59,18 +59,38 @@ class SSLlabsParser(object):
                 cert = ""
                 if "cert" in endpoints["details"]:
                     cert = endpoints["details"]["cert"]
-                    description = "%sCertifcate Subject: %s\n" % (description, cert["subject"])
-                    description = "%sIssuer Subject: %s\n" % (description, cert["issuerSubject"])
-                    description = "%sSignature Algorithm: %s\n" % (description, cert["sigAlg"])
+                    description = "%sCertifcate Subject: %s\n" % (
+                        description,
+                        cert["subject"],
+                    )
+                    description = "%sIssuer Subject: %s\n" % (
+                        description,
+                        cert["issuerSubject"],
+                    )
+                    description = "%sSignature Algorithm: %s\n" % (
+                        description,
+                        cert["sigAlg"],
+                    )
                 else:
                     for cert in host["certs"]:
-                        description = "%sCertifcate Subject: %s\n" % (description, cert["subject"])
-                        description = "%sIssuer Subject: %s\n" % (description, cert["issuerSubject"])
-                        description = "%sSignature Algorithm: %s\n" % (description, cert["sigAlg"])
+                        description = "%sCertifcate Subject: %s\n" % (
+                            description,
+                            cert["subject"],
+                        )
+                        description = "%sIssuer Subject: %s\n" % (
+                            description,
+                            cert["issuerSubject"],
+                        )
+                        description = "%sSignature Algorithm: %s\n" % (
+                            description,
+                            cert["sigAlg"],
+                        )
 
                 protocol_str = ""
                 for protocol_data in endpoints["details"]["protocols"]:
-                    protocol_str += protocol_data["name"] + " " + protocol_data["version"] + "\n"
+                    protocol_str += (
+                        protocol_data["name"] + " " + protocol_data["version"] + "\n"
+                    )
 
                 if protocol_str:
                     description += "\nProtocols:\n" + protocol_str
@@ -91,65 +111,163 @@ class SSLlabsParser(object):
                 description += suite_info
                 description += "Additional Information:\n\n"
                 if "serverSignature" in endpoints["details"]:
-                    description += "serverSignature: " + endpoints["details"]["serverSignature"] + "\n"
+                    description += (
+                        "serverSignature: "
+                        + endpoints["details"]["serverSignature"]
+                        + "\n"
+                    )
                 if "prefixDelegation" in endpoints["details"]:
-                    description += "prefixDelegation: " + str(endpoints["details"]["prefixDelegation"]) + "\n"
+                    description += (
+                        "prefixDelegation: "
+                        + str(endpoints["details"]["prefixDelegation"])
+                        + "\n"
+                    )
                 if "nonPrefixDelegation" in endpoints["details"]:
-                    description += "nonPrefixDelegation: " + str(endpoints["details"]["nonPrefixDelegation"]) + "\n"
+                    description += (
+                        "nonPrefixDelegation: "
+                        + str(endpoints["details"]["nonPrefixDelegation"])
+                        + "\n"
+                    )
                 if "vulnBeast" in endpoints["details"]:
-                    description += "vulnBeast: " + str(endpoints["details"]["vulnBeast"]) + "\n"
+                    description += (
+                        "vulnBeast: " + str(endpoints["details"]["vulnBeast"]) + "\n"
+                    )
                 if "renegSupport" in endpoints["details"]:
-                    description += "renegSupport: " + str(endpoints["details"]["renegSupport"]) + "\n"
+                    description += (
+                        "renegSupport: "
+                        + str(endpoints["details"]["renegSupport"])
+                        + "\n"
+                    )
                 if "stsStatus" in endpoints["details"]:
-                    description += "stsStatus: " + endpoints["details"]["stsStatus"] + "\n"
+                    description += (
+                        "stsStatus: " + endpoints["details"]["stsStatus"] + "\n"
+                    )
                 if "stsResponseHeader" in endpoints["details"]:
-                    description += "stsResponseHeader: " + endpoints["details"]["stsResponseHeader"] + "\n"
+                    description += (
+                        "stsResponseHeader: "
+                        + endpoints["details"]["stsResponseHeader"]
+                        + "\n"
+                    )
                 if "stsPreload" in endpoints["details"]:
-                    description += "stsPreload: " + str(endpoints["details"]["stsPreload"]) + "\n"
+                    description += (
+                        "stsPreload: " + str(endpoints["details"]["stsPreload"]) + "\n"
+                    )
                 if "sessionResumption" in endpoints["details"]:
-                    description += "sessionResumption: " + str(endpoints["details"]["sessionResumption"]) + "\n"
+                    description += (
+                        "sessionResumption: "
+                        + str(endpoints["details"]["sessionResumption"])
+                        + "\n"
+                    )
                 if "compressionMethods" in endpoints["details"]:
-                    description += "compressionMethods: " + str(endpoints["details"]["compressionMethods"]) + "\n"
+                    description += (
+                        "compressionMethods: "
+                        + str(endpoints["details"]["compressionMethods"])
+                        + "\n"
+                    )
                 if "supportsNpn" in endpoints["details"]:
-                    description += "supportsNpn: " + str(endpoints["details"]["supportsNpn"]) + "\n"
+                    description += (
+                        "supportsNpn: "
+                        + str(endpoints["details"]["supportsNpn"])
+                        + "\n"
+                    )
                 if "supportsAlpn" in endpoints["details"]:
-                    description += "supportsAlpn: " + str(endpoints["details"]["supportsAlpn"]) + "\n"
+                    description += (
+                        "supportsAlpn: "
+                        + str(endpoints["details"]["supportsAlpn"])
+                        + "\n"
+                    )
                 if "sessionTickets" in endpoints["details"]:
-                    description += "sessionTickets: " + str(endpoints["details"]["sessionTickets"]) + "\n"
+                    description += (
+                        "sessionTickets: "
+                        + str(endpoints["details"]["sessionTickets"])
+                        + "\n"
+                    )
                 if "ocspStapling" in endpoints["details"]:
-                    description += "ocspStapling: " + str(endpoints["details"]["ocspStapling"]) + "\n"
+                    description += (
+                        "ocspStapling: "
+                        + str(endpoints["details"]["ocspStapling"])
+                        + "\n"
+                    )
                 if "sniRequired" in endpoints["details"]:
-                    description += "sniRequired: " + str(endpoints["details"]["sniRequired"]) + "\n"
+                    description += (
+                        "sniRequired: "
+                        + str(endpoints["details"]["sniRequired"])
+                        + "\n"
+                    )
                 if "httpStatusCode" in endpoints["details"]:
-                    description += "httpStatusCode: " + str(endpoints["details"]["httpStatusCode"]) + "\n"
+                    description += (
+                        "httpStatusCode: "
+                        + str(endpoints["details"]["httpStatusCode"])
+                        + "\n"
+                    )
                 if "supportsRc4" in endpoints["details"]:
-                    description += "supportsRc4: " + str(endpoints["details"]["supportsRc4"]) + "\n"
+                    description += (
+                        "supportsRc4: "
+                        + str(endpoints["details"]["supportsRc4"])
+                        + "\n"
+                    )
                 if "rc4WithModern" in endpoints["details"]:
-                    description += "rc4WithModern: " + str(endpoints["details"]["rc4WithModern"]) + "\n"
+                    description += (
+                        "rc4WithModern: "
+                        + str(endpoints["details"]["rc4WithModern"])
+                        + "\n"
+                    )
                 if "forwardSecrecy" in endpoints["details"]:
-                    description += "forwardSecrecy: " + str(endpoints["details"]["forwardSecrecy"]) + "\n"
+                    description += (
+                        "forwardSecrecy: "
+                        + str(endpoints["details"]["forwardSecrecy"])
+                        + "\n"
+                    )
                 if "protocolIntolerance" in endpoints["details"]:
-                    description += "protocolIntolerance: " + str(endpoints["details"]["protocolIntolerance"]) + "\n"
+                    description += (
+                        "protocolIntolerance: "
+                        + str(endpoints["details"]["protocolIntolerance"])
+                        + "\n"
+                    )
                 if "miscIntolerance" in endpoints["details"]:
-                    description += "miscIntolerance: " + str(endpoints["details"]["miscIntolerance"]) + "\n"
+                    description += (
+                        "miscIntolerance: "
+                        + str(endpoints["details"]["miscIntolerance"])
+                        + "\n"
+                    )
                 if "heartbleed" in endpoints["details"]:
-                    description += "heartbleed: " + str(endpoints["details"]["heartbleed"]) + "\n"
+                    description += (
+                        "heartbleed: " + str(endpoints["details"]["heartbleed"]) + "\n"
+                    )
                 if "heartbeat" in endpoints["details"]:
-                    description += "heartbeat: " + str(endpoints["details"]["heartbeat"]) + "\n"
+                    description += (
+                        "heartbeat: " + str(endpoints["details"]["heartbeat"]) + "\n"
+                    )
                 if "openSslCcs" in endpoints["details"]:
-                    description += "openSslCcs: " + str(endpoints["details"]["openSslCcs"]) + "\n"
+                    description += (
+                        "openSslCcs: " + str(endpoints["details"]["openSslCcs"]) + "\n"
+                    )
                 if "openSSLLuckyMinus20" in endpoints["details"]:
-                    description += "openSSLLuckyMinus20: " + str(endpoints["details"]["openSSLLuckyMinus20"]) + "\n"
+                    description += (
+                        "openSSLLuckyMinus20: "
+                        + str(endpoints["details"]["openSSLLuckyMinus20"])
+                        + "\n"
+                    )
                 if "poodle" in endpoints["details"]:
-                    description += "poodle: " + str(endpoints["details"]["poodle"]) + "\n"
+                    description += (
+                        "poodle: " + str(endpoints["details"]["poodle"]) + "\n"
+                    )
                 if "poodleTls" in endpoints["details"]:
-                    description += "poodleTls: " + str(endpoints["details"]["poodleTls"]) + "\n"
+                    description += (
+                        "poodleTls: " + str(endpoints["details"]["poodleTls"]) + "\n"
+                    )
                 if "fallbackScsv" in endpoints["details"]:
-                    description += "fallbackScsv: " + str(endpoints["details"]["fallbackScsv"]) + "\n"
+                    description += (
+                        "fallbackScsv: "
+                        + str(endpoints["details"]["fallbackScsv"])
+                        + "\n"
+                    )
                 if "freak" in endpoints["details"]:
                     description += "freak: " + str(endpoints["details"]["freak"]) + "\n"
                 if "hasSct" in endpoints["details"]:
-                    description += "hasSct: " + str(endpoints["details"]["hasSct"]) + "\n"
+                    description += (
+                        "hasSct: " + str(endpoints["details"]["hasSct"]) + "\n"
+                    )
 
                 """
                 cName = ""
@@ -163,7 +281,11 @@ class SSLlabsParser(object):
 
                 protoName = ""
                 for protocols in endpoints["details"]["protocols"]:
-                    protoName = "%s %s %s\n" % (protoName, protocols["name"], protocols["version"])
+                    protoName = "%s %s %s\n" % (
+                        protoName,
+                        protocols["name"],
+                        protocols["version"],
+                    )
 
                 dupe_key = hostName + grade
 
@@ -172,24 +294,30 @@ class SSLlabsParser(object):
                     if description is not None:
                         find.description += description
                 else:
-                    find = Finding(title=title,
-                                   cwe=310,  # Cryptographic Issues
-                                   test=test,
-                                   active=False,
-                                   verified=False,
-                                   description=description,
-                                   severity=sev,
-                                   numerical_severity=Finding.get_numerical_severity(sev),
-                                   mitigation=mitigation,
-                                   impact=impact,
-                                   references=references,
-                                   url=host,
-                                   date=find_date,
-                                   dynamic_finding=True)
+                    find = Finding(
+                        title=title,
+                        cwe=310,  # Cryptographic Issues
+                        test=test,
+                        active=False,
+                        verified=False,
+                        description=description,
+                        severity=sev,
+                        numerical_severity=Finding.get_numerical_severity(sev),
+                        mitigation=mitigation,
+                        impact=impact,
+                        references=references,
+                        url=host,
+                        date=find_date,
+                        dynamic_finding=True,
+                    )
                     dupes[dupe_key] = find
                     find.unsaved_endpoints = list()
 
-                find.unsaved_endpoints.append(Endpoint(host=ipAddress, fqdn=hostName, port=port, protocol=protocol))
+                find.unsaved_endpoints.append(
+                    Endpoint(
+                        host=ipAddress, fqdn=hostName, port=port, protocol=protocol
+                    )
+                )
 
             self.items = list(dupes.values())
 

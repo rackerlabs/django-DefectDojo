@@ -22,7 +22,7 @@ class TestNexposeParser(TestCase):
         # vuln 1
         finding = findings[0]
         self.assertEqual("Critical", finding.severity)
-        self.assertEqual("Default SSH password: root password \"root\"", finding.title)
+        self.assertEqual('Default SSH password: root password "root"', finding.title)
         self.assertIsNone(finding.cve)
         self.assertEqual(1, len(finding.unsaved_endpoints))
         # vuln 2

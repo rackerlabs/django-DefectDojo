@@ -4,7 +4,6 @@ from dojo.models import Test
 
 
 class TestNpmAuditParser(TestCase):
-
     def test_npm_audit_parser_with_no_vuln_has_no_findings(self):
         testfile = open("dojo/unittests/scans/npm_audit_sample/no_vuln.json")
         parser = NpmAuditParser()
