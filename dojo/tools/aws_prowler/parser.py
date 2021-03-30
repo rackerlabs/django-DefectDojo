@@ -32,18 +32,18 @@ class AWSProwlerParser(object):
         account = None
 
         for row in reader:
-            profile = row.get('PROFILE')
-            account = row.get('ACCOUNT_NUM')
-            region = row.get('REGION')
-            title_id = row.get('TITLE_ID')
-            result = row.get('RESULT')
-            scored = row.get('SCORED')
-            level = row.get('LEVEL')
-            severity = row.get('SEVERITY')
-            title_text = row.get('TITLE_TEXT')
-            title_text = re.sub(r'\[.*\]\s', '', title_text)
+            profile = str(row.get('PROFILE'))
+            account = str(row.get('ACCOUNT_NUM'))
+            region = str(row.get('REGION'))
+            title_id = str(row.get('TITLE_ID'))
+            result = str(row.get('RESULT'))
+            scored = str(row.get('SCORED'))
+            level = str(row.get('LEVEL'))
+            severity = str(row.get('SEVERITY'))
+            title_text = str(row.get('TITLE_TEXT'))
+            title_text = str(re.sub(r'\[.*\]\s', '', title_text))
             title_text_trunc = Truncator(title_text).words(8)
-            notes = row.get('NOTES')
+            notes = str(row.get('NOTES'))
 
             sev = self.getCriticalityRating(result, level, severity)
             description = "**Region:** " + region + "\n\n" + notes + "\n"
