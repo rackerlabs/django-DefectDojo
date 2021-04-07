@@ -1038,6 +1038,7 @@ class ImportScanSerializer(serializers.Serializer):
         queryset=User.objects.all())
     tags = TagListSerializerField(required=False)
     close_old_findings = serializers.BooleanField(required=False, default=False)
+    skip_duplicates = serializers.BooleanField(required=False, default=False)
     push_to_jira = serializers.BooleanField(default=False)
     environment = serializers.CharField(required=False)
     version = serializers.CharField(required=False)
@@ -1051,11 +1052,13 @@ class ImportScanSerializer(serializers.Serializer):
     def save(self, push_to_jira=False):
         data = self.validated_data
         close_old_findings = data['close_old_findings']
+        skip_duplicates = data['skip_duplicates']
         active = data['active']
         verified = data['verified']
         min_sev = data['minimum_severity']
         test_type, created = Test_Type.objects.get_or_create(
             name=data.get('test_type', data['scan_type']))
+        scan_type = data['scan_type']
         endpoint_to_add = data['endpoint_to_add']
         scan_date = data['scan_date']
         scan_date_time = datetime.datetime.combine(scan_date, timezone.now().time())
@@ -1117,6 +1120,7 @@ class ImportScanSerializer(serializers.Serializer):
             items = parser_findings
             logger.debug('starting import of %i items.', len(items))
             i = 0
+
             for item in items:
                 sev = item.severity
                 if sev == 'Information' or sev == 'Informational':
@@ -1127,6 +1131,20 @@ class ImportScanSerializer(serializers.Serializer):
                 if (Finding.SEVERITIES[sev] >
                         Finding.SEVERITIES[data['minimum_severity']]):
                     continue
+
+                if skip_duplicates:
+                    from dojo.utils import do_dedupe_finding
+                    item.hash_code = item.compute_hash_code()
+                    deduplicationLogger.debug("new finding's hash_code: %s", item.hash_code)
+                    original_finding = do_dedupe_finding(item, return_original_without_save=True)
+                    if original_finding:
+                        deduplicationLogger.debug(
+                            'skipping upload of this finding because '
+                            'it already exists (original.id=%i)',
+                            original_finding.id
+                        )
+                        skipped_hashcodes.append(item.hash_code)
+                        continue
 
                 item.test = test
                 item.reporter = self.context['request'].user

@@ -98,7 +98,18 @@ def is_deduplication_on_engagement_mismatch(new_finding, to_duplicate_finding):
     return not new_finding.test.engagement.deduplication_on_engagement and to_duplicate_finding.test.engagement.deduplication_on_engagement
 
 
-def do_dedupe_finding(new_finding, *args, **kwargs):
+def do_dedupe_finding(new_finding, return_original_without_save=False, *args, **kwargs):
+    """Deduplicate finding using the algorithm configured at settings.dist.py for its parser (legacy by default).
+
+    :param new_finding: Finding to be deduplicated
+    :type new_finding: model:`dojo.Finding`
+    :param return_original_without_save: If new_finding is a duplicate this
+        param determine if the original finding should be returned (True) or the
+        duplicate saved on the database (False), defaults to False
+    :type return_original_without_save: bool, optional
+    :return: Original finding if return_original_without_save is True else None
+    :rtype: model:`dojo.Finding`
+    """
     try:
         enabled = System_Settings.objects.get(no_cache=True).enable_deduplication
     except System_Settings.DoesNotExist:
@@ -118,56 +129,73 @@ def do_dedupe_finding(new_finding, *args, **kwargs):
                 deduplicationAlgorithm = settings.DEDUPLICATION_ALGORITHM_PER_PARSER[scan_type]
             deduplicationLogger.debug('deduplication algorithm: ' + deduplicationAlgorithm)
             if(deduplicationAlgorithm == settings.DEDUPE_ALGO_UNIQUE_ID_FROM_TOOL):
-                deduplicate_unique_id_from_tool(new_finding)
+                return deduplicate_unique_id_from_tool(new_finding, return_original_without_save)
             elif(deduplicationAlgorithm == settings.DEDUPE_ALGO_HASH_CODE):
-                deduplicate_hash_code(new_finding)
+                return deduplicate_hash_code(new_finding, return_original_without_save)
             elif(deduplicationAlgorithm == settings.DEDUPE_ALGO_UNIQUE_ID_FROM_TOOL_OR_HASH_CODE):
-                deduplicate_uid_or_hash_code(new_finding)
+                return deduplicate_uid_or_hash_code(new_finding, return_original_without_save)
             else:
                 logger.debug('dedupe legacy start')
-                deduplicate_legacy(new_finding)
-                logger.debug('dedupe legacy start.done.')
+                return deduplicate_legacy(new_finding, return_original_without_save)
+                logger.debug('dedupe legacy done')
         else:
             deduplicationLogger.debug("no configuration per parser found; using legacy algorithm")
-            deduplicate_legacy(new_finding)
+            return deduplicate_legacy(new_finding, return_original_without_save)
     else:
         deduplicationLogger.debug("sync_dedupe: skipping dedupe because it's disabled in system settings get()")
 
 
-def deduplicate_legacy(new_finding):
+def deduplicate_legacy(new_finding, return_original_without_save=False):
+    """Mark finding as duplicate if another one already exists with the same:
+    hash_code and (title or CWE) and (endpoints or file_path+line)
+
+    :param new_finding: Finding to be deduplicated
+    :type new_finding: model:`dojo.Finding`
+    :param return_original_without_save: If new_finding is a duplicate this
+        param determine if the original finding should be returned (True) or the
+        duplicate saved on the database (False), defaults to False
+    :type return_original_without_save: bool, optional
+    :return: Original finding if return_original_without_save is True else None
+    :rtype: model:`dojo.Finding`
+    """
     # ---------------------------------------------------------
     # 1) Collects all the findings that have the same:
-    #      (title  and static_finding and dynamic_finding)
-    #      or (CWE and static_finding and dynamic_finding)
+    #       hash_code and (
+    #           (title  and static_finding and dynamic_finding)
+    #           or (CWE and static_finding and dynamic_finding)
+    #       )
     #    as the new one
     #    (this is "cond1")
     # ---------------------------------------------------------
     if new_finding.test.engagement.deduplication_on_engagement:
         eng_findings_cwe = Finding.objects.filter(
             test__engagement=new_finding.test.engagement,
+            hash_code=new_finding.hash_code,
             cwe=new_finding.cwe).exclude(id=new_finding.id).exclude(cwe=0).exclude(duplicate=True).values('id')
         eng_findings_title = Finding.objects.filter(
             test__engagement=new_finding.test.engagement,
+            hash_code=new_finding.hash_code,
             title=new_finding.title).exclude(id=new_finding.id).exclude(duplicate=True).values('id')
     else:
         eng_findings_cwe = Finding.objects.filter(
             test__engagement__product=new_finding.test.engagement.product,
+            hash_code=new_finding.hash_code,
             cwe=new_finding.cwe).exclude(id=new_finding.id).exclude(cwe=0).exclude(duplicate=True).values('id')
         eng_findings_title = Finding.objects.filter(
             test__engagement__product=new_finding.test.engagement.product,
+            hash_code=new_finding.hash_code,
             title=new_finding.title).exclude(id=new_finding.id).exclude(duplicate=True).values('id')
 
     total_findings = Finding.objects.filter(Q(id__in=eng_findings_cwe) | Q(id__in=eng_findings_title)).prefetch_related('endpoints', 'test', 'test__engagement', 'found_by', 'original_finding', 'test__test_type')
     deduplicationLogger.debug("Found " +
-        str(len(eng_findings_cwe)) + " findings with same cwe, " +
-        str(len(eng_findings_title)) + " findings with same title: " +
-        str(len(total_findings)) + " findings with either same title or same cwe")
+        str(len(eng_findings_cwe)) + " findings with same cwe and hash, " +
+        str(len(eng_findings_title)) + " findings with same title and hash: " +
+        str(len(total_findings)) + " findings with either one")
 
     # total_findings = total_findings.order_by('date')
     for find in total_findings.order_by('id'):
         flag_endpoints = False
         flag_line_path = False
-        flag_hash = False
         if is_deduplication_on_engagement_mismatch(new_finding, find):
             deduplicationLogger.debug(
                 'deduplication_on_engagement_mismatch, skipping dedupe.')
@@ -200,19 +228,17 @@ def deduplicate_legacy(new_finding):
 
             deduplicationLogger.debug("no endpoints on one of the findings and the new finding is either dynamic or doesn't have a file_path; Deduplication will not occur")
 
-        if find.hash_code == new_finding.hash_code:
-            flag_hash = True
-
         deduplicationLogger.debug(
             'deduplication flags for new finding (' + ('dynamic' if new_finding.dynamic_finding else 'static') + ') ' + str(new_finding.id) + ' and existing finding ' + str(find.id) +
-            ' flag_endpoints: ' + str(flag_endpoints) + ' flag_line_path:' + str(flag_line_path) + ' flag_hash:' + str(flag_hash))
+            ' flag_endpoints: ' + str(flag_endpoints) + ' flag_line_path:' + str(flag_line_path))
 
         # ---------------------------------------------------------
-        # 3) Findings are duplicate if (cond1 is true) and they have the same:
-        #    hash
-        #    and (endpoints or (line and file_path)
+        # 3) Findings are duplicate if:
+        #       (cond1 is true) and they have the same (endpoints or (line and file_path)
         # ---------------------------------------------------------
-        if ((flag_endpoints or flag_line_path) and flag_hash):
+        if flag_endpoints or flag_line_path:
+            if return_original_without_save:
+                return find
             try:
                 set_duplicate(new_finding, find)
             except Exception as e:
@@ -222,7 +248,18 @@ def deduplicate_legacy(new_finding):
             break
 
 
-def deduplicate_unique_id_from_tool(new_finding):
+def deduplicate_unique_id_from_tool(new_finding, return_original_without_save=False):
+    """Mark finding as duplicate if another one already exists with the same unique_id_from_tool
+
+    :param new_finding: Finding to be deduplicated
+    :type new_finding: model:`dojo.Finding`
+    :param return_original_without_save: If new_finding is a duplicate this
+        param determine if the original finding should be returned (True) or the
+        duplicate saved on the database (False), defaults to False
+    :type return_original_without_save: bool, optional
+    :return: Original finding if return_original_without_save is True else None
+    :rtype: model:`dojo.Finding`
+    """
     if new_finding.test.engagement.deduplication_on_engagement:
         existing_findings = Finding.objects.filter(
             test__engagement=new_finding.test.engagement,
@@ -247,6 +284,8 @@ def deduplicate_unique_id_from_tool(new_finding):
             deduplicationLogger.debug(
                 'deduplication_on_engagement_mismatch, skipping dedupe.')
             continue
+        if return_original_without_save:
+            return find
         try:
             set_duplicate(new_finding, find)
         except Exception as e:
@@ -255,7 +294,18 @@ def deduplicate_unique_id_from_tool(new_finding):
         break
 
 
-def deduplicate_hash_code(new_finding):
+def deduplicate_hash_code(new_finding, return_original_without_save=False):
+    """Mark finding as duplicate if another one already exists with the same hash_code
+
+    :param new_finding: Finding to be deduplicated
+    :type new_finding: model:`dojo.Finding`
+    :param return_original_without_save: If new_finding is a duplicate this
+        param determine if the original finding should be returned (True) or the
+        duplicate saved on the database (False), defaults to False
+    :type return_original_without_save: bool, optional
+    :return: Original finding if return_original_without_save is True else None
+    :rtype: model:`dojo.Finding`
+    """
     if new_finding.test.engagement.deduplication_on_engagement:
         existing_findings = Finding.objects.filter(
             test__engagement=new_finding.test.engagement,
@@ -278,6 +328,8 @@ def deduplicate_hash_code(new_finding):
             deduplicationLogger.debug(
                 'deduplication_on_engagement_mismatch, skipping dedupe.')
             continue
+        if return_original_without_save:
+            return find
         try:
             set_duplicate(new_finding, find)
         except Exception as e:
@@ -286,7 +338,19 @@ def deduplicate_hash_code(new_finding):
         break
 
 
-def deduplicate_uid_or_hash_code(new_finding):
+def deduplicate_uid_or_hash_code(new_finding, return_original_without_save=False):
+    """Mark finding as duplicate if another one already exists with the same:
+    unique_id_from_tool or hash_code
+
+    :param new_finding: Finding to be deduplicated
+    :type new_finding: model:`dojo.Finding`
+    :param return_original_without_save: If new_finding is a duplicate this
+        param determine if the original finding should be returned (True) or the
+        duplicate saved on the database (False), defaults to False
+    :type return_original_without_save: bool, optional
+    :return: Original finding if return_original_without_save is True else None
+    :rtype: model:`dojo.Finding`
+    """
     if new_finding.test.engagement.deduplication_on_engagement:
         existing_findings = Finding.objects.filter(
             (Q(hash_code__isnull=False) & Q(hash_code=new_finding.hash_code)) |
@@ -309,6 +373,8 @@ def deduplicate_uid_or_hash_code(new_finding):
             deduplicationLogger.debug(
                 'deduplication_on_engagement_mismatch, skipping dedupe.')
             continue
+        if return_original_without_save:
+            return find
         try:
             set_duplicate(new_finding, find)
         except Exception as e:
@@ -318,6 +384,13 @@ def deduplicate_uid_or_hash_code(new_finding):
 
 
 def set_duplicate(new_finding, existing_finding):
+    """Save duplicate on the database
+
+    :param new_finding: Duplicate to be saved
+    :type new_finding: model:`dojo.Finding`
+    :param existing_finding: Finding to be indicated as the original of new_finding
+    :type existing_finding: model:`dojo.Finding`
+    """
     if existing_finding.duplicate:
         raise Exception("Existing finding is a duplicate")
     if existing_finding.id == new_finding.id:
