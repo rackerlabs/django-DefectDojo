@@ -178,6 +178,9 @@ env = environ.Env(
     DD_AUTHORIZATION_STAFF_OVERRIDE=(bool, False),
 
     DD_FEATURE_FINDING_GROUPS=(bool, False),
+    DD_FEATURE_SUPERADMIN_TOKEN_FETCH=(bool, False),
+    # This feature above allows superadmin to fetch API key behalf all users, it requires FEATURE_AUTHORIZATION_V2
+    # WARNING: Do not use this feature in multi superuser environment
     DD_JIRA_TEMPLATE_ROOT=(str, 'dojo/templates/issue-trackers'),
     DD_TEMPLATE_DIR_PREFIX=(str, 'dojo/templates/'),
 
@@ -1062,8 +1065,13 @@ FEATURE_AUTHORIZATION_V2 = env('DD_FEATURE_AUTHORIZATION_V2')
 # When enabled, staff users have full access to all product types and products
 AUTHORIZATION_STAFF_OVERRIDE = env('DD_AUTHORIZATION_STAFF_OVERRIDE')
 
+FEATURE_AUTHORIZATION_V2 = env('DD_FEATURE_AUTHORIZATION_V2')
+
 EDITABLE_MITIGATED_DATA = env('DD_EDITABLE_MITIGATED_DATA')
 
+FEATURE_SUPERADMIN_TOKEN_FETCH = env('DD_FEATURE_SUPERADMIN_TOKEN_FETCH')
+# This feature above allows superadmin to fetch API key behalf all users, it requires FEATURE_AUTHORIZATION_V2
+# WARNING: Do not use this feature in multi superuser environment
 USE_L10N = True
 
 FEATURE_FINDING_GROUPS = env('DD_FEATURE_FINDING_GROUPS')

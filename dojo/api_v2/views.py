@@ -1,8 +1,10 @@
+import rest_framework.authtoken.views
 from django.http import HttpResponse, Http404
 from django.shortcuts import get_object_or_404
 from django.utils import timezone
 from django.core.exceptions import ValidationError
 from rest_framework import viewsets, mixins, status
+from rest_framework.authtoken.models import Token
 from rest_framework.response import Response
 from django.db import IntegrityError
 from rest_framework.permissions import DjangoModelPermissions, IsAuthenticated, IsAdminUser
@@ -12,6 +14,8 @@ from django_filters.rest_framework import DjangoFilterBackend
 from drf_yasg import openapi
 from drf_yasg.utils import swagger_auto_schema, no_body
 import base64
+
+
 from dojo.engagement.services import close_engagement, reopen_engagement
 from dojo.models import Product, Product_Type, Engagement, Test, Test_Import, Test_Type, Finding, \
     User, Stub_Finding, Finding_Template, Notes, \
@@ -1827,3 +1831,37 @@ class SystemSettingsViewSet(mixins.ListModelMixin,
     permission_classes = (permissions.IsSuperUser, DjangoModelPermissions)
     serializer_class = serializers.SystemSettingsSerializer
     queryset = System_Settings.objects.all()
+
+
+# Authorization: superuser if target_user is specified
+class ObtainAuthTokenExtended(rest_framework.authtoken.views.ObtainAuthToken):
+    serializer_class = serializers.AuthTokenSerializerExtended
+
+    def post(self, request, *args, **kwargs):
+        serializer = self.serializer_class(data=request.data,
+                                           context={'request': request})
+
+        serializer.is_valid(raise_exception=True)
+        user = serializer.validated_data['user']
+
+        if serializer.validated_data.get("target_user"):
+            target_user = serializer.validated_data['target_user']
+
+            # Only superuser and AUTHORIZATION_V2 mode can use this feature
+            # TODO: log action
+            if not user.is_superuser or not settings.FEATURE_AUTHORIZATION_V2 \
+                    or not settings.FEATURE_SUPERADMIN_TOKEN_FETCH:
+                return Response({'message': 'Action forbidden',
+                                 'username': user.username},
+                                status=status.HTTP_403_FORBIDDEN)
+
+            user = get_object_or_404(User, username=target_user)
+            # simple way to rotate token
+            if Token.objects.filter(user=user).count() > 0:
+                Token.objects.get(user=user).delete()
+
+        token, created = Token.objects.get_or_create(user=user)
+        return Response({
+            'token': token.key,
+            'target_user': user.username
+        })
