@@ -178,7 +178,15 @@ env = environ.Env(
     # Initial behaviour in Defect Dojo was to delete all duplicates when an original was deleted
     # New behaviour is to leave the duplicates in place, but set the oldest of duplicates as new original
     # Set to True to revert to the old behaviour where all duplicates are deleted
-    DD_DUPLICATE_CLUSTER_CASCADE_DELETE=(str, False)
+    DD_DUPLICATE_CLUSTER_CASCADE_DELETE=(str, False),
+    # Enable Rate Limiting for the login page
+    DD_RATE_LIMITER_ENABLED=(bool, False),
+    # Examples include 5/m 100/h and more https://django-ratelimit.readthedocs.io/en/stable/rates.html#simple-rates
+    DD_RATE_LIMITER_RATE=(str, '5/m'),
+    # Block the requests after rate limit is exceeded
+    DD_RATE_LIMITER_BLOCK=(bool, False),
+    # Forces the user to change password on next login.
+    DD_RATE_LIMITER_ACCOUNT_LOCKOUT=(bool, False),
 )
 
 
@@ -462,6 +470,12 @@ LOGIN_EXEMPT_URLS = (
 )
 
 LEGACY_API_V1_ENABLE = env('DD_LEGACY_API_V1_ENABLE')
+
+# https://django-ratelimit.readthedocs.io/en/stable/index.html
+RATE_LIMITER_ENABLED = env('DD_RATE_LIMITER_ENABLED')
+RATE_LIMITER_RATE = env('DD_RATE_LIMITER_RATE')  # Examples include 5/m 100/h and more https://django-ratelimit.readthedocs.io/en/stable/rates.html#simple-rates
+RATE_LIMITER_BLOCK = env('DD_RATE_LIMITER_BLOCK')  # Block the requests after rate limit is exceeded
+RATE_LIMITER_ACCOUNT_LOCKOUT = env('DD_RATE_LIMITER_ACCOUNT_LOCKOUT')  # Forces the user to change password on next login. 
 
 # ------------------------------------------------------------------------------
 # SECURITY DIRECTIVES

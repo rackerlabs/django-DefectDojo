@@ -26,6 +26,7 @@ from dojo.product.queries import get_authorized_product_members_for_user
 from dojo.group.queries import get_authorized_group_members_for_user
 from dojo.product_type.queries import get_authorized_product_type_members_for_user
 from dojo.authorization.roles_permissions import Permissions
+from dojo.decorators import dojo_ratelimit
 
 logger = logging.getLogger(__name__)
 
@@ -68,6 +69,8 @@ def api_v2_key(request):
 # #  user specific
 
 
+@dojo_ratelimit(key='post:username')
+@dojo_ratelimit(key='post:password')
 def login_view(request):
     if not settings.SHOW_LOGIN_FORM and settings.SOCIAL_LOGIN_AUTO_REDIRECT and sum([
         settings.GOOGLE_OAUTH_ENABLED,
