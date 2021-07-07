@@ -475,7 +475,7 @@ LEGACY_API_V1_ENABLE = env('DD_LEGACY_API_V1_ENABLE')
 RATE_LIMITER_ENABLED = env('DD_RATE_LIMITER_ENABLED')
 RATE_LIMITER_RATE = env('DD_RATE_LIMITER_RATE')  # Examples include 5/m 100/h and more https://django-ratelimit.readthedocs.io/en/stable/rates.html#simple-rates
 RATE_LIMITER_BLOCK = env('DD_RATE_LIMITER_BLOCK')  # Block the requests after rate limit is exceeded
-RATE_LIMITER_ACCOUNT_LOCKOUT = env('DD_RATE_LIMITER_ACCOUNT_LOCKOUT')  # Forces the user to change password on next login. 
+RATE_LIMITER_ACCOUNT_LOCKOUT = env('DD_RATE_LIMITER_ACCOUNT_LOCKOUT')  # Forces the user to change password on next login.
 
 # ------------------------------------------------------------------------------
 # SECURITY DIRECTIVES

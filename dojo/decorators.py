@@ -4,7 +4,6 @@ from django.db import models
 from django.conf import settings
 from django.forms.models import model_to_dict
 from django.db.models.query import QuerySet
-from django.conf import settings
 
 from ratelimit.exceptions import Ratelimited
 from ratelimit.core import is_ratelimited
