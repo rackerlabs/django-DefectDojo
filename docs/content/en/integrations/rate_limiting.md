@@ -46,6 +46,10 @@ In the event of a brute force attack, a users credentials could potentially be c
 
 In an attempt to circumvent that event, setting `DD_RATE_LIMITER_ACCOUNT_LOCKOUT` will force a user to reset their password upon the next attempted login. 
 
+#### Multi-Process Behvaior
+
+When using configurations with multiple uwsgi processes, the rate limiting package uses the default cache that is memory based and local to a process.
+
 #### Extra Configuation 
 
 For further information, please visit the package documentation [Django Ratelimit](https://django-ratelimit.readthedocs.io/en/stable/index.html)
