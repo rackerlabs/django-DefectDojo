@@ -46,7 +46,7 @@ In the event of a brute force attack, a users credentials could potentially be c
 
 In an attempt to circumvent that event, setting `DD_RATE_LIMITER_ACCOUNT_LOCKOUT` will force a user to reset their password upon the next attempted login. 
 
-#### Multi-Process Behvaior
+#### Multi-Process Behavior
 
 When using configurations with multiple uwsgi processes, the rate limiting package uses the default cache that is memory based and local to a process.
 
