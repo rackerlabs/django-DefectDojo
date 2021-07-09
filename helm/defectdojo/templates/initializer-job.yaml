@@ -9,6 +9,8 @@ metadata:
     app.kubernetes.io/instance: {{ .Release.Name }}
     app.kubernetes.io/managed-by: {{ .Release.Service }}
     helm.sh/chart: {{ include "defectdojo.chart" . }}
+  annotations:
+    "helm.sh/hook": pre-install
 spec:
   ttlSecondsAfterFinished: {{ .Values.initializerKeepSeconds }}
   template:
