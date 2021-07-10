@@ -1229,7 +1229,7 @@ class UsersTest(BaseClass.RESTEndpointTest):
     def __init__(self, *args, **kwargs):
         self.endpoint_model = User
         self.endpoint_path = 'users'
-        self.viewname = 'user'
+        self.viewname = 'dojo_user'
         self.viewset = UsersViewSet
         self.payload = {
             "username": "test_user",
@@ -1242,6 +1242,12 @@ class UsersTest(BaseClass.RESTEndpointTest):
         self.object_permission = False
         BaseClass.RESTEndpointTest.__init__(self, *args, **kwargs)
 
+    def test_user_multiple_usernames(self):
+        r = self.client.get("{}?username=user1&username=user2".format(reverse('dojo_user-list')), format='json')
+        self.assertEqual(r.status_code, 200, r.content[:1000])
+        self.assertEqual(r.json()['count'], 2, r.content[:1000])
+        self.assertEqual(r.json()['results'][0]['username'], 'user1', r.json()['results'][0])
+        self.assertEqual(r.json()['results'][1]['username'], 'user2', r.json()['results'][1])
 
 class ProductPermissionTest(DojoAPITestCase):
     fixtures = ['dojo_testdata.json']

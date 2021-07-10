@@ -1967,6 +1967,7 @@ class UserFilter(DojoFilter):
     first_name = CharFilter(lookup_expr='icontains')
     last_name = CharFilter(lookup_expr='icontains')
     username = CharFilter(lookup_expr='icontains')
+    email = CharFilter(lookup_expr='icontains')
     product_type = ModelMultipleChoiceFilter(
         queryset=Product_Type.objects.all(),
         label="Authorized Product Type")
@@ -1997,9 +1998,28 @@ class UserFilter(DojoFilter):
     class Meta:
         model = Dojo_User
         fields = ['is_staff', 'is_superuser', 'is_active', 'first_name',
-                  'last_name', 'username']
+                  'last_name', 'username', 'email']
         exclude = ['password', 'last_login', 'groups', 'user_permissions',
                    'date_joined']
+
+
+class ApiUserFilter(DojoFilter):
+    username = ModelMultipleChoiceFilter(field_name='username', to_field_name='username',
+                                         queryset=Dojo_User.objects.all())
+
+    o = OrderingFilter(
+        # tuple-mapping retains order
+        fields=(
+            ('username', 'username'),
+            ('email', 'email'),
+            ('last_name', 'last_name'),
+            ('first_name', 'first_name'),
+        ),
+    )
+
+    class Meta:
+        model = Dojo_User
+        fields = ['id', 'first_name', 'last_name', 'email']
 
 
 class GroupFilter(DojoFilter):
