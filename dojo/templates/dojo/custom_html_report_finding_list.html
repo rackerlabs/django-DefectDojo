@@ -133,7 +133,7 @@
             {% with images=finding|file_images %}
                 <h6>Images</h6>
                 {% for pic in images %}
-                    <p><img src="{{ host }}{% pic_token pic 'original' %}" style="max-width: 85%"></p>
+                    <p><img src="{{ host }}{% pic_token pic 'original' %}" style="max-width: 85%" alt="Finding Image"></p>
                 {% empty %}
                     <p class="text-center">No images found.</p>
                 {% endfor %}
