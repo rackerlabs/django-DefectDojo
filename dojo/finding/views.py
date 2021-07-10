@@ -3,9 +3,6 @@ import base64
 import json
 import logging
 import mimetypes
-import os
-import shutil
-
 from collections import OrderedDict, defaultdict
 from django.db import models
 from django.db.models.functions import Length

@@ -23,7 +23,6 @@ from django.conf import settings
 from rest_framework import serializers
 from django.core.exceptions import ValidationError, PermissionDenied
 from django.utils import timezone
-import base64
 import datetime
 import six
 from django.utils.translation import ugettext_lazy as _
