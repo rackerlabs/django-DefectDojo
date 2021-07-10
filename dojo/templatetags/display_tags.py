@@ -7,9 +7,9 @@ from django.utils.safestring import mark_safe, SafeData
 from django.utils.text import normalize_newlines
 from django.urls import reverse
 from django.contrib.auth.models import User
-from dojo.utils import prepare_for_view, get_system_setting, get_full_url
+from dojo.utils import prepare_for_view, get_system_setting, get_full_url, get_file_images
 from dojo.user.helper import user_is_authorized
-from dojo.models import Check_List, FindingImageAccessToken, Finding, System_Settings, Product, Dojo_User
+from dojo.models import Check_List, FileAccessToken, Finding, System_Settings, Product, Dojo_User
 import markdown
 from django.db.models import Sum, Case, When, IntegerField, Value
 from django.utils import timezone
@@ -408,9 +408,14 @@ def colgroup(parser, token):
 def pic_token(context, image, size):
     user_id = context['user_id']
     user = User.objects.get(id=user_id)
-    token = FindingImageAccessToken(user=user, image=image, size=size)
+    token = FileAccessToken(user=user, file=image, size=size)
     token.save()
     return reverse('download_finding_pic', args=[token.token])
+
+
+@register.filter
+def file_images(obj):
+    return get_file_images(obj, return_objects=True)
 
 
 @register.simple_tag

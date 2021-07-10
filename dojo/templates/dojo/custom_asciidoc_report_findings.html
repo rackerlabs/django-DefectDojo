@@ -97,13 +97,13 @@
     {% if include_finding_images %}
         <p><b>==== Finding Images: ====</b>
             <br>
-            {% if find.images.all %}
-                {% for pic in find.images.all %}
-                    image::{{ host }}{% pic_token pic 'small' %}[] +<br>
+            {% with images=find|file_images %}
+                {% for pic in images %}
+                    image::{{ request.scheme }}://{{ request.get_host }}{% pic_token pic 'small' %}[] +<br>
+                {% empty %}
+                    No images found.
                 {% endfor %}
-            {% else %}
-                No images found.
-            {% endif %}
+            {% endwith %}
         </p><br>
     {% else %}
         <br>

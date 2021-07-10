@@ -77,8 +77,6 @@ urlpatterns = [
         views.defect_finding_review, name='defect_finding_review'),
     url(r'^finding/(?P<fid>\d+)/open', views.reopen_finding,
         name='reopen_finding'),
-    url(r'^finding/(?P<fid>\d+)/manage_images', views.manage_images,
-        name='manage_images'),
     url(r'^finding/image/(?P<token>[^/]+)$', views.download_finding_pic,
         name='download_finding_pic'),
     url(r'^finding/(?P<fid>\d+)/merge$',

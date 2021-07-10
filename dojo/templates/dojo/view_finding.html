@@ -63,11 +63,6 @@
                             {% endif %}
                             {% if user|is_authorized_for_staff:finding or finding|has_object_permission:"Finding_Edit" %}
                                 <li role="presentation">
-                                    <a href="{% url 'manage_images' finding.id %}">
-                                        <i class="fa fa-file-image-o"></i> Manage Images
-                                    </a>
-                                </li>
-                                <li role="presentation">
                                     <a href="{% url 'manage_files' oid=finding.id obj_type='Finding' %}">
                                         <i class="fa fa-file-image-o"></i> Manage Files
                                     </a>
@@ -717,44 +712,6 @@
             </div>
         </div>
 
-        {% if finding.images.exists %}
-            <div class="panel panel-default">
-                <div class="panel-heading">
-                    <h4>
-                        Images
-                        <div class="pull-right btn-group" role="group">
-                            <a title="Edit Images" class="btn btn-sm btn-primary"
-                               href="{% url 'manage_images' finding.id %}">
-                                <span class="fa fa-pencil-square-o"></span>
-                            </a>
-                            <a data-toggle="collapse" href="#vuln_pics" class="btn btn-sm btn-primary">
-                                <i class="glyphicon glyphicon-chevron-up"></i>
-                            </a>
-                        </div>
-                    </h4>
-                </div>
-                <div class="panel-body  collapse in" id="vuln_pics">
-                    {% for pic in finding.images.all %}
-                        <div class="col-md-1">
-                            <a href="#"
-                               data-imageurl="{{ request.scheme }}://{{ request.get_host }}{{ pic.image_large.url }}"
-                               data-origurl="{{ request.scheme }}://{{ request.get_host }}{{ pic.image.url }}"
-                               data-caption="{{ pic.caption }}"
-                               class="thumbnail" data-toggle="modal"
-                               data-target="#findingImageModal" id="finding_pic">
-                                <img src="{{ request.scheme }}://{{ request.get_host }}{{ pic.image_thumbnail.url }}" alt="{{ pic.caption }}" title="{{ pic.caption }}" />
-                            </a>
-                        </div>
-                    {% endfor %}
-                </div>
-                <div class="panel-footer">
-                    <i title="Click on thumbnail to magnify."
-                       class="text-info fa fa-search"></i>
-                    <small>Click on thumbnail to magnify.</small>
-                </div>
-            </div>
-        {% endif %}
-
         {% if files %}
             <div class="row">
                 <div class="col-md-12" id="cred">
@@ -791,30 +748,6 @@
                 </div>
             </div>
         {% endif %}
-
-        <div class="modal fade" id="findingImageModal" tabindex="-1" role="dialog"
-             aria-labelledby="findingImageModalLabel">
-            <div class="modal-dialog" role="document">
-                <div class="modal-content">
-                    <div class="modal-header">
-                        <h4 class="pull-left">Finding Images</h4>
-                        <button type="button" class="pull-right btn btn-xs btn-default" data-dismiss="modal"><span
-                                class="fa fa-close"></span></button>
-                    </div>
-                    <div class="modal-body">
-                        <a id="a_to_replace" class="modal_finding_pic" href="{{ pic.image.url }}" target="_blank"
-                           title="View original image.">
-                            <img id="to_replace" src="{{ pic.image_large.url }}" class="img-responsive"/>
-                        </a>
-                        <p id="caption_to_replace">{{ pic.caption }}</p>
-                    </div>
-                    <div class="modal-footer">
-                        <a href="#" id="next" class="btn btn-default bnt-xs pull-right"><span
-                                class="fa fa-arrow-right"></span></a>
-                    </div>
-                </div>
-            </div>
-        </div>
 
         <div class="panel panel-default">
             <div class="panel-heading">
@@ -1095,18 +1028,6 @@
 
         });
 
-        $('#findingImageModal').on('show.bs.modal', function (event) {
-            var link = $(event.relatedTarget);
-            var loc = link.data('imageurl')
-            var loco = link.data('origurl')
-            var caption = link.data('caption');
-            console.log(link);
-            console.log(loc);
-            var modal = $(this);
-            modal.find('#to_replace').attr('src', loc);
-            modal.find('#a_to_replace').attr('href', loco);
-            modal.find('#caption_to_replace').html(caption);
-        });
         $("a#next").on('click', function (e) {
             e.preventDefault();
             var showing = $("img#to_replace").attr('src');
