@@ -787,7 +787,7 @@ class FindingsTest(BaseClass.RESTEndpointTest):
             "static_finding": False,
             "dynamic_finding": False,
             "endpoints": [1, 2],
-            "images": [],
+            "files": [],
             "tags": ['tag1', 'tag_2'],
         }
         self.update_fields = {'duplicate': False, 'active': True, "push_to_jira": "True", 'tags': ['finding_tag_new']}
