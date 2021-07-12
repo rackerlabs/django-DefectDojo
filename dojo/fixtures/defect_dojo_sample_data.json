@@ -24081,20 +24081,6 @@
     }
 },
 {
-    "model": "dojo.findingimage",
-    "pk": 1,
-    "fields": {
-        "image": "finding_files/chop.png"
-    }
-},
-{
-    "model": "dojo.findingimage",
-    "pk": 2,
-    "fields": {
-        "image": "finding_files/chop.png"
-    }
-},
-{
     "model": "dojo.jira_instance",
     "pk": 2,
     "fields": {
