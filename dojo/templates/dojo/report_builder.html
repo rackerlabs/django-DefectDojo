@@ -217,7 +217,8 @@
                 var valid = true;
 
                 $('.in-use-widgets .form-control').not('#finding-list .form-control')
-                        .not('#endpoint-list .form-control').not('#wysiwyg-content .form-control').each(function () {
+                        .not('#endpoint-list .form-control').not('#wysiwyg-content .form-control')
+                        .not('.bs-searchbox .form-control').not('div').each(function () {
                     if ($(this).val() === '')
                         valid = false;
                 });

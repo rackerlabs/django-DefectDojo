@@ -4,6 +4,7 @@
   "dependencies": {
     "JUMFlot": "jumjum123/JUMFlot#*",
     "bootstrap": "^3.4.0",
+    "bootstrap-select": "^1.13.18",
     "bootstrap-social": "^4.0.0",
     "bootstrap-wysiwyg": "^2.0.0",
     "bootswatch": "3.4.1",

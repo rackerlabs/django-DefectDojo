@@ -31,6 +31,8 @@
     <script src="{% static "components-jqueryui/jquery-ui.min.js" %}"></script>
     <!-- Bootstrap Core JavaScript -->
     <script src="{% static "bootstrap/dist/js/bootstrap.min.js" %}"></script>
+    <!-- Bootstrap Select -->
+    <script src="{% static "bootstrap-select/dist/js/bootstrap-select.min.js" %}"></script>
 
     <!-- Metis Menu Plugin JavaScript -->
     <script src="{% static "metismenu/dist/metisMenu.min.js" %}"></script>
@@ -62,6 +64,9 @@
 
     <!-- Bootstrap Core CSS -->
     <link href="{% static "bootstrap/dist/css/bootstrap.min.css" %}" rel="stylesheet">
+
+    <!-- Bootstrap Select -->
+    <link href="{% static "bootstrap-select/dist/css/bootstrap-select.min.css" %}" rel="stylesheet">
 
     <!-- MetisMenu CSS -->
     <link href="{% static "metismenu/dist/metisMenu.min.css" %}" rel="stylesheet">
@@ -756,6 +761,11 @@
             <!-- 'placeholder': 'Select or add some tags...', -->
             <!-- 'no_results_text': "Tag not found, press TAB key to add.", -->
         <!-- }); -->
+
+        $('select').addClass('selectpicker');
+        $('.selectpicker').attr('data-live-search', 'true');
+        $('.selectpicker').css('width', '70%');
+        $('.selectpicker').selectpicker();
 
     });
 </script>

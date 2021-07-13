@@ -179,7 +179,11 @@ input[type="file"] {
 }
 
 .form-control {
-    width: 70%;
+    width: 70% !important;
+}
+
+.bs-searchbox .form-control {
+    width: 100% !important;
 }
 
 .dojo-input-group {

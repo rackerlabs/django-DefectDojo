@@ -146,7 +146,7 @@ class ReportBuilderTest(BaseTestCase):
         dropdown.click()
 
         # print('waiting for filter section to expand...')
-        my_select = WebDriverWait(driver, 20).until(EC.visibility_of_element_located((By.ID, "id_include_finding_notes")))
+        my_select = WebDriverWait(driver, 20).until(EC.visibility_of_element_located((By.XPATH, "//label[@for='id_include_finding_notes']")))
 
         my_select = Select(driver.find_element_by_id("id_include_finding_notes"))
         my_select.select_by_index(1)
