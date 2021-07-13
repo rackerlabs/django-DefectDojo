@@ -1,0 +1,19 @@
+{
+    "Issues": [
+        {
+            "issue_type": {
+                "name": "Finding",
+                "description_html": null,
+                "remediation_html": null,
+                "vulnerability_classifications_html": null,
+                "references_html": null
+            },
+            "description_html": null,
+            "remediation_html":null,
+            "severity": "high",
+            "path": "/path",
+            "origin": "https://www.test.com",
+            "evidence": null
+        }
+    ]
+}

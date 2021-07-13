@@ -1,0 +1,153 @@
+{
+    "Issues": [
+        {
+            "issue_type": {
+                "name": "Finding 1",
+                "description_html": "issue description 1",
+                "remediation_html": "issue remediation 1",
+                "vulnerability_classifications_html": "CWE-79",
+                "references_html": "ref 1"
+            },
+            "description_html": "description 1",
+            "remediation_html": "remediation 1",
+            "severity": "high",
+            "path": "/path",
+            "origin": "https://www.test.com",
+            "evidence": [
+                {
+                    "request_index": 0,
+                    "request_segments": [
+                        {
+                            "data_html": "request data 1/"
+                        },
+                        {
+                            "highlight_html": "request data 2/"
+                        },
+                        {
+                            "data_html": "request data 3/"
+                        }
+                    ]
+                },
+                {
+                    "response_index": 0,
+                    "response_segments": [
+                        {
+                            "data_html": "response data 1/"
+                        },
+                        {
+                            "highlight_html": "response data 3/"
+                        },
+                        {
+                            "data_html": "response data 4/"
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "issue_type": {
+                "name": "Finding 2",
+                "description_html": "issue description 2",
+                "remediation_html": "remediation description 2",
+                "vulnerability_classifications_html": "CWE-79",
+                "references_html": "reference 2"
+            },
+            "description_html": "description 2",
+            "remediation_html": "remediation 2",
+            "severity": "high",
+            "path": "/path2",
+            "origin": "https://www.test.com",
+            "evidence": [
+                {
+                    "request_index": 0,
+                    "request_segments": [
+                        {
+                            "data_html": "request data 1/"
+                        },
+                        {
+                            "highlight_html": "request data 2/"
+                        },
+                        {
+                            "data_html": "request data 3/"
+                        }
+                    ]
+                },
+                {
+                    "response_index": 0,
+                    "response_segments": [
+                        {
+                            "data_html": "response_data 1"
+                        }
+                    ]
+                },
+                {
+                    "request_index": 1,
+                    "request_segments": [
+                        {
+                            "data_html": "request data 12/"
+                        },
+                        {
+                            "highlight_html": "request data 22/"
+                        },
+                        {
+                            "data_html": "request data 23/"
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "issue_type": {
+                "name": "Finding 2",
+                "description_html": "issue description 2",
+                "remediation_html": "remediation description 2",
+                "vulnerability_classifications_html": "CWE-79",
+                "references_html": "reference 2"
+            },
+            "description_html": "description 3",
+            "remediation_html": "remediation 2",
+            "severity": "high",
+            "path": "/path3",
+            "origin": "https://www.test.com",
+            "evidence": [
+                {
+                    "request_index": 0,
+                    "request_segments": [
+                        {
+                            "data_html": "new request data 1/"
+                        },
+                        {
+                            "highlight_html": "new request data 2/"
+                        },
+                        {
+                            "data_html": "new request data 3/"
+                        }
+                    ]
+                },
+                {
+                    "response_index": 0,
+                    "response_segments": [
+                        {
+                            "data_html": "new response data 1"
+                        },
+                        {}
+                    ]
+                },
+                {
+                    "request_index": 1,
+                    "request_segments": [
+                        {
+                            "data_html": "new request data 12/"
+                        },
+                        {
+                            "highlight_html": "new request data 22/"
+                        },
+                        {
+                            "data_html": "new request data 23/"
+                        }
+                    ]
+                }
+            ]
+        }
+    ]
+}

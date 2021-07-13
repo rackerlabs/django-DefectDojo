@@ -1,0 +1,48 @@
+{
+    "Issues": [
+        {
+            "issue_type": {
+                "name": null,
+                "description_html": "issue description 1",
+                "remediation_html": "issue remediation 1",
+                "vulnerability_classifications_html": "CWE-79",
+                "references_html": "ref 1"
+            },
+            "description_html": "description 1",
+            "remediation_html": "remediation 1",
+            "severity": "high",
+            "path": "/path",
+            "origin": "https://www.test.com",
+            "evidence": [
+                {
+                    "request_index": 0,
+                    "request_segments": [
+                        {
+                            "data_html": "request data 1/"
+                        },
+                        {
+                            "highlight_html": "request data 2/"
+                        },
+                        {
+                            "data_html": "request data 3/"
+                        }
+                    ]
+                },
+                {
+                    "response_index": 0,
+                    "response_segments": [
+                        {
+                            "data_html": "response data 1/"
+                        },
+                        {
+                            "highlight_html": "response data 3/"
+                        },
+                        {
+                            "data_html": "response data 4/"
+                        }
+                    ]
+                }
+            ]
+        }
+    ]
+}
