@@ -227,11 +227,6 @@
                                        {% endif %}
                                        {% if user|is_authorized_for_staff:finding or finding|has_object_permission:"Finding_Edit" %}
                                           <li class="divider"></li>
-                                          <li role="presentation">
-                                              <a href="{% url 'manage_images' finding.id %}">
-                                                  <i class="fa fa-file-image-o"></i> Manage Images
-                                              </a>
-                                          </li>
                                           {% if finding.under_review and dojo_user in finding.reviewers.all or dojo_user == finding.review_requested_by and finding.under_review %}
                                               <li role="presentation">
                                                   <a href="{% url 'clear_finding_review' finding.id %}">

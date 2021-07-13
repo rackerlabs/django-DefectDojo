@@ -16,7 +16,7 @@ from dojo.notifications.helper import create_notification
 from django.contrib import messages
 from dojo.celery import app
 from dojo.decorators import dojo_async_task, dojo_model_from_id, dojo_model_to_id
-from dojo.utils import truncate_with_dots, prod_name
+from dojo.utils import truncate_with_dots, prod_name, get_file_images
 from django.urls import reverse
 from dojo.forms import JIRAProjectForm, JIRAEngagementForm
 
@@ -675,10 +675,15 @@ def add_jira_issue(obj, *args, **kwargs):
             findings = obj.findings.all()
 
         for find in findings:
-            for pic in find.images.all():
-                jira_attachment(
-                    find, jira, new_issue,
-                    settings.MEDIA_ROOT + pic.image_large.name)
+            for pic in get_file_images(find):
+                # It doesn't look like the celery cotainer has anything in the media
+                # folder. Has this feature ever worked?
+                try:
+                    jira_attachment(
+                        find, jira, new_issue,
+                        settings.MEDIA_ROOT + '/' + pic)
+                except FileNotFoundError as e:
+                    logger.info(e)
 
         if jira_project.enable_engagement_epic_mapping:
             eng = obj.test.engagement
@@ -792,10 +797,15 @@ def update_jira_issue(obj, *args, **kwargs):
             findings = obj.findings.all()
 
         for find in findings:
-            for pic in find.images.all():
-                jira_attachment(
-                    find, jira, issue,
-                    settings.MEDIA_ROOT + pic.image_large.name)
+            for pic in get_file_images(find):
+                # It doesn't look like the celery cotainer has anything in the media
+                # folder. Has this feature ever worked?
+                try:
+                    jira_attachment(
+                        find, jira, new_issue,
+                        settings.MEDIA_ROOT + '/' + pic)
+                except FileNotFoundError as e:
+                    logger.info(e)
 
         if jira_project.enable_engagement_epic_mapping:
             eng = find.test.engagement

@@ -672,13 +672,6 @@
                                             </a>
                                         </li>
                                         <li class="divider"></li>
-                                        {% endif %}
-                                    {% if finding|has_object_permission:"Finding_Edit" or user|is_authorized_for_staff:finding %}
-                                        <li role="presentation">
-                                            <a href="{% url 'manage_images' finding.id %}">
-                                                <i class="fa fa-file-image-o"></i> Manage Images
-                                            </a>
-                                        </li>
                                     {% endif %}
                                     {% if finding|has_object_permission:"Finding_Edit" or user|is_authorized_for_change:finding %}
                                         {% if finding.under_review and dojo_user in finding.reviewers.all or dojo_user == finding.review_requested_by and finding.under_review %}

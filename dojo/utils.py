@@ -5,6 +5,7 @@ import binascii
 import os
 import hashlib
 import bleach
+import mimetypes
 from cryptography.hazmat.primitives.ciphers import Cipher, algorithms, modes
 from cryptography.hazmat.backends import default_backend
 from calendar import monthrange
@@ -2043,3 +2044,24 @@ def prod_name(obj):
         return 'Unknown'
 
     return get_product(obj).name
+
+
+# Returns image locations by default (i.e. uploaded_files/09577eb1-6ccb-430b-bc82-0742d4c97a09.png)
+# if return_objects=True, return the FileUPload object instead of just the file location
+def get_file_images(obj, return_objects=False):
+    logger.debug('getting images for %s:%s', type(obj), obj)
+    files = None
+    if not obj:
+        return files
+    files = obj.files.all()
+
+    images = []
+    for file in files:
+        file_name = file.file.name
+        file_type = mimetypes.guess_type(file_name)[0]
+        if file_type and 'image' in file_type:
+            if return_objects:
+                images.append(file)
+            else:
+                images.append(file_name)
+    return images

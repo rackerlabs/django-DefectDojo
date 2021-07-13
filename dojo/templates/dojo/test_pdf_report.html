@@ -342,14 +342,14 @@
                     <h6>References</h6>
                     <pre>{{ finding.references|markdown_render }}</pre>
                     {% if include_finding_images %}
-                        <h6>Images</h6>
-                        {% if finding.images.all.count > 0 %}
-                            {% for pic in finding.images.all %}
-                                <p><img src="{{ host }}{% pic_token pic 'original' %}" style="max-width: 85%"></p>
+                        {% with images=finding|file_images %}
+                            <h6>Images</h6>
+                            {% for pic in images %}
+                                <p><img src="{{ host }}{% pic_token pic 'original' %}" style="max-width: 85%" alt="Finding Image"></p>
+                            {% empty %}
+                                <p class="text-center">No images found.</p>
                             {% endfor %}
-                        {% else %}
-                            <p class="text-center">No images found.</p>
-                        {% endif %}
+                        {% endwith %}
                     {% endif %}
                     {% if include_finding_notes %}
                         {% with notes=finding.notes.all|get_public_notes %}

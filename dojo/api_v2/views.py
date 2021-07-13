@@ -502,7 +502,6 @@ class FindingViewSet(prefetch.PrefetchListMixin,
     def get_queryset(self):
         findings = get_authorized_findings(Permissions.Finding_View).prefetch_related('endpoints',
                                                     'reviewers',
-                                                    'images',
                                                     'found_by',
                                                     'notes',
                                                     'risk_acceptance_set',
@@ -1760,7 +1759,6 @@ class TestImportViewSet(prefetch.PrefetchListMixin,
                                         'findings_affected__notes__author',
                                         'findings_affected__notes__history',
                                         'findings_affected__files',
-                                        'findings_affected__images',
                                         'findings_affected__found_by',
                                         'findings_affected__tags',
                                         'findings_affected__risk_acceptance_set',
@@ -2134,19 +2132,19 @@ def report_generate(request, obj, options):
     }
 
     finding_notes = []
-    finding_images = []
+    finding_files = []
 
     if include_finding_images:
         for finding in findings.qs.order_by('numerical_severity'):
-            images = finding.images.all()
-            if images:
-                finding_images.append(
+            files = finding.files.all()
+            if files:
+                finding_files.append(
                     {
                         "finding_id": finding,
-                        "images": images
+                        "files": files
                     }
                 )
-        result['finding_images'] = finding_images
+        result['finding_files'] = finding_files
 
     if include_finding_notes:
         for finding in findings.qs.order_by('numerical_severity'):

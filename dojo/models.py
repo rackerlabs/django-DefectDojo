@@ -19,8 +19,6 @@ from django_extensions.db.models import TimeStampedModel
 from django.utils.deconstruct import deconstructible
 from django.utils.timezone import now
 from django.utils.functional import cached_property
-from imagekit.models import ImageSpecField
-from imagekit.processors import ResizeToCover
 from django.utils import timezone
 from pytz import all_timezones
 from polymorphic.models import PolymorphicModel
@@ -1757,10 +1755,6 @@ class Finding(models.Model):
                                          on_delete=models.CASCADE,
                                          verbose_name="Last Reviewed By",
                                          help_text="Provides the person who last reviewed the flaw.")
-    images = models.ManyToManyField('FindingImage',
-                                    blank=True,
-                                    verbose_name="Images",
-                                    help_text="Image(s) / Screenshot(s) related to the flaw.")
     files = models.ManyToManyField(FileUpload,
                                    blank=True,
                                    editable=False,
@@ -2733,36 +2727,12 @@ class Risk_Acceptance(models.Model):
         return None
 
 
-class FindingImage(models.Model):
-    image = models.ImageField(upload_to=UniqueUploadNameProvider('finding_images'))
-    caption = models.CharField(max_length=500, blank=True)
-    image_thumbnail = ImageSpecField(source='image',
-                                     processors=[ResizeToCover(100, 100)],
-                                     format='JPEG',
-                                     options={'quality': 70})
-    image_small = ImageSpecField(source='image',
-                                 processors=[ResizeToCover(640, 480)],
-                                 format='JPEG',
-                                 options={'quality': 100})
-    image_medium = ImageSpecField(source='image',
-                                  processors=[ResizeToCover(800, 600)],
-                                  format='JPEG',
-                                  options={'quality': 100})
-    image_large = ImageSpecField(source='image',
-                                 processors=[ResizeToCover(1024, 768)],
-                                 format='JPEG',
-                                 options={'quality': 100})
-
-    def __str__(self):
-        return self.image.name or 'No Image'
-
-
-class FindingImageAccessToken(models.Model):
+class FileAccessToken(models.Model):
     """This will allow reports to request the images without exposing the
     media root to the world without
     authentication"""
     user = models.ForeignKey(User, null=False, blank=False, on_delete=models.CASCADE)
-    image = models.ForeignKey(FindingImage, null=False, blank=False, on_delete=models.CASCADE)
+    file = models.ForeignKey(FileUpload, null=False, blank=False, on_delete=models.CASCADE)
     token = models.CharField(max_length=255)
     size = models.CharField(max_length=9,
                             choices=(
@@ -2776,7 +2746,7 @@ class FindingImageAccessToken(models.Model):
     def save(self, *args, **kwargs):
         if not self.token:
             self.token = uuid4()
-        return super(FindingImageAccessToken, self).save(*args, **kwargs)
+        return super(FileAccessToken, self).save(*args, **kwargs)
 
 
 class BannerConf(models.Model):
@@ -3682,8 +3652,8 @@ admin.site.register(Language_Type)
 admin.site.register(App_Analysis)
 admin.site.register(Test)
 admin.site.register(Finding, FindingAdmin)
-admin.site.register(FindingImage)
-admin.site.register(FindingImageAccessToken)
+admin.site.register(FileUpload)
+admin.site.register(FileAccessToken)
 admin.site.register(Stub_Finding)
 admin.site.register(Engagement)
 admin.site.register(Risk_Acceptance)

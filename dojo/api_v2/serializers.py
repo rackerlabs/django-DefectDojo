@@ -9,7 +9,7 @@ from dojo.models import Finding_Group, Product, Engagement, Test, Finding, \
     Finding_Template, Test_Type, Development_Environment, NoteHistory, \
     JIRA_Issue, Tool_Product_Settings, Tool_Configuration, Tool_Type, \
     Product_Type, JIRA_Instance, Endpoint, JIRA_Project, \
-    Notes, DojoMeta, FindingImage, Note_Type, App_Analysis, Endpoint_Status, \
+    Notes, DojoMeta, Note_Type, App_Analysis, Endpoint_Status, \
     Sonarqube_Issue, Sonarqube_Issue_Transition, Sonarqube_Product, Regulation, \
     System_Settings, FileUpload, SEVERITY_CHOICES, Test_Import, \
     Test_Import_Finding_Action, Product_Type_Member, Product_Member, \
@@ -23,7 +23,6 @@ from django.conf import settings
 from rest_framework import serializers
 from django.core.exceptions import ValidationError, PermissionDenied
 from django.utils import timezone
-import base64
 import datetime
 import six
 from django.utils.translation import ugettext_lazy as _
@@ -843,17 +842,6 @@ class RiskAcceptanceSerializer(serializers.ModelSerializer):
         fields = '__all__'
 
 
-class FindingImageSerializer(serializers.ModelSerializer):
-    base64 = serializers.SerializerMethodField()
-
-    class Meta:
-        model = FindingImage
-        fields = ["base64", "caption", "id"]
-
-    def get_base64(self, obj) -> bytes:
-        return base64.b64encode(obj.image.read())
-
-
 class FindingMetaSerializer(serializers.ModelSerializer):
     class Meta:
         model = DojoMeta
@@ -923,7 +911,6 @@ class FindingRelatedFieldsSerializer(serializers.Serializer):
 
 
 class FindingSerializer(TaggitSerializer, serializers.ModelSerializer):
-    images = FindingImageSerializer(many=True, read_only=True)
     tags = TagListSerializerField(required=False)
     request_response = serializers.SerializerMethodField()
     accepted_risks = RiskAcceptanceSerializer(many=True, read_only=True, source='risk_acceptance_set')
@@ -1059,7 +1046,7 @@ class FindingCreateSerializer(TaggitSerializer, serializers.ModelSerializer):
 
     class Meta:
         model = Finding
-        exclude = ['images']
+        fields = '__all__'
         extra_kwargs = {
             'reporter': {'default': serializers.CurrentUserDefault()},
         }
@@ -1422,11 +1409,6 @@ class AddNewFileOptionSerializer(serializers.ModelSerializer):
         fields = '__all__'
 
 
-class FindingToFindingImagesSerializer(serializers.Serializer):
-    finding_id = serializers.PrimaryKeyRelatedField(queryset=Finding.objects.all(), many=False, allow_null=True)
-    images = FindingImageSerializer(many=True)
-
-
 class FindingToNotesSerializer(serializers.Serializer):
     finding_id = serializers.PrimaryKeyRelatedField(queryset=Finding.objects.all(), many=False, allow_null=True)
     notes = NoteSerializer(many=True)
@@ -1472,7 +1454,6 @@ class ReportGenerateSerializer(serializers.Serializer):
     title = serializers.CharField(max_length=200)
     user_id = serializers.IntegerField()
     host = serializers.CharField(max_length=200)
-    finding_images = FindingToFindingImagesSerializer(many=True, allow_null=True, required=False)
     finding_notes = FindingToNotesSerializer(many=True, allow_null=True, required=False)
 
 

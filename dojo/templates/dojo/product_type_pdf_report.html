@@ -201,56 +201,42 @@
                                 </table>
                             </div>
                         </div>
-                    </div>
 
-                    {% include "dojo/snippets/endpoints.html" with finding=finding destination="Report" %}
+                        {% include "dojo/snippets/endpoints.html" with finding=finding destination="Report" %}
 
-                    <h6>CVSS v3</h6>
-                    <pre>{{ finding.cvssv3 }}</pre>
+                        <h6>CVSS v3</h6>
+                        <pre>{{ finding.cvssv3 }}</pre>
 
-                    <h6>Description</h6>
-                    <pre>{{ finding.description }}</pre>
+                        <h6>Description</h6>
+                        <pre>{{ finding.description }}</pre>
 
-                    <h6>Mitigation</h6>
-                    <pre>{{ finding.mitigation }}</pre>
-                    {% if finding.get_report_requests %}
-                        <h5>Sample Request(s): Displaying {{finding.get_report_requests.count}} of {{finding.burprawrequestresponse_set.count}}</h5>
-                        {% for req in finding.get_report_requests %}
-                            <h6>Request {{forloop.counter}} </h6>
-                            <pre>{{ req.get_request }}</pre>
-                            {% if req.get_response %}
-                             <h6>Response {{forloop.counter}}</h6>
-                             <pre>{{ req.get_response|truncatechars_html:800 }}</pre>
-                            {% endif %}
-                        {% endfor %}
-                    {% endif %}
-                    <h6>Impact</h6>
-                    <pre>{{ finding.impact }}</pre>
-                    <h6>References</h6>
-                    <pre>{{ finding.references }}</pre>
-                    {% if include_finding_images %}
-                        <h6>Images</h6>
-                        {% if finding.images.all.count > 0 %}
-                            {% for pic in finding.images.all %}
-                                <p><img src="{{ host }}{% pic_token pic 'original' %}" style="max-width: 85%"></p>
+                        <h6>Mitigation</h6>
+                        <pre>{{ finding.mitigation }}</pre>
+                        {% if finding.get_report_requests %}
+                            <h5>Sample Request(s): Displaying {{finding.get_report_requests.count}} of {{finding.burprawrequestresponse_set.count}}</h5>
+                            {% for req in finding.get_report_requests %}
+                                <h6>Request {{forloop.counter}} </h6>
+                                <pre>{{ req.get_request }}</pre>
+                                {% if req.get_response %}
+                                <h6>Response {{forloop.counter}}</h6>
+                                <pre>{{ req.get_response|truncatechars_html:800 }}</pre>
+                                {% endif %}
                             {% endfor %}
                         {% endif %}
-                    {% endif %}
-                    <h6>Impact</h6>
-                    <pre>{{ finding.impact }}</pre>
-                    <h6>References</h6>
-                    <pre>{{ finding.references }}</pre>
-
-                    {% if include_finding_images %}
-                        <h6>Images</h6>
-                        {% if finding.images.all.count > 0 %}
-                            {% for pic in finding.images.all %}
-                                <p><img src="{{ host }}{% pic_token pic 'original' %}" style="max-width: 85%" alt="finding_image"></p>
-                            {% endfor %}
-                        {% else %}
-                            <p class="text-center">No images found.</p>
+                        <h6>Impact</h6>
+                        <pre>{{ finding.impact }}</pre>
+                        <h6>References</h6>
+                        <pre>{{ finding.references }}</pre>
+                        {% if include_finding_images %}
+                        {% with images=finding|file_images %}
+                                <h6>Images</h6>
+                                {% for pic in images %}
+                                    <p><img src="{{ host }}{% pic_token pic 'original' %}" style="max-width: 85%" alt="Finding Image"></p>
+                                {% empty %}
+                                    <p class="text-center">No images found.</p>
+                                {% endfor %}
+                            {% endwith %}
                         {% endif %}
-                    {% endif %}
 
                         {% if include_finding_notes %}
                             {% with notes=finding.notes.all|get_public_notes %}
@@ -295,7 +281,6 @@
                                 {% endif %}
                             {% endwith %}
                         {% endif %}
-                    {% endif }
                     {% endfor %}
                 {% endfor %}
             </div>

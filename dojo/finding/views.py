@@ -3,9 +3,6 @@ import base64
 import json
 import logging
 import mimetypes
-import os
-import shutil
-
 from collections import OrderedDict, defaultdict
 from django.db import models
 from django.db.models.functions import Length
@@ -24,17 +21,19 @@ from django.utils.safestring import mark_safe
 from django.utils import timezone
 from django.views.decorators.http import require_POST
 from itertools import chain
+from imagekit import ImageSpec
+from imagekit.processors import ResizeToFill
 from dojo.utils import add_error_message_to_response, add_field_errors_to_response, add_success_message_to_response, close_external_issue, redirect, reopen_external_issue
 import copy
 
 from dojo.filters import OpenFindingFilter, AcceptedFindingFilter, ClosedFindingFilter, TemplateFindingFilter, SimilarFindingFilter
 from dojo.forms import NoteForm, TypedNoteForm, CloseFindingForm, FindingForm, PromoteFindingForm, FindingTemplateForm, \
-    DeleteFindingTemplateForm, FindingImageFormSet, JIRAFindingForm, GITHUBFindingForm, ReviewFindingForm, ClearFindingReviewForm, \
+    DeleteFindingTemplateForm, JIRAFindingForm, GITHUBFindingForm, ReviewFindingForm, ClearFindingReviewForm, \
     DefectFindingForm, StubFindingForm, DeleteFindingForm, DeleteStubFindingForm, ApplyFindingTemplateForm, \
     FindingFormID, FindingBulkUpdateForm, MergeFindings
 from dojo.models import Finding, Finding_Group, Notes, NoteHistory, Note_Type, \
-    BurpRawRequestResponse, Stub_Finding, Endpoint, Finding_Template, FindingImage, Endpoint_Status, \
-    FindingImageAccessToken, GITHUB_PKey, GITHUB_Issue, Dojo_User, Cred_Mapping, Test, Product, User, Engagement
+    BurpRawRequestResponse, Stub_Finding, Endpoint, Finding_Template, Endpoint_Status, \
+    FileAccessToken, GITHUB_PKey, GITHUB_Issue, Dojo_User, Cred_Mapping, Test, Product, User, Engagement
 from dojo.utils import get_page_items, add_breadcrumb, FileIterWrapper, process_notifications, \
     get_system_setting, apply_cwe_to_template, Product_Tab, calculate_grade, \
     redirect_to_return_url_or_else, get_return_url, add_external_issue, update_external_issue, \
@@ -1536,114 +1535,46 @@ def delete_template(request, tid):
         return HttpResponseForbidden()
 
 
-@user_is_authorized(Finding, Permissions.Finding_Edit, 'fid', 'staff')
-def manage_images(request, fid):
-    finding = get_object_or_404(Finding, id=fid)
-    images_formset = FindingImageFormSet(queryset=finding.images.all())
-    error = False
-
-    messages.add_message(
-                request,
-                messages.INFO,
-                'Finding Images will be removed as of 06/31/2021. Please use the File Uploads instead.',
-                extra_tags='alert-danger')
-
-    if request.method == 'POST':
-        images_formset = FindingImageFormSet(
-            request.POST, request.FILES, queryset=finding.images.all())
-        if images_formset.is_valid():
-            # remove all from database and disk
-
-            images_formset.save()
-
-            for obj in images_formset.deleted_objects:
-                os.remove(os.path.join(settings.MEDIA_ROOT, obj.image.name))
-                if obj.image_thumbnail is not None and os.path.isfile(
-                        os.path.join(settings.MEDIA_ROOT, obj.image_thumbnail.name)):
-                    os.remove(os.path.join(settings.MEDIA_ROOT, obj.image_thumbnail.name))
-                if obj.image_medium is not None and os.path.isfile(
-                        os.path.join(settings.MEDIA_ROOT, obj.image_medium.name)):
-                    os.remove(os.path.join(settings.MEDIA_ROOT, obj.image_medium.name))
-                if obj.image_large is not None and os.path.isfile(
-                        os.path.join(settings.MEDIA_ROOT, obj.image_large.name)):
-                    os.remove(os.path.join(settings.MEDIA_ROOT, obj.image_large.name))
-
-            for obj in images_formset.new_objects:
-                finding.images.add(obj)
-
-            orphan_images = FindingImage.objects.filter(finding__isnull=True)
-            for obj in orphan_images:
-                os.remove(os.path.join(settings.MEDIA_ROOT, obj.image.name))
-                if obj.image_thumbnail is not None and os.path.isfile(
-                        os.path.join(settings.MEDIA_ROOT, obj.image_thumbnail.name)):
-                    os.remove(os.path.join(settings.MEDIA_ROOT, obj.image_thumbnail.name))
-                if obj.image_medium is not None and os.path.isfile(
-                        os.path.join(settings.MEDIA_ROOT, obj.image_medium.name)):
-                    os.remove(os.path.join(settings.MEDIA_ROOT, obj.image_medium.name))
-                if obj.image_large is not None and os.path.isfile(
-                        os.path.join(settings.MEDIA_ROOT, obj.image_large.name)):
-                    os.remove(os.path.join(settings.MEDIA_ROOT, obj.image_large.name))
-                obj.delete()
-
-            files = os.listdir(os.path.join(settings.MEDIA_ROOT, 'finding_images'))
-
-            for file in files:
-                with_media_root = os.path.join(settings.MEDIA_ROOT, 'finding_images', file)
-                with_part_root_only = os.path.join('finding_images', file)
-                if os.path.isfile(with_media_root):
-                    pic = FindingImage.objects.filter(
-                        image=with_part_root_only)
-
-                    if len(pic) == 0:
-                        os.remove(with_media_root)
-                        cache_to_remove = os.path.join(settings.MEDIA_ROOT, 'CACHE', 'images', 'finding_images',
-                            os.path.splitext(file)[0])
-                        if os.path.isdir(cache_to_remove):
-                            shutil.rmtree(cache_to_remove)
-                    else:
-                        for p in pic:
-                            if p.finding_set is None:
-                                p.delete()
-
-            messages.add_message(
-                request,
-                messages.SUCCESS,
-                'Images updated successfully.',
-                extra_tags='alert-success')
-        else:
-            error = True
-            messages.add_message(
-                request,
-                messages.ERROR,
-                'Please check form data and try again.',
-                extra_tags='alert-danger')
-
-        if not error:
-            return HttpResponseRedirect(reverse('view_finding', args=(fid, )))
-    product_tab = Product_Tab(finding.test.engagement.product.id, title="Manage Finding Images", tab="findings")
-    return render(
-        request, 'dojo/manage_images.html', {
-            'product_tab': product_tab,
-            'images_formset': images_formset,
-            'active_tab': 'findings',
-            'name': 'Manage Finding Images',
-            'finding': finding,
-        })
-
-
 def download_finding_pic(request, token):
+    class Thumbnail(ImageSpec):
+        processors = [ResizeToFill(100, 100)]
+        format = 'JPEG'
+        options = {'quality': 70}
+
+    class Small(ImageSpec):
+        processors = [ResizeToFill(640, 480)]
+        format = 'JPEG'
+        options = {'quality': 100}
+
+    class Medium(ImageSpec):
+        processors = [ResizeToFill(800, 600)]
+        format = 'JPEG'
+        options = {'quality': 100}
+
+    class Large(ImageSpec):
+        processors = [ResizeToFill(1024, 768)]
+        format = 'JPEG'
+        options = {'quality': 100}
+
+    class Original(ImageSpec):
+        format = 'JPEG'
+        options = {'quality': 100}
+
     mimetypes.init()
 
+    size_map = {
+        'thumbnail': Thumbnail,
+        'small': Small,
+        'medium': Medium,
+        'large': Large,
+        'original': Original,
+    }
+
     try:
-        access_token = FindingImageAccessToken.objects.get(token=token)
-        sizes = {
-            'thumbnail': access_token.image.image_thumbnail,
-            'small': access_token.image.image_small,
-            'medium': access_token.image.image_medium,
-            'large': access_token.image.image_large,
-            'original': access_token.image.image,
-        }
-        if access_token.size not in list(sizes.keys()):
+        access_token = FileAccessToken.objects.get(token=token)
+        size = access_token.size
+
+        if access_token.size not in list(size_map.keys()):
             raise Http404
         size = access_token.size
         # we know there is a token - is it for this image
@@ -1655,11 +1586,14 @@ def download_finding_pic(request, token):
     except:
         raise PermissionDenied
 
-    response = StreamingHttpResponse(FileIterWrapper(open(sizes[size].path, 'rb')))
-    response['Content-Disposition'] = 'inline'
-    mimetype, encoding = mimetypes.guess_type(sizes[size].name)
-    response['Content-Type'] = mimetype
-    return response
+    with open(access_token.file.file.file.name, 'rb') as file:
+        file_name = file.name
+        image = size_map[size](source=file).generate()
+        response = StreamingHttpResponse(FileIterWrapper(image))
+        response['Content-Disposition'] = 'inline'
+        mimetype, encoding = mimetypes.guess_type(file_name)
+        response['Content-Type'] = mimetype
+        return response
 
 
 @user_is_authorized(Product, Permissions.Finding_Edit, 'pid', 'staff')
