@@ -327,15 +327,18 @@ def deduplicate_uid_or_hash_code(new_finding):
         break
 
 
-def set_duplicate(new_finding, existing_finding):
+def set_duplicate(new_finding, existing_finding, update_existing_finding=True):
     if existing_finding.duplicate:
         logger.debug('existing finding: %s:%s:duplicate=%s;duplicate_finding=%s', existing_finding.id, existing_finding.title, existing_finding.duplicate, existing_finding.duplicate_finding.id if existing_finding.duplicate_finding else 'None')
         raise Exception("Existing finding is a duplicate")
     if existing_finding.id == new_finding.id:
         raise Exception("Can not add duplicate to itself")
     deduplicationLogger.debug('Setting new finding ' + str(new_finding.id) + ' as a duplicate of existing finding ' + str(existing_finding.id))
-    if is_duplicate_reopen(new_finding, existing_finding):
-        set_duplicate_reopen(new_finding, existing_finding)
+
+    # Update existing finding's status in case of changes.
+    if update_existing_finding and is_duplicate_changed_status(new_finding, existing_finding):
+        set_existing_change_status(new_finding, existing_finding)
+
     new_finding.duplicate = True
     new_finding.active = False
     new_finding.verified = False
@@ -346,7 +349,8 @@ def set_duplicate(new_finding, existing_finding):
     # A -> C and B -> C should be true
     for find in new_finding.original_finding.all().order_by('-id'):
         new_finding.original_finding.remove(find)
-        set_duplicate(find, existing_finding)
+        set_duplicate(find, existing_finding, False)
+
     existing_finding.found_by.add(new_finding.test.test_type)
     logger.debug('saving new finding: %d', new_finding.id)
     super(Finding, new_finding).save()
@@ -354,21 +358,36 @@ def set_duplicate(new_finding, existing_finding):
     super(Finding, existing_finding).save()
 
 
-def is_duplicate_reopen(new_finding, existing_finding):
-    if (existing_finding.is_mitigated or existing_finding.mitigated) and not existing_finding.out_of_scope and not existing_finding.false_p and new_finding.active and not new_finding.is_mitigated:
-        return True
+def is_duplicate_changed_status(new_finding, existing_finding):
+    if not existing_finding.out_of_scope and not existing_finding.false_p:
+        # Mitigation status. Reopen or close based on mitigation status.
+        existing_mitigated = (existing_finding.is_mitigated or existing_finding.mitigated)
+        new_mitigated = (new_finding.is_mitigated or new_finding.mitigated)
+        if existing_mitigated != new_mitigated:
+            return True
+    return False
+
+
+def set_existing_change_status(new_finding, existing_finding):
+    if new_finding.mitigated and not existing_finding.mitigated:
+        event = "marked mitigated"
+    elif existing_finding.mitigated and not new_finding.mitigated:
+        event = "reopened"
+    elif new_finding.active and not existing_finding.active:
+        event = "reopened"
+    elif existing_finding.active and not new_finding.active:
+        event = "closed"
+    elif new_finding.verified and not existing_finding.verified:
+        event = "marked verified"
     else:
-        return False
+        event = "changed"
 
-
-def set_duplicate_reopen(new_finding, existing_finding):
-    logger.debug('duplicate reopen existing finding')
     existing_finding.mitigated = new_finding.mitigated
     existing_finding.is_mitigated = new_finding.is_mitigated
     existing_finding.active = new_finding.active
     existing_finding.verified = new_finding.verified
     existing_finding.notes.create(author=existing_finding.reporter,
-                                    entry="This finding has been automatically re-openend as it was found in recent scans.")
+                                  entry="This finding has been automatically " + event + " due to a new scan import.")
     existing_finding.save()
 
 

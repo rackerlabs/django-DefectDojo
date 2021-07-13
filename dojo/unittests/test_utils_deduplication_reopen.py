@@ -52,7 +52,9 @@ class TestDuplicationReopen(TestCase):
         if self.finding_d.id:
             self.finding_d.delete()
 
-    def test_false_positive_reopen(self):
+    def test_false_positive_shouldnt_reopen(self):
+        # Finding a: FP, mitigated.
+        # Finding b: active duplicate finding.
         self.finding_a.active = False
         self.finding_a.verified = False  # in the gui, a FP can not be true
         set_duplicate(self.finding_b, self.finding_a)
@@ -81,9 +83,10 @@ class TestDuplicationReopen(TestCase):
         self.assertFalse(self.finding_b.active)
         self.assertFalse(self.finding_b.verified)
 
-    def test_out_of_scope_reopen(self):
+    def test_out_of_scope_shouldnt_reopen(self):
         logger.debug('c: is_mitigated1: %s', self.finding_c.is_mitigated)
         logger.debug('d: is_mitigated1: %s', self.finding_d.is_mitigated)
+
         self.finding_c.active = False
         self.finding_c.verified = False
 
@@ -120,3 +123,79 @@ class TestDuplicationReopen(TestCase):
         self.assertFalse(self.finding_d.is_mitigated)
         self.assertFalse(self.finding_d.active)
         self.assertFalse(self.finding_d.verified)
+
+    def test_mitigated_reopen(self):
+        # Mitigated normal finding.
+        self.finding_a.active = False
+        self.finding_a.verified = True
+        self.finding_a.false_p = False
+        self.finding_a.mitigated = datetime.date(1970, 1, 1)
+        self.finding_a.is_mitigated = True
+
+        # Newly imported, active finding.
+        self.finding_b.active = True
+        self.finding_b.verified = True
+        self.finding_b.duplicate = False
+        self.finding_b.duplicate_finding = None
+
+        # Marks b as duplicate, but should reopen a.
+        set_duplicate(self.finding_b, self.finding_a)
+
+        super(Finding, self.finding_a).save()
+        super(Finding, self.finding_b).save()
+
+        fix_loop_duplicates()
+
+        # Get latest status
+        self.finding_a = Finding.objects.get(id=self.finding_a.id)
+        self.finding_b = Finding.objects.get(id=self.finding_b.id)
+
+        # a should be not-mitigated and active (open).
+        self.assertFalse(self.finding_a.false_p)
+        self.assertFalse(self.finding_a.is_mitigated)
+        self.assertTrue(self.finding_a.active)
+        self.assertTrue(self.finding_a.verified)
+
+        # b should be closed (not active).
+        self.assertFalse(self.finding_b.false_p)
+        self.assertFalse(self.finding_b.is_mitigated)
+        self.assertFalse(self.finding_b.active)
+        self.assertFalse(self.finding_b.verified)
+
+    def test_mitigation_by_duplicate(self):
+        # 'Duplicate' implies re-import.
+        # Normal open finding.
+        self.finding_a.active = True
+        self.finding_a.verified = True
+        self.finding_a.false_p = False
+        self.finding_a.mitigated = None
+        self.finding_a.is_mitigated = False
+
+        # Newly imported but mitigated finding.
+        self.finding_b.active = False
+        self.finding_b.verified = True
+        self.finding_b.duplicate = False
+        self.finding_b.duplicate_finding = None
+        self.finding_b.mitigated = datetime.date(1970, 1, 1)
+        self.finding_b.is_mitigated = True
+
+        # Marks b as duplicate, but should close (mitigated) a.
+        set_duplicate(self.finding_b, self.finding_a)
+
+        super(Finding, self.finding_a).save()
+        super(Finding, self.finding_b).save()
+
+        fix_loop_duplicates()
+
+        # Get latest status
+        self.finding_a = Finding.objects.get(id=self.finding_a.id)
+        self.finding_b = Finding.objects.get(id=self.finding_b.id)
+
+        # a should be mitigated and not active (closed).
+        self.assertFalse(self.finding_a.false_p)
+        self.assertTrue(self.finding_a.is_mitigated)
+        self.assertFalse(self.finding_a.active)
+        self.assertTrue(self.finding_a.verified)
+
+        # b should be closed (not active).
+        self.assertFalse(self.finding_b.active)

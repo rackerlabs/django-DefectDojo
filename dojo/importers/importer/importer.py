@@ -80,8 +80,11 @@ class DojoDefaultImporter(object):
             item.last_reviewed = now
             item.last_reviewed_by = user if user else get_current_user
 
-            # Only set active/verified flags if they were NOT set by default value(True)
-            if item.active:
+            # Only set active/verified flags if they were NOT set by default value(True),
+            # and if the new finding was not marked mitigated by the importer.
+            if item.is_mitigated:
+                item.active = False
+            elif item.active:
                 item.active = active
             if item.verified:
                 item.verified = verified

@@ -77,44 +77,77 @@ class DojoDefaultReImporter(object):
                 finding = findings[0]
                 if finding.false_p or finding.out_of_scope or finding.risk_accepted:
                     logger.debug('%i: skipping existing finding (it is marked as false positive:%s and/or out of scope:%s or is a risk accepted:%s): %i:%s:%s:%s', i, finding.false_p, finding.out_of_scope, finding.risk_accepted, finding.id, finding, finding.component_name, finding.component_version)
-                elif finding.mitigated or finding.is_mitigated:
-                    logger.debug('%i: reactivating: %i:%s:%s:%s', i, finding.id, finding, finding.component_name, finding.component_version)
-                    finding.mitigated = None
-                    finding.is_mitigated = False
-                    finding.mitigated_by = None
-                    finding.active = True
-                    finding.verified = verified
-
-                    # existing findings may be from before we had component_name/version fields
-                    finding.component_name = finding.component_name if finding.component_name else component_name
-                    finding.component_version = finding.component_version if finding.component_version else component_version
-
-                    # don't dedupe before endpoints are added
-                    finding.save(dedupe_option=False)
-                    note = Notes(
-                        entry="Re-activated by %s re-upload." % scan_type,
-                        author=user)
-                    note.save()
-                    endpoint_status = finding.endpoint_status.all()
-                    for status in endpoint_status:
-                        status.mitigated_by = None
-                        status.mitigated_time = None
-                        status.mitigated = False
-                        status.last_modified = timezone.now()
-                        status.save()
-                    finding.notes.add(note)
-                    reactivated_items.append(finding)
-                    reactivated_count += 1
                 else:
-                    # existing findings may be from before we had component_name/version fields
-                    logger.debug('%i: updating existing finding: %i:%s:%s:%s', i, finding.id, finding, finding.component_name, finding.component_version)
-                    if not finding.component_name or not finding.component_version:
+                    # Existing finding was marked mitigated or inactive, but new one is not: reopen/sync.
+                    if (not finding.active or finding.is_mitigated) and not item.is_mitigated:
+                        logger.debug('%i: reactivating: %i:%s:%s:%s', i, finding.id, finding, finding.component_name, finding.component_version)
+                        finding.mitigated = None
+                        finding.is_mitigated = False
+                        finding.mitigated_by = None
+                        finding.active = True
+                        finding.verified = verified
+
+                        # existing findings may be from before we had component_name/version fields
                         finding.component_name = finding.component_name if finding.component_name else component_name
                         finding.component_version = finding.component_version if finding.component_version else component_version
-                        finding.save(dedupe_option=False)
 
-                    unchanged_items.append(finding)
-                    unchanged_count += 1
+                        # don't dedupe before endpoints are added
+                        finding.save(dedupe_option=False)
+                        note = Notes(
+                            entry="Re-activated by %s re-upload." % scan_type,
+                            author=user)
+                        note.save()
+                        endpoint_status = finding.endpoint_status.all()
+                        for status in endpoint_status:
+                            status.mitigated_by = None
+                            status.mitigated_time = None
+                            status.mitigated = False
+                            status.last_modified = timezone.now()
+                            status.save()
+                        finding.notes.add(note)
+                        reactivated_items.append(finding)
+                        reactivated_count += 1
+
+                    # Existing finding was marked active, but fresh one is marked mitigated. Reflect/sync.
+                    elif finding.active and item.is_mitigated:
+                        logger.debug('%i: closing(mitigated): %i:%s:%s:%s', i, finding.id, finding, finding.component_name, finding.component_version)
+                        finding.mitigated = item.mitigated
+                        finding.is_mitigated = True
+                        finding.mitigated_by = item.mitigated_by
+                        finding.active = False
+                        finding.verified = verified
+
+                        # existing findings may be from before we had component_name/version fields
+                        finding.component_name = finding.component_name if finding.component_name else component_name
+                        finding.component_version = finding.component_version if finding.component_version else component_version
+
+                        # don't dedupe before endpoints are added
+                        finding.save(dedupe_option=False)
+                        note = Notes(
+                            entry="Closed (mitigated) by %s re-upload." % scan_type,
+                            author=user)
+                        note.save()
+                        endpoint_status = finding.endpoint_status.all()
+                        for status in endpoint_status:
+                            status.mitigated_by = None
+                            status.mitigated_time = None
+                            status.mitigated = False
+                            status.last_modified = timezone.now()
+                            status.save()
+                        finding.notes.add(note)
+                        # No counter for revided findings. TODO ?
+
+                    # No change required on existing finding.
+                    else:
+                        # existing findings may be from before we had component_name/version fields
+                        logger.debug('%i: updating existing finding: %i:%s:%s:%s', i, finding.id, finding, finding.component_name, finding.component_version)
+                        if not finding.component_name or not finding.component_version:
+                            finding.component_name = finding.component_name if finding.component_name else component_name
+                            finding.component_version = finding.component_version if finding.component_version else component_version
+                            finding.save(dedupe_option=False)
+
+                        unchanged_items.append(finding)
+                        unchanged_count += 1
                 if finding.dynamic_finding:
                     logger.debug("Re-import found an existing dynamic finding for this new finding. Checking the status of endpoints")
                     update_endpoint_status(finding, item, user)
@@ -124,7 +157,7 @@ class DojoDefaultReImporter(object):
                 item.last_reviewed = timezone.now()
                 item.last_reviewed_by = user
                 item.verified = verified
-                item.active = active
+                item.active = False if item.is_mitigated else active
                 # Save it. Don't dedupe before endpoints are added.
                 item.save(dedupe_option=False)
                 logger.debug('%i: reimport created new finding as no existing finding match: %i:%s:%s:%s', i, item.id, item, item.component_name, item.component_version)
