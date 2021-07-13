@@ -1,9 +1,9 @@
 import base64
 import hashlib
 import logging
-from operator import itemgetter
 import os
 import re
+from typing import Dict, Set, Optional
 from uuid import uuid4
 from django.conf import settings
 
@@ -31,7 +31,6 @@ from dateutil.relativedelta import relativedelta
 from tagulous.models import TagField
 import tagulous.admin
 from django.db.models import JSONField
-from itertools import groupby
 import hyperlink
 from cvss import CVSS3
 
@@ -2488,12 +2487,11 @@ class Finding_Group(TimeStampedModel):
 
     @cached_property
     def components(self):
-        # Using defaultdict() + groupby()
-        # Convert list of tuples to dictionary value lists
-        component_tuples = set([(find.component_name, find.component_version) for find in self.findings.all()])
-        components = dict((k, [v[1] for v in itr]) for k, itr in groupby(
-                                component_tuples, itemgetter(0)))
-        return ','.join([key + ':' + ', '.join(value) for key, value in components.items() if key and value])
+        components: Dict[str, Set[Optional[str]]] = {}
+        for finding in self.findings.all():
+            if finding.component_name is not None:
+                components.setdefault(finding.component_name, set()).add(finding.component_version)
+        return "; ".join(f"""{name}: {", ".join(map(str, versions))}""" for name, versions in components.items())
 
     @property
     def age(self):
