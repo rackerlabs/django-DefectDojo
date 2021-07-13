@@ -2,7 +2,7 @@ import logging
 from collections import deque
 
 from dojo.models import Sonarqube_Issue_Transition
-from dojo.tools.sonarqube_api.api_client import SonarQubeAPI
+from dojo.tools.sonarqube_api.importer import SonarQubeApiImporter
 
 logger = logging.getLogger(__name__)
 
@@ -104,11 +104,8 @@ class SonarQubeApiUpdater(object):
 
         logger.debug("Checking if finding '{}' needs to be updated in SonarQube".format(finding))
 
-        product = finding.test.engagement.product
-        config = product.sonarqube_product_set.all().first()
-        client = SonarQubeAPI(
-            tool_config=config.sonarqube_tool_config if config else None
-        )
+        client, _ = SonarQubeApiImporter.prepare_client(finding.test)
+        # we don't care about config, each finding knows which config was used during import
 
         target_status = self.get_sonarqube_status_for(finding)
 

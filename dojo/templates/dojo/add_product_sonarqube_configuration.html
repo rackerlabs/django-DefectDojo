@@ -1,0 +1,17 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block content %}
+    <h3> Add {{ product.name }} SonarQube Configuration</h3>
+    <form class="form-horizontal" method="post">{% csrf_token %}
+        {% include "dojo/form_fields.html" with form=form %}
+        <div class="form-group">
+            <div class="col-sm-offset-2 col-sm-2">
+                <input class="btn btn-primary" type="submit" name="add" value="Save"/>
+            </div>
+            <div class="col-sm-2">
+                <input class="btn btn-primary" type="submit" name="add_another" value="Save &amp; Add Another"/>
+            </div>
+        </div>
+    </form>
+{% endblock %}

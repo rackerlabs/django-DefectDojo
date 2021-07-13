@@ -283,7 +283,7 @@ class DojoDefaultReImporter(object):
 
     def reimport_scan(self, scan, scan_type, test, active=True, verified=True, tags=None, minimum_severity=None,
                     user=None, endpoints_to_add=None, scan_date=None, version=None, branch_tag=None, build_id=None,
-                    commit_hash=None, push_to_jira=None, close_old_findings=True, group_by=None):
+                    commit_hash=None, push_to_jira=None, close_old_findings=True, group_by=None, sonarqube_config=None):
 
         logger.debug(f'REIMPORT_SCAN: parameters: {locals()}')
 
@@ -294,6 +294,14 @@ class DojoDefaultReImporter(object):
         scan_date_time = datetime.datetime.combine(scan_date, timezone.now().time())
         if settings.USE_TZ:
             scan_date_time = timezone.make_aware(scan_date_time, timezone.get_default_timezone())
+
+        if sonarqube_config:  # it there is not sonarqube_config, just use original
+            if sonarqube_config.product != test.engagement.product:
+                raise ValidationError('"sonarqube_config" has to be from same product as "test"')
+
+            if test.sonarqube_config != sonarqube_config:  # update of sonarqube_config
+                test.sonarqube_config = sonarqube_config
+                test.save()
 
         logger.debug('REIMPORT_SCAN: Parse findings')
         parsed_findings = importer_utils.parse_findings(scan, test, active, verified, scan_type)

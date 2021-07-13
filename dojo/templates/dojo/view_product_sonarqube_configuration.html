@@ -1,0 +1,200 @@
+{% extends "base.html" %}
+{% load display_tags %}
+{% load get_config_setting %}
+{% load static %}
+{% block add_styles %}
+    ul#select_by_severity a:hover, ul#bulk_edit a:hover {
+    cursor: pointer;
+    }
+{% endblock %}
+{% block content %}
+    <div class="panel panel-default">
+        <div class="panel-heading">
+            <div class="clearfix">
+                <h3 class="pull-left">SonarQube Configurations</h3>
+
+                <div id="test-pulldown" class="dropdown pull-right">
+                    <button class="btn btn-primary dropdown-toggle" type="button" id="dropdownMenu1"
+                            data-toggle="dropdown" aria-expanded="true">
+                        <span class="fa fa-bars"></span>
+                        <span class="caret"></span>
+                    </button>
+                    <ul class="dropdown-menu dropdown-menu-right" role="menu" aria-labelledby="dropdownMenu1">
+                        <li role="presentation">
+                            <a href="{% url 'add_sonarqube' pid %}">
+                                <i class="fa fa-pencil-square-o"></i> Add SonarQube Configuration
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+        <div class="table-responsive">
+            <table class="table-striped table table-condensed table-hover left">
+                <tr>
+                    <th>SonarQube Project Key</th>
+                    <th>SonarQube Tool Config</th>
+                    <th>Details</th>
+                </tr>
+                {% for sonarqube in sonarqube_queryset %}
+                <tr>
+                    <td>{{ sonarqube.sonarqube_project_key }}</td>
+                    <td>
+                        {% if sonarqube.sonarqube_tool_config %}
+                            {% if request.user.is_superuser %}
+                                <a href="{% url 'edit_tool_config' sonarqube.sonarqube_tool_config.id %}">
+                            {% endif %}
+                            {{ sonarqube.sonarqube_tool_config }}
+                            {% if request.user.is_superuser %}
+                                </a>
+                            {% endif %}
+                        {% endif %}
+                    </td>
+                    <td>
+                       <div class="btn-group">
+                           <a class="btn btn-sm btn-warning"
+                              href="{% url 'edit_sonarqube' sonarqube.product.id sonarqube.id %}">Edit</a>
+                           <a class="btn btn-sm btn-danger"
+                              href="{% url 'delete_sonarqube' sonarqube.product.id sonarqube.id %}">Delete</a>
+                       </div>
+                   </td>
+                </tr>
+                {% endfor %}
+            </table>
+        </div>
+    </div>
+
+    </div>
+{% endblock %}
+{% block postscript %}
+    <script type="text/javascript" src="{% static "jquery-highlight/jquery.highlight.js" %}"></script>
+    <script type="text/javascript">
+        $(function () {
+            $('form#bulk_change_form').on('submit', function(e){
+                $('input[type=checkbox].select_one:checked').each(function(){
+                    var hidden_input = $('<input type="hidden" value="' + this.id + '" name="finding_to_update">')
+                    $('form#bulk_change_form').append(hidden_input);
+                });
+            });
+
+            $('input#select_all').on('click', function (e) {
+                if ($(this).is(":checked")) {
+                    $('input.select_one').prop('checked', true);
+                    $('div#bulk_edit_menu').removeClass('hidden');
+                }
+                else {
+                    $('input.select_one').prop('checked', false);
+                    $('div#bulk_edit_menu').addClass('hidden');
+                }
+            });
+
+            $('ul#select_by_severity a').on('click', function (e) {
+                $('input.select_one').prop('checked', false);
+                if ($(this).attr('id') == 'All') {
+                    $('input.select_one').prop('checked', true);
+                    $('input#select_all').prop('indeterminate', false);
+                    $('input#select_all').prop('checked', true);
+                }
+                else {
+                    $('input.' + this.id).prop('checked', true);
+                    $('input#select_all').prop('indeterminate', true);
+                }
+
+                if ($(this).attr('id') == 'None') {
+                    $('div#bulk_edit_menu').addClass('hidden');
+                }
+                else {
+                    $('div#bulk_edit_menu').removeClass('hidden');
+                }
+            });
+
+
+            $('a.delete-finding').on('click', function (e) {
+                return confirm('Are you sure you want to delete this finding?');
+            });
+
+            $('a#add_notes_link').on('click', function (e) {
+                $("html, body").animate({scrollTop: $("#id_entry").offset().top}, 600);
+                $("#id_entry").focus();
+                $("#test-pulldown").dropdown('toggle')
+                return false;
+            });
+
+            if (document.referrer.indexOf('simple_search') > 0) {
+                var terms = '';
+                if ($.cookie('highlight')) {
+                    terms = $.cookie('highlight').split(' ');
+
+                    for (var i = 0; i < terms.length; i++) {
+                        $('body').highlight(terms[i]);
+                    }
+                }
+
+                $('input#simple_search').val(terms);
+            }
+            ;
+
+
+            $('form#quick-add-form').on("submit", function () {
+                $('form#quick-add-form').removeClass("has-error");
+                $('button#the_button').attr('disabled', true).removeClass("btn-success btn-danger").addClass('btn-warning');
+                $('i#fa-icon').removeClass("fa-plus").addClass("fa-spinner fa-pulse");
+
+                $.ajax({
+                    type: "POST",
+                    data: JSON.stringify($(this).serializeObject()),
+                    url: '{{ ajax_url }}',
+                    contentType: 'application/json',
+                    // The ``X-CSRFToken`` evidently can't be set in the
+                    // ``headers`` option, so force it here.
+                    // This method requires jQuery 1.5+.
+                    beforeSend: function (jqXHR, settings) {
+                        // Pull the token out of the DOM.
+                        jqXHR.setRequestHeader('X-CSRFToken', $('input[name=csrfmiddlewaretoken]').val());
+                    },
+                    success: function (data, textStatus, jqXHR) {
+                        // Your processing of the data here. <a href='" + jqXHR.getResponseHeader('Location') + "'>" +  + "</a>
+                        //
+                        $('table#stub_findings').removeClass('hidden');
+                        var fid = jqXHR.getResponseHeader('Location').split('/');
+                        fid = fid[fid.length - 2];
+                        var row = $("<tr id='added-" + fid + "' class='success'></tr>");
+                        var link = $('<a></a>');
+
+                        link.attr('href', "/stub_finding/" + fid + "/promote");
+                        link.text($("input#quick_add_finding").val());
+                        var title = $("<td></td>").append(link);
+                        var severity = $("<td> </td>");
+                        var reporter = $("<td>{{ request.user.username }}</td>");
+                        var date = $("<td>None</td>");
+                        var actions = $('<td><div class="btn-group"><a class="btn btn-sm btn-warning" href="/stub_finding/[id]/promote">Promote To Finding</a> <a class="btn btn-sm btn-danger" href="/stub_finding/[id]/delete">Delete</a></div></td>'.replace(/\[id\]/g, fid));
+
+                        row.append(title, severity, reporter, date, actions).appendTo("#stub_findings tbody");
+                        $("input#quick_add_finding").val("")
+                        $('button#the_button').removeClass("btn-warning btn-danger").addClass('btn-success');
+
+                        $("input#quick_add_finding").focus()
+
+                        setTimeout(function () {
+                            $("tr#added-" + fid + " td").animate({
+                                backgroundColor: "#fff",
+                            })
+                        }, 2000)
+                    },
+                    error: function () {
+                        $('form#quick-add-form').addClass("has-error");
+                        $('button#the_button').removeClass("btn-warning").addClass('btn-danger');
+                    },
+                    complete: function () {
+                        $('i#fa-icon').addClass("fa-plus").removeClass("fa-spinner fa-pulse");
+                        $('button#the_button').attr('disabled', false);
+
+                    }
+                });
+                return false;
+            });
+
+        });
+
+    </script>
+{% endblock %}

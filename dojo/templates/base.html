@@ -524,6 +524,18 @@
                         </li>
                         <li role="separator" class="divider"></li>
                         <li role="presentation">
+                            <a class="" href="{% url 'add_sonarqube' product_tab.product.id %}">
+                                <i class="fa fa-plus"></i> Add SonarQube Configuration
+                            </a>
+                        </li>
+                        <li role="presentation">
+                            <a title="Edit SonarQube Configurations"
+                               href="{% url 'view_sonarqube' product_tab.product.id %}">
+                                <i class="fa fa-history"></i> View SonarQube Configurations
+                            </a>
+                        </li>
+                        <li role="separator" class="divider"></li>
+                        <li role="presentation">
                             <a class="" href="{% url 'new_object' product_tab.product.id %}">
                                 <i class="fa fa-plus"></i> Add Product Tracking Files
                             </a>

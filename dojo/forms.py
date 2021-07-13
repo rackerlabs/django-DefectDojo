@@ -437,6 +437,7 @@ class ImportScanForm(forms.Form):
     branch_tag = forms.CharField(max_length=100, required=False, help_text="Branch or Tag that was scanned.")
     commit_hash = forms.CharField(max_length=100, required=False, help_text="Commit that was scanned.")
     build_id = forms.CharField(max_length=100, required=False, help_text="ID of the build that was scanned.")
+    sonarqube_config = forms.ModelChoiceField(Sonarqube_Product.objects, required=False, label='SonarQube Config')
 
     tags = TagField(required=False, help_text="Add tags that help describe this scan.  "
                     "Choose from the list or add new tags. Press Enter key to add.")
@@ -507,6 +508,7 @@ class ReImportScanForm(forms.Form):
     branch_tag = forms.CharField(max_length=100, required=False, help_text="Branch or Tag that was scanned.")
     commit_hash = forms.CharField(max_length=100, required=False, help_text="Commit that was scanned.")
     build_id = forms.CharField(max_length=100, required=False, help_text="ID of the build that was scanned.")
+    sonarqube_config = forms.ModelChoiceField(Sonarqube_Product.objects, required=False, label='SonarQube Config')
 
     if settings.FEATURE_FINDING_GROUPS:
         group_by = forms.ChoiceField(required=False, choices=Finding_Group.GROUP_BY_OPTIONS, help_text='Choose an option to automatically group new findings by the chosen option')
@@ -829,13 +831,15 @@ class TestForm(forms.ModelForm):
                 self.fields['lead'].queryset = User.objects.filter(id__in=authorized_for_lead)
             else:
                 self.fields['lead'].queryset = get_authorized_users_for_product_and_product_type(None, product, Permissions.Product_View)
+            self.fields['sonarqube_config'].queryset = Sonarqube_Product.objects.filter(product=product)
         else:
             self.fields['lead'].queryset = User.objects.exclude(is_staff=False)
 
     class Meta:
         model = Test
         fields = ['title', 'test_type', 'target_start', 'target_end', 'description',
-                  'environment', 'percent_complete', 'tags', 'lead', 'version', 'branch_tag', 'build_id', 'commit_hash']
+                  'environment', 'percent_complete', 'tags', 'lead', 'version', 'branch_tag', 'build_id', 'commit_hash',
+                  'sonarqube_config']
 
 
 class DeleteTestForm(forms.ModelForm):
@@ -2116,7 +2120,7 @@ class Sonarqube_ProductForm(forms.ModelForm):
     sonarqube_tool_config = forms.ModelChoiceField(
         label='SonarQube Configuration',
         queryset=Tool_Configuration.objects.filter(tool_type__name="SonarQube").order_by('name'),
-        required=False
+        required=True
     )
 
     class Meta:
@@ -2202,6 +2206,15 @@ class ToolConfigForm(forms.ModelForm):
                 code='invalid')
 
         return form_data
+
+
+class DeleteSonarqubeConfigurationForm(forms.ModelForm):
+    id = forms.IntegerField(required=True,
+                            widget=forms.widgets.HiddenInput())
+
+    class Meta:
+        model = Sonarqube_Product
+        fields = ['id']
 
 
 class DeleteObjectsSettingsForm(forms.ModelForm):

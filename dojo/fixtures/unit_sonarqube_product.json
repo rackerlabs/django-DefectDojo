@@ -1,0 +1,44 @@
+[
+  {
+    "model": "dojo.product_type",
+    "pk": 1,
+    "fields": {
+      "name": "Research and Development",
+      "description": null,
+      "critical_product": true,
+      "key_product": false,
+      "updated": null,
+      "created": null,
+      "authorized_users": []
+    }
+  },
+  {
+    "model": "dojo.product",
+    "pk": 1,
+    "fields": {
+      "name": "product",
+      "description": "desc",
+      "product_manager": null,
+      "technical_contact": null,
+      "team_manager": null,
+      "created": null,
+      "prod_type": 1,
+      "updated": null,
+      "tid": 0,
+      "prod_numeric_grade": null,
+      "business_criticality": null,
+      "platform": null,
+      "lifecycle": null,
+      "origin": null,
+      "user_records": null,
+      "revenue": null,
+      "external_audience": false,
+      "internet_accessible": false,
+      "enable_simple_risk_acceptance": false,
+      "enable_full_risk_acceptance": true,
+      "authorized_users": [],
+      "regulations": [],
+      "tags": []
+    }
+  }
+]

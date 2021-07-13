@@ -29,11 +29,6 @@
             <hr>
             {% include "dojo/form_fields.html" with form=gform %}
         {% endif %}
-        {% if sonarqube_form %}
-            <h4> SonarQube API </h4>
-            <hr>
-            {% include "dojo/form_fields.html" with form=sonarqube_form %}
-        {% endif %}
         <div class="form-group">
             <div class="col-sm-offset-2 col-sm-10">
                 <input class="btn btn-primary" type="submit" value="Submit"/>

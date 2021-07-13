@@ -26,7 +26,8 @@ deduplicationLogger = logging.getLogger("dojo.specific-loggers.deduplication")
 class DojoDefaultImporter(object):
 
     def create_test(self, scan_type, engagement, lead, environment, tags=None,
-                    scan_date=None, version=None, branch_tag=None, build_id=None, commit_hash=None, now=timezone.now()):
+                    scan_date=None, version=None, branch_tag=None, build_id=None, commit_hash=None, now=timezone.now(),
+                    sonarqube_config=None):
 
         test_type, created = Test_Type.objects.get_or_create(
             name=scan_type)
@@ -46,6 +47,7 @@ class DojoDefaultImporter(object):
             branch_tag=branch_tag,
             build_id=build_id,
             commit_hash=commit_hash,
+            sonarqube_config=sonarqube_config,
             tags=tags)
         try:
             # TODO What is going on here?
@@ -270,7 +272,7 @@ class DojoDefaultImporter(object):
 
     def import_scan(self, scan, scan_type, engagement, lead, environment, active, verified, tags=None, minimum_severity=None,
                     user=None, endpoints_to_add=None, scan_date=None, version=None, branch_tag=None, build_id=None,
-                    commit_hash=None, push_to_jira=None, close_old_findings=False, group_by=None):
+                    commit_hash=None, push_to_jira=None, close_old_findings=False, group_by=None, sonarqube_config=None):
 
         logger.debug(f'IMPORT_SCAN: parameters: {locals()}')
 
@@ -282,9 +284,13 @@ class DojoDefaultImporter(object):
         if settings.USE_TZ:
             scan_date_time = timezone.make_aware(scan_date_time, timezone.get_default_timezone())
 
+        if sonarqube_config and sonarqube_config.product != engagement.product:
+            raise ValidationError('"sonarqube_config" has to be from same product as "engagement"')
+
         logger.debug('IMPORT_SCAN: Create Test')
         test = self.create_test(scan_type, engagement, lead, environment, scan_date=scan_date, tags=tags,
-                            version=version, branch_tag=branch_tag, build_id=build_id, commit_hash=commit_hash, now=now)
+                            version=version, branch_tag=branch_tag, build_id=build_id, commit_hash=commit_hash, now=now,
+                            sonarqube_config=sonarqube_config)
 
         logger.debug('IMPORT_SCAN: Parse findings')
         parsed_findings = importer_utils.parse_findings(scan, test, active, verified, scan_type)

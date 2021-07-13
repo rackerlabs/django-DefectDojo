@@ -39,22 +39,40 @@ class SonarQubeApiImporter(object):
             'rejected'
         ]
 
+    @staticmethod
+    def prepare_client(test):
+        product = test.engagement.product
+        if test.sonarqube_config:
+            config = test.sonarqube_config  # https://github.com/DefectDojo/django-DefectDojo/pull/4676 case no. 7 and 8
+            # Double check of config
+            if config.product != product:
+                raise Exception('Product SonarQube Configuration and "Product" mismatch')
+        else:
+            sqqs = product.sonarqube_product_set.filter(product=product)
+            if sqqs.count() == 1:  # https://github.com/DefectDojo/django-DefectDojo/pull/4676 case no. 4
+                config = sqqs.first()
+            elif sqqs.count() > 1:  # https://github.com/DefectDojo/django-DefectDojo/pull/4676 case no. 6
+                raise Exception(
+                    'It has configured more than one Product SonarQube Configuration but non of them has been choosen.\n'
+                    'Please specify at Test which one should be used.'
+                )
+            else:  # https://github.com/DefectDojo/django-DefectDojo/pull/4676 cases no. 1-3
+                config = None
+
+        return SonarQubeAPI(tool_config=config.sonarqube_tool_config if config else None), config
+
     def import_issues(self, test):
 
         items = list()
 
         try:
-            product = test.engagement.product
-            config = product.sonarqube_product_set.all().first()
 
-            client = SonarQubeAPI(
-                tool_config=config.sonarqube_tool_config if config else None
-            )
+            client, config = self.prepare_client(test)
 
-            if config and config.sonarqube_project_key:
+            if config and config.sonarqube_project_key:  # https://github.com/DefectDojo/django-DefectDojo/pull/4676 cases no. 5 and 8
                 component = client.get_project(config.sonarqube_project_key)
-            else:
-                component = client.find_project(product.name)
+            else:  # https://github.com/DefectDojo/django-DefectDojo/pull/4676 cases no. 2, 4 and 7
+                component = client.find_project(test.engagement.product.name)
 
             issues = client.find_issues(component['key'])
             logging.info('Found {} issues for component {}'.format(len(issues), component["key"]))

@@ -1,0 +1,16 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block content %}
+<h3>Edit SonarQube Configuration</h3>
+<form class="form-horizontal" enctype="multipart/form-data" method="post">{% csrf_token %}
+    {% include "dojo/form_fields.html" with form=sqcform %}
+    <div class="form-group">
+        <div class="col-sm-offset-2 col-sm-10">
+            <input class="btn btn-primary" type="submit" value="Submit"/>
+        </div>
+    </div>
+</form>
+{% endblock %}
+{% block postscript %}
+{% endblock %}

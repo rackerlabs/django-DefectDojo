@@ -16,7 +16,7 @@ from django_filters.filters import ChoiceFilter, _truncate
 import pytz
 from django.db.models import Q
 from dojo.models import Dojo_User, Finding_Group, Product_Type, Finding, Product, Test_Import, Test_Type, \
-    Endpoint, Development_Environment, Finding_Template, Note_Type, \
+    Endpoint, Development_Environment, Finding_Template, Note_Type, Sonarqube_Product, \
     Engagement_Survey, Question, TextQuestion, ChoiceQuestion, Endpoint_Status, Engagement, \
     ENGAGEMENT_STATUS_CHOICES, Test, App_Analysis, SEVERITY_CHOICES, Dojo_Group
 from dojo.utils import get_system_setting
@@ -1760,6 +1760,7 @@ class EngagementTestFilter(DojoFilter):
             ('target_start', 'target_start'),
             ('target_end', 'target_end'),
             ('lead', 'lead'),
+            ('sonarqube_config', 'sonarqube_config'),
         ),
         field_labels={
             'name': 'Test Name',
@@ -1771,12 +1772,13 @@ class EngagementTestFilter(DojoFilter):
         model = Test
         fields = ['id', 'title', 'test_type', 'target_start',
                      'target_end', 'percent_complete',
-                     'version']
+                     'version', 'sonarqube_config']
 
     def __init__(self, *args, **kwargs):
         self.engagement = kwargs.pop('engagement')
         super(DojoFilter, self).__init__(*args, **kwargs)
         self.form.fields['test_type'].queryset = Test_Type.objects.filter(test__engagement=self.engagement).distinct().order_by('name')
+        self.form.fields['sonarqube_config'].queryset = Sonarqube_Product.objects.filter(product=self.engagement.product).distinct()
 
 
 class ApiTestFilter(DojoFilter):
@@ -1813,6 +1815,7 @@ class ApiTestFilter(DojoFilter):
             ('branch_tag', 'branch_tag'),
             ('build_id', 'build_id'),
             ('commit_hash', 'commit_hash'),
+            ('sonarqube_config', 'sonarqube_config'),
             ('engagement', 'engagement'),
             ('created', 'created'),
             ('updated', 'updated'),
@@ -1827,7 +1830,8 @@ class ApiTestFilter(DojoFilter):
         fields = ['id', 'title', 'test_type', 'target_start',
                      'target_end', 'notes', 'percent_complete',
                      'actual_time', 'engagement', 'version',
-                     'branch_tag', 'build_id', 'commit_hash']
+                     'branch_tag', 'build_id', 'commit_hash',
+                     'sonarqube_config']
 
 
 class ApiAppAnalysisFilter(DojoFilter):

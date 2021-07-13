@@ -1,0 +1,19 @@
+[
+  {
+    "model": "dojo.tool_configuration",
+    "pk": 2,
+    "fields": {
+      "name": "SQ2",
+      "description": null,
+      "url": "http://localhost/",
+      "tool_type": 1,
+      "authentication_type": "API",
+      "extras": null,
+      "username": null,
+      "password": null,
+      "auth_title": null,
+      "ssh": "",
+      "api_key": null
+    }
+  }
+]

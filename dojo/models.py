@@ -1401,6 +1401,40 @@ class Development_Environment(models.Model):
                  "url": reverse("edit_dev_env", args=(self.id,))}]
 
 
+class Sonarqube_Issue(models.Model):
+    key = models.CharField(max_length=30, unique=True, help_text="SonarQube issue key")
+    status = models.CharField(max_length=20, help_text="SonarQube issue status")
+    type = models.CharField(max_length=15, help_text="SonarQube issue type")
+
+    def __str__(self):
+        return self.key
+
+
+class Sonarqube_Issue_Transition(models.Model):
+    sonarqube_issue = models.ForeignKey(Sonarqube_Issue, on_delete=models.CASCADE, db_index=True)
+    created = models.DateTimeField(null=False, editable=False, default=now)
+    finding_status = models.CharField(max_length=100)
+    sonarqube_status = models.CharField(max_length=50)
+    transitions = models.CharField(max_length=100)
+
+    class Meta:
+        ordering = ('-created', )
+
+
+class Sonarqube_Product(models.Model):
+    product = models.ForeignKey(Product, on_delete=models.CASCADE)
+    sonarqube_project_key = models.CharField(
+        max_length=200, null=True, blank=True, verbose_name="SonarQube Project Key"
+    )
+    sonarqube_tool_config = models.ForeignKey(
+        Tool_Configuration, verbose_name="SonarQube Configuration",
+        null=False, blank=False, on_delete=models.CASCADE
+    )
+
+    def __str__(self):
+        return '{} | {}'.format(self.sonarqube_tool_config.name, self.sonarqube_project_key)
+
+
 class Test(models.Model):
     engagement = models.ForeignKey(Engagement, editable=False, on_delete=models.CASCADE)
     lead = models.ForeignKey(User, editable=True, null=True, on_delete=models.CASCADE)
@@ -1432,6 +1466,7 @@ class Test(models.Model):
                                    null=True, blank=True, help_text="Commit hash tested, a reimport may update this field.", verbose_name="Commit Hash")
     branch_tag = models.CharField(editable=True, max_length=150,
                                    null=True, blank=True, help_text="Tag or branch that was tested, a reimport may update this field.", verbose_name="Branch/Tag")
+    sonarqube_config = models.ForeignKey(Sonarqube_Product, null=True, editable=True, blank=True, on_delete=models.CASCADE, verbose_name="SonarQube Config")
 
     class Meta:
         indexes = [
@@ -1530,40 +1565,6 @@ class Test_Import_Finding_Action(TimeStampedModel):
 
     def __str__(self):
         return '%i: %s' % (self.finding.id, self.action)
-
-
-class Sonarqube_Issue(models.Model):
-    key = models.CharField(max_length=30, unique=True, help_text="SonarQube issue key")
-    status = models.CharField(max_length=20, help_text="SonarQube issue status")
-    type = models.CharField(max_length=15, help_text="SonarQube issue type")
-
-    def __str__(self):
-        return self.key
-
-
-class Sonarqube_Issue_Transition(models.Model):
-    sonarqube_issue = models.ForeignKey(Sonarqube_Issue, on_delete=models.CASCADE, db_index=True)
-    created = models.DateTimeField(null=False, editable=False, default=now)
-    finding_status = models.CharField(max_length=100)
-    sonarqube_status = models.CharField(max_length=50)
-    transitions = models.CharField(max_length=100)
-
-    class Meta:
-        ordering = ('-created', )
-
-
-class Sonarqube_Product(models.Model):
-    product = models.ForeignKey(Product, on_delete=models.CASCADE)
-    sonarqube_project_key = models.CharField(
-        max_length=200, null=True, blank=True, verbose_name="SonarQube Project Key"
-    )
-    sonarqube_tool_config = models.ForeignKey(
-        Tool_Configuration, verbose_name="SonarQube Configuration",
-        null=True, blank=True, on_delete=models.CASCADE
-    )
-
-    def __str__(self):
-        return '{} | {}'.format(self.product.name, self.sonarqube_project_key)
 
 
 class Finding(models.Model):

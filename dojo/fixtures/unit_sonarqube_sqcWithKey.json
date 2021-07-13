@@ -1,0 +1,11 @@
+[
+  {
+    "model": "dojo.sonarqube_product",
+    "pk": 2,
+    "fields": {
+      "product": 1,
+      "sonarqube_project_key": "someKey",
+      "sonarqube_tool_config": 1
+    }
+  }
+]
