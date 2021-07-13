@@ -684,7 +684,7 @@ class Product(models.Model):
         (NONE_CRITICALITY, _('None')),
     )
 
-    name = models.CharField(max_length=255, unique=True)
+    name = models.CharField(max_length=255)
     description = models.CharField(max_length=4000)
 
     product_manager = models.ForeignKey(Dojo_User, null=True, blank=True,
@@ -725,6 +725,9 @@ class Product(models.Model):
 
     class Meta:
         ordering = ('name',)
+        constraints = [
+            models.UniqueConstraint(fields=['name', 'prod_type'], name='product_constraint')
+        ]
 
     @cached_property
     def findings_count(self):

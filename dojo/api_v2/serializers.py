@@ -1151,6 +1151,13 @@ class ProductSerializer(TaggitSerializer, serializers.ModelSerializer):
         else:
             exclude = ['tid', 'updated', 'authorized_users']
 
+    def validate(self, data):
+        if self.context['request'].method in ['POST', 'PATCH', 'PUT']:
+            products = Product.objects.filter(prod_type=data.get('prod_type'), name=data.get('name'))
+            if products.count() > 0:
+                raise ValidationError('Product name for the same type already exists')
+        return data
+
     def get_findings_count(self, obj) -> int:
         return obj.findings_count
 
