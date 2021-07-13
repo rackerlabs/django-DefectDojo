@@ -369,7 +369,7 @@ def set_duplicate_reopen(new_finding, existing_finding):
     existing_finding.verified = new_finding.verified
     existing_finding.notes.create(author=existing_finding.reporter,
                                     entry="This finding has been automatically re-openend as it was found in recent scans.")
-    existing_finding.save()
+    existing_finding.save(push_to_jira=True)
 
 
 def do_apply_rules(new_finding, *args, **kwargs):
