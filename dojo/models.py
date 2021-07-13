@@ -1535,7 +1535,7 @@ class Test_Import_Finding_Action(TimeStampedModel):
 class Sonarqube_Issue(models.Model):
     key = models.CharField(max_length=30, unique=True, help_text="SonarQube issue key")
     status = models.CharField(max_length=20, help_text="SonarQube issue status")
-    type = models.CharField(max_length=15, help_text="SonarQube issue type")
+    type = models.CharField(max_length=20, help_text="SonarQube issue type")
 
     def __str__(self):
         return self.key

@@ -142,6 +142,45 @@ class SonarQubeAPI:
 
         return issues
 
+    def find_hotspots(self, project_key):
+        """
+        Search for hotspots.
+        :param project_key: project key
+        :return:
+        """
+        page = 1
+        max_page = 100
+        hotspots = list()
+
+        while page <= max_page:
+            request_filter = {
+                'projectKey': project_key,
+                'p': page
+            }
+            response = self.session.get(
+                url='{}/hotspots/search'.format(self.sonar_api_url),
+                params=request_filter,
+                headers={
+                    'User-Agent': 'DefectDojo'
+                },
+            )
+
+            if response.ok:
+                hotspots_page = response.json().get('hotspots')
+                if not hotspots_page:
+                    break
+                hotspots.extend(hotspots_page)
+                page += 1
+
+            else:
+                raise Exception(
+                    "Unable to find the hotspots for project {} due to {} - {}".format(
+                        project_key, response.status_code, response.content
+                    )
+                )
+
+        return hotspots
+
     def get_issue(self, issue_key):
         """
         Search for issues.
@@ -202,6 +241,30 @@ class SonarQubeAPI:
                 self.rules_cache.update({rule_id: rule})
             else:
                 raise Exception("Unable to get the rule {} due to {} - {}".format(
+                    rule_id, response.status_code, response.content
+                ))
+        return rule
+
+    def get_hotspot_rule(self, rule_id):
+        """
+        Get detailed information about a hotspot
+        :param rule_id:
+        :return:
+        """
+        rule = self.rules_cache.get(rule_id)
+        if not rule:
+            response = self.session.get(
+                url='{}/hotspots/show'.format(self.sonar_api_url),
+                params={'hotspot': rule_id},
+                headers={
+                    'User-Agent': 'DefectDojo'
+                },
+            )
+            if response.ok:
+                rule = response.json()['rule']
+                self.rules_cache.update({rule_id: rule})
+            else:
+                raise Exception("Unable to get the hotspot rule {} due to {} - {}".format(
                     rule_id, response.status_code, response.content
                 ))
         return rule

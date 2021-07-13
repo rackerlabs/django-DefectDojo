@@ -1,0 +1,15 @@
+[
+	{
+		"key": "AXgm6Z-ophPPY0C1qhRq",
+		"component": "internal.dummy.project:spec/support/user_fixture.rb",
+		"project": "internal.dummy.project",
+		"securityCategory": "auth",
+		"vulnerabilityProbability": "HIGH",
+		"status": "TO_REVIEW",
+		"line": 9,
+		"message": "\"password\" detected here, make sure this is not a hard-coded credential.",
+		"author": "",
+		"creationDate": "2017-12-13T03:00:45+0000",
+		"updateDate": "2021-03-12T14:47:56+0000"
+	}
+]

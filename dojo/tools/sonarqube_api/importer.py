@@ -18,7 +18,9 @@ class SonarQubeApiImporter(object):
     """
 
     def get_findings(self, filename, test):
-        return self.import_issues(test)
+        items = self.import_issues(test)
+        items.extend(self.import_hotspots(test))
+        return items
 
     @staticmethod
     def is_confirmed(state):
@@ -37,6 +39,12 @@ class SonarQubeApiImporter(object):
             'closed',
             'dismissed',
             'rejected'
+        ]
+
+    @staticmethod
+    def is_reviewed(state):
+        return state.lower() in [
+            'reviewed'
         ]
 
     def import_issues(self, test):
@@ -125,6 +133,89 @@ class SonarQubeApiImporter(object):
 
         return items
 
+    def import_hotspots(self, test):
+
+        items = list()
+
+        try:
+            product = test.engagement.product
+            config = product.sonarqube_product_set.all().first()
+
+            client = SonarQubeAPI(
+                tool_config=config.sonarqube_tool_config if config else None
+            )
+
+            if config and config.sonarqube_project_key:
+                project = client.get_project(config.sonarqube_project_key)
+            else:
+                project = client.find_project(product.name)
+
+            hotspots = client.find_hotspots(project['key'])
+            logging.info('Found {} hotspots for project {}'.format(len(hotspots), project["key"]))
+
+            for hotspot in hotspots:
+                status = hotspot['status']
+
+                if self.is_reviewed(status):
+                    continue
+
+                type = 'SECURITY_HOTSPOT'
+                if len(hotspot['message']) > 511:
+                    title = hotspot['message'][0:507] + "..."
+                else:
+                    title = hotspot['message']
+                component_key = hotspot['component']
+                line = hotspot.get('line')
+                rule_id = hotspot['key']
+                rule = client.get_hotspot_rule(rule_id)
+                severity = self.convert_sonar_review_priority(rule['vulnerabilityProbability'])
+                description = self.clean_rule_description_html(rule['vulnerabilityDescription'])
+                cwe = self.clean_cwe(rule['riskDescription'])
+                references = self.get_references(rule['riskDescription'])
+
+                sonarqube_issue, _ = Sonarqube_Issue.objects.update_or_create(
+                    key=hotspot['key'],
+                    defaults={
+                        'status': status,
+                        'type': type
+                    }
+                )
+
+                # Only assign the SonarQube_issue to the first finding related to the issue
+                if Finding.objects.filter(sonarqube_issue=sonarqube_issue).exists():
+                    sonarqube_issue = None
+
+                find = Finding(
+                    title=title,
+                    cwe=cwe,
+                    description=description,
+                    test=test,
+                    severity=severity,
+                    references=references,
+                    file_path=component_key,
+                    line=line,
+                    active=True,
+                    verified=self.is_confirmed(status),
+                    false_p=False,
+                    duplicate=False,
+                    out_of_scope=False,
+                    static_finding=True,
+                    sonarqube_issue=sonarqube_issue,
+                )
+                items.append(find)
+
+        except Exception as e:
+            logger.exception(e)
+            create_notification(
+                event='other',
+                title='SonarQube API hotspot import issue',
+                description=e,
+                icon='exclamation-triangle',
+                source='SonarQube API'
+            )
+
+        return items
+
     @staticmethod
     def clean_rule_description_html(raw_html):
         search = re.search(r"^(.*?)(?:(<h2>See</h2>)|(<b>References</b>))", raw_html, re.DOTALL)
@@ -150,6 +241,18 @@ class SonarQubeApiImporter(object):
         elif sev == "major":
             return "Medium"
         elif sev == "minor":
+            return "Low"
+        else:
+            return "Info"
+
+    @staticmethod
+    def convert_sonar_review_priority(sonar_review_priority):
+        sev = sonar_review_priority.lower()
+        if sev == "high":
+            return "High"
+        elif sev == "medium":
+            return "Medium"
+        elif sev == "low":
             return "Low"
         else:
             return "Info"
