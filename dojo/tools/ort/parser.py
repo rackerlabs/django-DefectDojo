@@ -124,7 +124,7 @@ def get_rule_violation_model(rule_violation_unresolved, packages, licenses, depe
         rule_violation_unresolved['license_source'] = 'unset'
     license_id = find_license_id(licenses, license_tmp)
 
-    return RuleViolationModel(package, license_id, project_names, rule_violation_unresolved)
+    return RuleViolationModel(package, license_id, license_tmp, project_names, rule_violation_unresolved)
 
 
 def find_package_by_id(packages, pkg_id):
@@ -145,13 +145,31 @@ def find_license_id(licenses, license_id):
     return id
 
 
+def find_finding_path(findings, license_num):
+    for f in findings:
+        if f['type'] == 'LICENSE':
+            if license_num == f['license']:
+                return f['path']
+
+
 def get_item(model, test):
-    desc = f"""root projects: {', '.join(model.projects)}
-source  : {model.rule_violation['license_source']}
-license : {model.license_id}
-package : {model.pkg['id']}
-message : {model.rule_violation['message']}
-how to fix : {model.rule_violation['how_to_fix']}"""
+
+    if 'findings' in model.pkg:
+        finding_path = find_finding_path(model.pkg['findings'], model.license_id_number)
+        desc = f"""root projects: {', '.join(model.projects)}
+        source  : {model.rule_violation['license_source']}
+        license : {model.license_id}
+        package : {model.pkg['id']}
+        message : {model.rule_violation['message']}
+        path	: {finding_path}
+        how to fix : {model.rule_violation['how_to_fix']}"""
+    else:
+        desc = f"""root projects: {', '.join(model.projects)}
+        source  : {model.rule_violation['license_source']}
+        license : {model.license_id}
+        package : {model.pkg['id']}
+        message : {model.rule_violation['message']}
+        how to fix : {model.rule_violation['how_to_fix']}"""
 
     severity = get_severity(model.rule_violation)
 
@@ -176,6 +194,7 @@ how to fix : {model.rule_violation['how_to_fix']}"""
 RuleViolationModel = namedtuple('RuleViolationModel', [
     'pkg',
     'license_id',
+    'license_id_number',
     'projects',
     'rule_violation'
 ])
