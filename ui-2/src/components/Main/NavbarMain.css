@@ -1,0 +1,17 @@
+.navbar__right {
+  display: flex;
+  flex-direction: row;
+}
+.dropdown-menu h6 {
+  padding-left: 20px;
+}
+.navbar__right h5 {
+  text-align: center;
+}
+.dropdown-menu {
+  max-height: 472px;
+  overflow-y: scroll;
+}
+.navbardown__item {
+  display: flex;
+}
