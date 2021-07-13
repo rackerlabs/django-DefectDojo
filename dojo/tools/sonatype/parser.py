@@ -109,6 +109,7 @@ def get_item(vulnerability, test):
         finding = Finding(
             title=finding_title,
             cve=cve,
+            cvssv3_score=score,
             test=test,
             severity=severity,
             description=finding_description,
