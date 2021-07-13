@@ -153,7 +153,7 @@ class DedupeTest(BaseTestCase):
         driver.find_element_by_id('id_file').send_keys(self.relative_path + "/dedupe_scans/dedupe_path_1.json")
         driver.find_elements_by_css_selector("button.btn.btn-primary")[1].click()
 
-        self.assertTrue(self.is_success_message_present(text='a total of 3 findings'))
+        self.assertTrue(self.is_success_message_present(text='a total of 1 findings'))
 
         # Second test
         self.goto_active_engagements_overview(driver)
@@ -166,7 +166,7 @@ class DedupeTest(BaseTestCase):
         driver.find_element_by_id('id_file').send_keys(self.relative_path + "/dedupe_scans/dedupe_path_2.json")
         driver.find_elements_by_css_selector("button.btn.btn-primary")[1].click()
 
-        self.assertTrue(self.is_success_message_present(text='a total of 3 findings'))
+        self.assertTrue(self.is_success_message_present(text='a total of 1 findings'))
 
     @on_exception_html_source_logger
     def test_check_path_status(self):
