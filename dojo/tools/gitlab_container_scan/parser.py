@@ -1,5 +1,6 @@
 import json
 import textwrap
+from datetime import datetime
 from dojo.models import Finding
 
 
@@ -13,10 +14,10 @@ class GitlabContainerScanParser(object):
         return ["GitLab Container Scan"]
 
     def get_label_for_scan_types(self, scan_type):
-        return "GitLab Container Scan Scan"
+        return "GitLab Container Scan"
 
     def get_description_for_scan_types(self, scan_type):
-        return "GitLab Container Scan report file can be imported in JSON format (option --json)."
+        return "GitLab Container Scanning report file can be imported in JSON format (option --json)."
 
     def get_findings(self, file, test):
 
@@ -26,7 +27,7 @@ class GitlabContainerScanParser(object):
         data = json.load(file)
 
         # This is required by schema - it won't be null / undefined
-        date = data["scan"]["end_time"]
+        date = datetime.strptime(data["scan"]["end_time"], "%Y-%m-%dT%H:%M:%S")
 
         # Vulnerabilities is stored on vulnerabilities key
         vulnerabilities = data["vulnerabilities"]

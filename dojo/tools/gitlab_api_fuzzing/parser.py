@@ -11,13 +11,13 @@ class GitlabAPIFuzzingParser(object):
     """
 
     def get_scan_types(self):
-        return ["GitLab API Fuzzing Report Scan"]
+        return ["GitLab API Fuzzing Scan"]
 
     def get_label_for_scan_types(self, scan_type):
-        return "GitLab API Fuzzing Report Scan"
+        return "GitLab API Fuzzing Scan"
 
     def get_description_for_scan_types(self, scan_type):
-        return "GitLab API Fuzzing Report report file can be imported in JSON format (option --json)."
+        return "GitLab API Fuzzing scanning report file can be imported in JSON format (option --json)."
 
     def get_findings(self, file, test):
         findings = []
