@@ -1912,13 +1912,14 @@ def finding_bulk_update_all(request, pid=None):
                 skipped_risk_accept_count = 0
                 if form.cleaned_data['risk_acceptance']:
                     for finding in finds:
-                        if form.cleaned_data['risk_accept']:
-                            if not finding.test.engagement.product.enable_simple_risk_acceptance:
-                                skipped_risk_accept_count += 1
-                            else:
-                                ra_helper.simple_risk_accept(finding)
-                        elif form.cleaned_data['risk_unaccept']:
-                            ra_helper.risk_unaccept(finding)
+                        if not finding.duplicate:
+                            if form.cleaned_data['risk_accept']:
+                                if not finding.test.engagement.product.enable_simple_risk_acceptance:
+                                    skipped_risk_accept_count += 1
+                                else:
+                                    ra_helper.simple_risk_accept(finding)
+                            elif form.cleaned_data['risk_unaccept']:
+                                ra_helper.risk_unaccept(finding)
 
                     for prod in prods:
                         calculate_grade(prod)

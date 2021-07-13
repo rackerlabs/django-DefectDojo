@@ -109,10 +109,11 @@ def remove_finding_from_risk_acceptance(risk_acceptance, finding):
 
 def add_findings_to_risk_acceptance(risk_acceptance, findings):
     for finding in findings:
-        finding.active = False
-        finding.risk_accepted = True
-        finding.save(dedupe_option=False)
-        risk_acceptance.accepted_findings.add(finding)
+        if not finding.duplicate:
+            finding.active = False
+            finding.risk_accepted = True
+            finding.save(dedupe_option=False)
+            risk_acceptance.accepted_findings.add(finding)
     risk_acceptance.save()
 
     # best effort jira integration, no status changes

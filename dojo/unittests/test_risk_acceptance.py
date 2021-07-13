@@ -63,9 +63,6 @@ class RiskAcceptanceTestUI(DojoTestCase):
         if not any(finding.risk_accepted for finding in findings):
             return True
 
-        if not any(finding.active_risk_acceptance for finding in findings):
-            return True
-
         return False
 
     def assert_all_inactive_risk_accepted(self, findings):
@@ -73,9 +70,6 @@ class RiskAcceptanceTestUI(DojoTestCase):
             return False
 
         if all(finding.risk_accepted for finding in findings):
-            return True
-
-        if all(finding.active_risk_acceptance for finding in findings):
             return True
 
         return False
@@ -247,15 +241,15 @@ class RiskAcceptanceTestUI(DojoTestCase):
         ra1 = Risk_Acceptance.objects.last()
 
         ra_data = copy.copy(self.data_risk_accceptance)
-        ra_data['accepted_findings'] = [3]
-        ra_data['return_url'] = reverse('view_finding', args=(3, ))
-        response = self.add_risk_acceptance(1, ra_data, 3)
+        ra_data['accepted_findings'] = [7]
+        ra_data['return_url'] = reverse('view_finding', args=(7, ))
+        response = self.add_risk_acceptance(1, ra_data, 7)
         ra2 = Risk_Acceptance.objects.last()
 
         ra_data = copy.copy(self.data_risk_accceptance)
-        ra_data['accepted_findings'] = [4]
-        ra_data['return_url'] = reverse('view_finding', args=(4, ))
-        response = self.add_risk_acceptance(1, ra_data, 4)
+        ra_data['accepted_findings'] = [22]
+        ra_data['return_url'] = reverse('view_finding', args=(22, ))
+        response = self.add_risk_acceptance(3, ra_data, 22)
         ra3 = Risk_Acceptance.objects.last()
 
         return ra1, ra2, ra3
