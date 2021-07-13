@@ -483,16 +483,15 @@ XML file from IBM App Scanner.
 
 XML Scan Result File from Immuniweb Scan.
 
-IntSights Report
---------------
+###IntSights Report
 
 IntSights Threat Command is a commercial Threat Intelligence platform that monitors both the open and dark web to identify threats for the Assets you care about (Domain Names, IP addresses, Brand Names, etc.).
 
-### Manual Import
-Use the Export CSV feature in the IntSights Threat Command GUI to create an *IntSights Alerts.csv* file. This CSV
+#### Manual Import
+Use the Export CSV feature in the IntSights Threat Command GUI to create an *IntSights Alerts.csv* file. This CSV 
 file can then be imported into Defect Dojo.
 
-### Automated Import
+#### Automated Import
 
 The IntSights `get-complete-alert` API only returns details for a single alert. To automate the process,
 individually fetch details for each alert and append to a list. The list is then saved as the value for the key
@@ -673,9 +672,24 @@ see
 
 ### Qualys Scan
 
+#### Qualys Scan Report (XML)
+
 Qualys output files can be imported in API XML format. Qualys output
 files can be imported in WebGUI XML format.
 
+#### Qualys Scan Report (CSV)
+Qualys Scan Report in CSV format. Include the following detailed results in the Report Template
+```
+ Vulnerability Details
+     Threat
+     Impact
+   Solution
+        Patches and Workarounds
+        Virtual Patches and Mitigating Controls
+     Compliance
+     Exploitability
+     Associated Malware
+```
 ### Qualys Webapp Scan
 
 Qualys WebScan output files can be imported in XML format.
@@ -883,6 +897,18 @@ Detailed XML Report
 ### Wapiti Scan
 
 Import XML report.
+
+### WhiteHat Sentinel Dynamic Scan
+WhiteHat Sentinel Dynamic is a commercial cloud-based DAST platform. All Findings are verified by security engineers 
+and thus 
+there is an extremely low false-positive rate.
+
+Use the WhiteHat Sentinel *vuln* API and query below to fetch vulnerabilities for the site in question.
+
+`vuln?query_site={site_id}&format=json&display_attack_vectors=open&display_request=1&display_response=0&display_body=0&display_description=custom&display_solution=1&display_custom_risk=1&display_risk=1&display_body_match=0&display_headers=0&query_status=open`
+
+The JSON output from this API can be saved to a file for manual import, or be imported directly via the Defect Dojo API.
+
 
 ### Whitesource Scan
 

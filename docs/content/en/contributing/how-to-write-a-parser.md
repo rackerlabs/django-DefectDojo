@@ -196,7 +196,8 @@ For ex:
 
 ### Test database
 
-To test your unit tests locally, you first need to grant some rights. Get your MySQL root password from the docker-compose logs, login as root and issue the following commands:
+To test your unit tests locally, you first need to grant some rights. Get your MySQL root password from the 
+docker-compose logs by looking for the entry ```[Note] [Entrypoint]: GENERATED ROOT PASSWORD:```, login as root and issue the following commands:
 
 {{< highlight mysql >}}
 MYSQL> grant all privileges on test_defectdojo.* to defectdojo@'%';

@@ -1,0 +1,58 @@
+"ReportName","06/08/2021 at 18:39:05 (GMT+0000)"
+"Company Name","123 Fake St.",,"Springfield","Oregon","United States of America","97475"
+"User Name","org","Manager"
+
+"IP","Network","DNS","NetBIOS","Tracking Method","OS","IP Status","QID","Title","Vuln Status","Type","Severity","Port","Protocol","FQDN","SSL","First Detected","Last Detected","Times Detected","Date Last Fixed","CVE ID","Vendor Reference","Bugtraq ID","CVSS3","CVSS3 Base","CVSS3 Temporal","Threat","Impact","Solution","Exploitability","Associated Malware","PCI Vuln","Ticket State","Instance","OS CPE","Category","Associated Tags"
+"10.98.57.180","Global Default Network","ip-10-98-57-180.eu-west-1.compute.internal","EC2AMAZ-IU0C43L","QAGENT","Windows Server 2016 Datacenter 64 bit Edition Version 1607","host scanned, found vuln","105971","EOL/Obsolete Software: Microsoft ASP.NET 1.0 Detected","Active","Vuln","5",,,,,"05/13/2021 07:08:28","05/25/2021 07:36:58","74",,,"Microsoft ASP.NET End of Life",,"7.4","8.1 (AV:N/AC:H/PR:N/UI:N/S:U/C:H/I:H/A:H)","7.4 (E:U/RL:U/RC:C)","Microsoft ASP.NET 1.0 has reached product End of Life in its support cycle on June 27, 2019 .
+No further bug fixes, enhancements, security updates or technical support is available for this version.
+QID Detection Logic (Authenticated):
+The qid looks for sub directories under %programfiles%\dotnet\shared\Microsoft.NETCore.App, %programfiles(x86)%\dotnet\shared\Microsoft.NETCore.App and checks for vulnerable versions in .version file on Windows.","The system is at high risk of being exposed to security vulnerabilities. Since the vendor no longer provides updates, obsolete software is more vulnerable to viruses and other attacks.","Upgrade to the latest supported Microsoft ASP.NET. Refer to dotnet-core (https://docs.microsoft.com/en-us/lifecycle/products/microsoft-net-and-net-core).",,,"yes","Open",,,"Security Policy","AWS, Cloud Agent"
+"10.98.57.180","Global Default Network","ip-10-98-57-180.eu-west-1.compute.internal","EC2AMAZ-IU0C43L","QAGENT","Windows Server 2016 Datacenter 64 bit Edition Version 1607","host scanned, found vuln","105970","EOL/Obsolete Software: Microsoft ASP.NET 1.1 Detected","Active","Vuln","5",,,,,"05/13/2021 07:08:28","05/25/2021 07:36:58","74",,,"Microsoft ASP.NET End of Life",,"7.4","8.1 (AV:N/AC:H/PR:N/UI:N/S:U/C:H/I:H/A:H)","7.4 (E:U/RL:U/RC:C)","Microsoft ASP.NET 1.1 has reached product End of Life in its support cycle on June 27, 2019 .
+No further bug fixes, enhancements, security updates or technical support is available for this version.
+QID Detection Logic (Authenticated):
+The qid looks for sub directories under %programfiles%\dotnet\shared\Microsoft.NETCore.App, %programfiles(x86)%\dotnet\shared\Microsoft.NETCore.App and checks for vulnerable versions in .version file on Windows.","The system is at high risk of being exposed to security vulnerabilities. Since the vendor no longer provides updates, obsolete software is more vulnerable to viruses and other attacks.","Upgrade to the latest supported Microsoft ASP.NET. Refer to dotnet-core (https://docs.microsoft.com/en-us/lifecycle/products/microsoft-net-and-net-core).",,,"yes","Open",,,"Security Policy","AWS, Cloud Agent"
+"10.98.57.180","Global Default Network","ip-10-98-57-180.eu-west-1.compute.internal","EC2AMAZ-IU0C43L","QAGENT","Windows Server 2016 Datacenter 64 bit Edition Version 1607","host scanned, found vuln","91762","Microsoft Windows Security Update for May 2021","Active","Vuln","5",,,,,"05/13/2021 07:08:28","05/25/2021 07:36:58","74",,"CVE-2021-31192, CVE-2021-31188, CVE-2021-31170, CVE-2021-28476, CVE-2021-31184, CVE-2021-31190, CVE-2021-31167, CVE-2021-31168, CVE-2021-31208, CVE-2021-31169, CVE-2021-31165, CVE-2021-1720, CVE-2021-28479, CVE-2021-31185, CVE-2021-31194, CVE-2021-31191, CVE-2021-31186, CVE-2021-31205, CVE-2021-31193, CVE-2021-31187, CVE-2020-26144, CVE-2020-24587, CVE-2020-24588","KB5003169, KB5003171, KB5003172, KB5003174, KB5003197, KB5003203, KB5003208, KB5003209, KB5003210, KB5003220, KB5003225, KB5003228, KB5003233",,"8.6","9.9 (AV:N/AC:L/PR:L/UI:N/S:C/C:H/I:H/A:H)","8.6 (E:U/RL:O/RC:C)","Microsoft releases the security update for Windows May 2021
+The KB Articles associated with the update:
+KB5003169 (https://support.microsoft.com/en-us/help/5003169)
+KB5003171 (https://support.microsoft.com/en-us/help/5003171)
+KB5003172 (https://support.microsoft.com/en-us/help/5003172)
+KB5003174 (https://support.microsoft.com/en-us/help/5003174)
+KB5003197 (https://support.microsoft.com/en-us/help/5003197)
+KB5003203 (https://support.microsoft.com/en-us/help/5003203)
+KB5003208 (https://support.microsoft.com/en-us/help/5003208)
+KB5003209 (https://support.microsoft.com/en-us/help/5003209)
+KB5003210 (https://support.microsoft.com/en-us/help/5003210)
+KB5003220 (https://support.microsoft.com/en-us/help/5003220)
+KB5003225 (https://support.microsoft.com/en-us/help/5003225)
+KB5003228 (https://support.microsoft.com/en-us/help/5003228)
+KB5003233 (https://support.microsoft.com/en-us/help/5003233)
+ This QID checks for the file version of ntoskrnl.exe
+ The following versions of ntoskrnl.exe with their corresponding KBs are verified:
+KB5003169 -
+KB5003171 -
+KB5003172 -
+KB5003174 -
+KB5003197 -
+KB5003203 -
+KB5003208 -
+KB5003209 -
+KB5003210 -
+KB5003220 -
+KB5003225 -
+KB5003228 -
+KB5003233 -","A remote attacker could exploit this vulnerability and execute code on the target system.","Please refer to the Security Update Guide (https://portal.msrc.microsoft.com/en-us/security-guidance) for more information pertaining to these vulnerabilities.
+ Patch:
+Following are links for downloading patches to fix the vulnerabilities:
+  Microsoft Security Update Guide: WIndows (https://portal.msrc.microsoft.com/en-us/security-guidance)",,,"yes","Open",,,"Windows","AWS, Cloud Agent"
+"10.98.57.151","Global Default Network","ip-10-98-57-151.eu-west-1.compute.internal","EC2AMAZ-N4OQ6HS","QAGENT","Windows Server 2016 Datacenter 64 bit Edition Version 1607","host scanned, found vuln","105971","EOL/Obsolete Software: Microsoft ASP.NET 1.0 Detected","Active","Vuln","5",,,,,"05/25/2021 15:13:02","06/08/2021 11:08:19","50","06/07/2021 22:53:26",,"Microsoft ASP.NET End of Life",,"7.4","8.1 (AV:N/AC:H/PR:N/UI:N/S:U/C:H/I:H/A:H)","7.4 (E:U/RL:U/RC:C)","Microsoft ASP.NET 1.0 has reached product End of Life in its support cycle on June 27, 2019 .
+No further bug fixes, enhancements, security updates or technical support is available for this version.
+QID Detection Logic (Authenticated):
+The qid looks for sub directories under %programfiles%\dotnet\shared\Microsoft.NETCore.App, %programfiles(x86)%\dotnet\shared\Microsoft.NETCore.App and checks for vulnerable versions in .version file on Windows.","The system is at high risk of being exposed to security vulnerabilities. Since the vendor no longer provides updates, obsolete software is more vulnerable to viruses and other attacks.","Upgrade to the latest supported Microsoft ASP.NET. Refer to dotnet-core (https://docs.microsoft.com/en-us/lifecycle/products/microsoft-net-and-net-core).",,,"yes","Open",,,"Security Policy","AWS, Cloud Agent"
+"10.98.49.209","Global Default Network","ip-10-98-49-209.eu-west-1.compute.internal","EC2AMAZ-N4OQ6HS","QAGENT","Windows Server 2016 Datacenter 64 bit Edition Version 1607","host scanned, found vuln","105971","EOL/Obsolete Software: Microsoft ASP.NET 1.0 Detected","Active","Vuln","5",,,,,"05/26/2021 09:46:37","06/08/2021 12:18:00","44","05/27/2021 00:38:46",,"Microsoft ASP.NET End of Life",,"7.4","8.1 (AV:N/AC:H/PR:N/UI:N/S:U/C:H/I:H/A:H)","7.4 (E:U/RL:U/RC:C)","Microsoft ASP.NET 1.0 has reached product End of Life in its support cycle on June 27, 2019 .
+No further bug fixes, enhancements, security updates or technical support is available for this version.
+QID Detection Logic (Authenticated):
+The qid looks for sub directories under %programfiles%\dotnet\shared\Microsoft.NETCore.App, %programfiles(x86)%\dotnet\shared\Microsoft.NETCore.App and checks for vulnerable versions in .version file on Windows.","The system is at high risk of being exposed to security vulnerabilities. Since the vendor no longer provides updates, obsolete software is more vulnerable to viruses and other attacks.","Upgrade to the latest supported Microsoft ASP.NET. Refer to dotnet-core (https://docs.microsoft.com/en-us/lifecycle/products/microsoft-net-and-net-core).",,,"yes","Open",,,"Security Policy","AWS, Cloud Agent"
+"10.98.35.11","Global Default Network","ip-10-98-35-11.eu-west-1.compute.internal","EC2AMAZ-N4OQ6HS","QAGENT","Windows Server 2016 Datacenter 64 bit Edition Version 1607","host scanned, found vuln","105971","EOL/Obsolete Software: Microsoft ASP.NET 1.0 Detected","Active","Vuln","5",,,,,"06/02/2021 17:08:57","06/08/2021 11:53:11","37",,,"Microsoft ASP.NET End of Life",,"7.4","8.1 (AV:N/AC:H/PR:N/UI:N/S:U/C:H/I:H/A:H)","7.4 (E:U/RL:U/RC:C)","Microsoft ASP.NET 1.0 has reached product End of Life in its support cycle on June 27, 2019 .
+No further bug fixes, enhancements, security updates or technical support is available for this version.
+QID Detection Logic (Authenticated):
+The qid looks for sub directories under %programfiles%\dotnet\shared\Microsoft.NETCore.App, %programfiles(x86)%\dotnet\shared\Microsoft.NETCore.App and checks for vulnerable versions in .version file on Windows.","The system is at high risk of being exposed to security vulnerabilities. Since the vendor no longer provides updates, obsolete software is more vulnerable to viruses and other attacks.","Upgrade to the latest supported Microsoft ASP.NET. Refer to dotnet-core (https://docs.microsoft.com/en-us/lifecycle/products/microsoft-net-and-net-core).",,,"yes","Open",,,"Security Policy","AWS, Cloud Agent"
